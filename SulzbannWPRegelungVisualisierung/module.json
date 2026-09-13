@@ -1,0 +1,13 @@
+{
+    "id": "{99579F07-CC3D-432E-891D-1EAB9E024762}",
+    "name": "Sulzbann WP Regelung Visualisierung",
+    "type": 3,
+    "vendor": "Sulzbann",
+    "aliases": [
+        "Sulzbann WP Regelung Visu"
+    ],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "SBWRV"
+}
