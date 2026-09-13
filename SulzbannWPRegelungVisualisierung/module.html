@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<style>
+
+:root {
+
+    --bg: #f4f6f7;
+    --surface: #ffffff;
+
+    --text: #17191c;
+    --muted: #65727b;
+
+    --border: #c9d1d5;
+
+    --green: #249665;
+    --green-soft: #e3f3eb;
+
+    --red: #d7484e;
+    --red-soft: #f8e4e5;
+
+    --blue: #1685d1;
+    --blue-soft: #e0eff9;
+
+    --orange: #cf8c15;
+    --orange-soft: #f7ecd9;
+
+    --grey: #78909c;
+    --grey-soft: #edf1f3;
+}
+
+
+@media (prefers-color-scheme: dark) {
+
+    :root {
+
+        --bg: #071721;
+        --surface: #102532;
+
+        --text: #f4f7f9;
+        --muted: #a7bac5;
+
+        --border: #35505f;
+
+        --green: #28c886;
+        --green-soft: #123d2e;
+
+        --red: #ff5460;
+        --red-soft: #482329;
+
+        --blue: #35a7f2;
+        --blue-soft: #153c55;
+
+        --orange: #f1ad37;
+        --orange-soft: #49361b;
+
+        --grey: #91a5af;
+        --grey-soft: #253844;
+    }
+}
+
+
+* {
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    color: var(--text);
+}
+
+
+body {
+    padding: 10px;
+}
+
+
+.dashboard {
+
+    width: 100%;
+
+    display: grid;
+
+    gap: 10px;
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.header {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        auto;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 12px 14px;
+
+    background: var(--surface);
+
+    border:
+        1px
+        solid
+        var(--border);
+
+    border-radius: 12px;
+}
+
+
+.header-title {
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.header-sub {
+
+    margin-top: 2px;
+
+    font-size: 12px;
+
+    color: var(--muted);
+}
+
+
+.mode {
+
+    min-width: 105px;
+
+    padding: 8px 12px;
+
+    border-radius: 9px;
+
+    text-align: center;
+
+    font-size: 15px;
+    font-weight: 750;
+
+    background: var(--grey-soft);
+    color: var(--grey);
+}
+
+
+.mode.heating {
+
+    background: var(--red-soft);
+    color: var(--red);
+}
+
+
+.mode.cooling {
+
+    background: var(--blue-soft);
+    color: var(--blue);
+}
+
+
+.mode.warning {
+
+    background: var(--orange-soft);
+    color: var(--orange);
+}
+
+
+.settings-button {
+
+    min-height: 40px;
+
+    padding: 0 15px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    background: var(--grey-soft);
+
+    color: var(--text);
+
+    font: inherit;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    cursor: pointer;
+}
+
+
+.settings-button:hover {
+    filter: brightness(1.05);
+}
+
+
+/* ============================================================
+   GRID
+============================================================ */
+
+.grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(180px, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.card {
+
+    min-width: 0;
+
+    padding: 12px;
+
+    background: var(--surface);
+
+    border:
+        1px
+        solid
+        var(--border);
+
+    border-radius: 12px;
+}
+
+
+.card-title {
+
+    margin-bottom: 9px;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+.row {
+
+    min-height: 27px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+
+    padding: 3px 0;
+
+    border-bottom:
+        1px
+        solid
+        color-mix(
+            in srgb,
+            var(--border),
+            transparent 60%
+        );
+}
+
+
+.row:last-child {
+    border-bottom: none;
+}
+
+
+.label {
+
+    min-width: 0;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+
+.value {
+
+    flex: 0 0 auto;
+
+    text-align: right;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   STATUSBADGES
+============================================================ */
+
+.badge {
+
+    display: inline-flex;
+
+    min-width: 47px;
+    height: 23px;
+
+    padding: 0 7px;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    font-size: 11px;
+    font-weight: 750;
+}
+
+
+.badge.yes {
+
+    color: var(--green);
+    background: var(--green-soft);
+}
+
+
+.badge.no {
+
+    color: var(--grey);
+    background: var(--grey-soft);
+}
+
+
+/* ============================================================
+   MASTER
+============================================================ */
+
+.master {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        1fr;
+
+    gap: 8px;
+}
+
+
+.master-box {
+
+    padding: 9px;
+
+    text-align: center;
+
+    border-radius: 8px;
+
+    background: var(--grey-soft);
+}
+
+
+.master-label {
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+.master-value {
+
+    margin-top: 3px;
+
+    font-size: 13px;
+    font-weight: 750;
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.status-area {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
+    gap: 10px;
+}
+
+
+.status {
+
+    padding: 11px 13px;
+
+    background: var(--surface);
+
+    border:
+        1px
+        solid
+        var(--border);
+
+    border-radius: 12px;
+}
+
+
+.status-title {
+
+    margin-bottom: 5px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.status-text {
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+    color: var(--muted);
+}
+
+
+/* ============================================================
+   SETTINGS
+============================================================ */
+
+.parameter-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap:
+        3px
+        12px;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 1050px) {
+
+    .grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(180px, 1fr)
+            );
+    }
+}
+
+
+@media (max-width: 620px) {
+
+    body {
+        padding: 6px;
+    }
+
+
+    .header {
+
+        grid-template-columns:
+            1fr
+            auto;
+    }
+
+
+    .header-main {
+
+        grid-column:
+            1 / -1;
+    }
+
+
+    .grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .status-area {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .master {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .parameter-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="dashboard">
+
+
+<!-- ============================================================
+     HEADER
+============================================================ -->
+
+<div class="header">
+
+    <div class="header-main">
+
+        <div class="header-title">
+            WP-Regelung
+        </div>
+
+        <div class="header-sub">
+            Sulzbann · Gebäude · FBH · Wetter · PV
+        </div>
+
+    </div>
+
+
+    <div class="mode {{MODE_CLASS}}">
+        {{MODE}}
+    </div>
+
+
+    <button
+        id="settingsButton"
+        class="settings-button"
+        type="button"
+    >
+        ⚙ Einstellungen
+    </button>
+
+</div>
+
+
+
+<!-- ============================================================
+     MASTER
+============================================================ -->
+
+<div class="card">
+
+    <div class="card-title">
+        WP ist Master
+    </div>
+
+
+    <div class="master">
+
+        <div class="master-box">
+
+            <div class="master-label">
+                Heizregelung
+            </div>
+
+            <div class="master-value">
+                <span class="badge {{HEATING_ACTIVE_CLASS}}">
+                    {{HEATING_ACTIVE}}
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="master-box">
+
+            <div class="master-label">
+                Kühlregelung
+            </div>
+
+            <div class="master-value">
+                <span class="badge {{COOLING_ACTIVE_CLASS}}">
+                    {{COOLING_ACTIVE}}
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="master-box">
+
+            <div class="master-label">
+                Optimierung erlaubt
+            </div>
+
+            <div class="master-value">
+                <span class="badge {{OPTIMIZATION_CLASS}}">
+                    {{OPTIMIZATION}}
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ============================================================
+     HAUPTGRID
+============================================================ -->
+
+<div class="grid">
+
+
+<!-- GEBÄUDE -->
+
+<div class="card">
+
+    <div class="card-title">
+        Gebäude
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Mittel
+        </span>
+
+        <span class="value">
+            {{TEMP_MEAN}} °C
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Minimum
+        </span>
+
+        <span class="value">
+            {{TEMP_MIN}} °C
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Maximum
+        </span>
+
+        <span class="value">
+            {{TEMP_MAX}} °C
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Trend
+        </span>
+
+        <span class="value">
+            {{TEMP_TREND}} K/h · {{TEMP_TREND_TEXT}}
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- BEDARF -->
+
+<div class="card">
+
+    <div class="card-title">
+        Bedarf
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Heizen Rohwert
+        </span>
+
+        <span class="badge {{HEAT_RAW_CLASS}}">
+            {{HEAT_RAW}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Heizen relevant
+        </span>
+
+        <span class="badge {{HEAT_RELEVANT_CLASS}}">
+            {{HEAT_RELEVANT}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Kühlen Rohwert
+        </span>
+
+        <span class="badge {{COOL_RAW_CLASS}}">
+            {{COOL_RAW}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Kühlen relevant
+        </span>
+
+        <span class="badge {{COOL_RELEVANT_CLASS}}">
+            {{COOL_RELEVANT}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            passend zur WP
+        </span>
+
+        <span class="badge {{RELEVANT_DEMAND_CLASS}}">
+            {{RELEVANT_DEMAND}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Räume H / K
+        </span>
+
+        <span class="value">
+            {{HEAT_ROOMS}} / {{COOL_ROOMS}}
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- FBH -->
+
+<div class="card">
+
+    <div class="card-title">
+        FBH / Hydraulik
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Ventile offen
+        </span>
+
+        <span class="value">
+            {{OPEN_TOTAL}} / 14
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            EG
+        </span>
+
+        <span class="value">
+            {{OPEN_EG}} / 4
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            OG
+        </span>
+
+        <span class="value">
+            {{OPEN_OG}} / 6
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Einliegerwohnung
+        </span>
+
+        <span class="value">
+            {{OPEN_ELW}} / 4
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Stellwert Ø
+        </span>
+
+        <span class="value">
+            {{DEMAND_MEAN}} %
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Stellwert max.
+        </span>
+
+        <span class="value">
+            {{DEMAND_MAX}} %
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Hydraulik verfügbar
+        </span>
+
+        <span class="badge {{HYDRAULIC_CLASS}}">
+            {{HYDRAULIC}}
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- METEO -->
+
+<div class="card">
+
+    <div class="card-title">
+        MeteoSchweiz · morgen
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Maximum
+        </span>
+
+        <span class="value">
+            {{FORECAST_MAX}} °C
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Mittel
+        </span>
+
+        <span class="value">
+            {{FORECAST_MEAN}} °C
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Minimum
+        </span>
+
+        <span class="value">
+            {{FORECAST_MIN}} °C
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Globalstrahlung
+        </span>
+
+        <span class="value">
+            {{FORECAST_SOLAR}} kWh/m²
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- PROGNOSE -->
+
+<div class="card">
+
+    <div class="card-title">
+        Wetterbewertung
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Heizen Roh
+        </span>
+
+        <span class="badge {{FORECAST_HEAT_RAW_CLASS}}">
+            {{FORECAST_HEAT_RAW}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Heizen relevant
+        </span>
+
+        <span class="badge {{FORECAST_HEAT_RELEVANT_CLASS}}">
+            {{FORECAST_HEAT_RELEVANT}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Kühlen Roh
+        </span>
+
+        <span class="badge {{FORECAST_COOL_RAW_CLASS}}">
+            {{FORECAST_COOL_RAW}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Kühlen relevant
+        </span>
+
+        <span class="badge {{FORECAST_COOL_RELEVANT_CLASS}}">
+            {{FORECAST_COOL_RELEVANT}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            passend zur WP
+        </span>
+
+        <span class="badge {{FORECAST_RELEVANT_CLASS}}">
+            {{FORECAST_RELEVANT}}
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- PV -->
+
+<div class="card">
+
+    <div class="card-title">
+        Solcast / PV
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            0–24 h P50
+        </span>
+
+        <span class="value">
+            {{PV024}} kWh
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            24–48 h P50
+        </span>
+
+        <span class="value">
+            {{PV2448}} kWh
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Peak
+        </span>
+
+        <span class="value">
+            {{PV_PEAK}} kW
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Vertrauen
+        </span>
+
+        <span class="value">
+            {{PV_CONFIDENCE}} %
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            PV gut erwartet
+        </span>
+
+        <span class="badge {{PV_GOOD_CLASS}}">
+            {{PV_GOOD}}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span class="label">
+            Vorziehen sinnvoll
+        </span>
+
+        <span class="badge {{PRESHIFT_CLASS}}">
+            {{PRESHIFT}}
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- PARAMETER -->
+
+<div class="card">
+
+    <div class="card-title">
+        Regelgrenzen
+    </div>
+
+
+    <div class="parameter-grid">
+
+        <div class="row">
+
+            <span class="label">
+                Heizen EIN
+            </span>
+
+            <span class="value">
+                {{HEAT_ON}} K
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span class="label">
+                Heizen AUS
+            </span>
+
+            <span class="value">
+                {{HEAT_OFF}} K
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span class="label">
+                Kühlen EIN
+            </span>
+
+            <span class="value">
+                {{COOL_ON}} °C
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span class="label">
+                Kühlen AUS
+            </span>
+
+            <span class="value">
+                {{COOL_OFF}} °C
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span class="label">
+                Wetter Heizmittel
+            </span>
+
+            <span class="value">
+                {{FORECAST_HEAT_MEAN}} °C
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span class="label">
+                Wetter Heizminimum
+            </span>
+
+            <span class="value">
+                {{FORECAST_HEAT_MIN}} °C
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span class="label">
+                Wetter Kühlgrenze
+            </span>
+
+            <span class="value">
+                {{FORECAST_COOL_MAX}} °C
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span class="label">
+                Globalstrahlung
+            </span>
+
+            <span class="value">
+                {{FORECAST_SOLAR_LIMIT}} kWh/m²
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span class="label">
+                PV-Grenze
+            </span>
+
+            <span class="value">
+                {{PV_LIMIT}} kWh
+            </span>
+
+        </div>
+
+
+        <div class="row">
+
+            <span class="label">
+                Mindestvertrauen
+            </span>
+
+            <span class="value">
+                {{CONFIDENCE_LIMIT}} %
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+
+<!-- ============================================================
+     STATUS
+============================================================ -->
+
+<div class="status-area">
+
+    <div class="status">
+
+        <div class="status-title">
+            Bedarfsstatus
+        </div>
+
+        <div class="status-text">
+            {{BEDARF_STATUS}}
+        </div>
+
+    </div>
+
+
+    <div class="status">
+
+        <div class="status-title">
+            Prognosestatus
+        </div>
+
+        <div class="status-text">
+            {{FORECAST_STATUS}}
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+/*
+ * ============================================================
+ * EINSTELLUNGEN ÖFFNEN
+ * ============================================================
+ *
+ * IP-Symcon >= 8.2 stellt im HTML SDK openObject() bereit.
+ *
+ * Damit öffnen wir direkt:
+ *
+ * Siemens OWZ
+ *   > WP Regelung
+ *     > Parameter
+ */
+
+const settingsButton =
+    document.getElementById(
+        'settingsButton'
+    );
+
+
+if (settingsButton) {
+
+    settingsButton.addEventListener(
+        'click',
+        function () {
+
+            const objectID =
+                Number(
+                    '{{PARAMETER_CATEGORY_ID}}'
+                );
+
+
+            if (
+                !Number.isInteger(objectID)
+                ||
+                objectID <= 0
+            ) {
+
+                return;
+            }
+
+
+            if (
+                typeof openObject
+                ===
+                'function'
+            ) {
+
+                openObject(
+                    objectID
+                );
+            }
+
+        }
+    );
+}
+
+</script>
+
+</body>
+
+</html>
