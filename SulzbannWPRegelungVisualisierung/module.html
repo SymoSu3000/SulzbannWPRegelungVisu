@@ -14,6 +14,10 @@
 
 <style>
 
+/* ============================================================
+   THEME
+============================================================ */
+
 :root {
     color-scheme: light dark;
 
@@ -106,6 +110,10 @@
 }
 
 
+/* ============================================================
+   BASIS
+============================================================ */
+
 * {
     box-sizing:border-box;
 }
@@ -148,9 +156,15 @@ button {
 }
 
 
+/* ============================================================
+   KACHEL
+============================================================ */
+
 .view-shell {
     width:100%;
     height:100%;
+
+    min-height:0;
 
     padding:
         50px
@@ -171,7 +185,16 @@ button {
 }
 
 
+/* ============================================================
+   HEADER
+============================================================ */
+
 .compact-head {
+    flex:
+        0
+        0
+        auto;
+
     display:flex;
 
     align-items:center;
@@ -238,35 +261,15 @@ button {
     margin-top:2px;
 
     font-size:17px;
-    font-weight:700;
-
-    line-height:1.15;
-}
-
-
-.value {
-    margin-top:3px;
-
-    font-size:17px;
     line-height:1.15;
 
     font-weight:700;
 }
 
 
-.card {
-    background:var(--sb-card);
-
-    border:
-        1px
-        solid
-        var(--sb-border);
-
-    border-radius:9px;
-
-    min-width:0;
-}
-
+/* ============================================================
+   BUTTONS
+============================================================ */
 
 .actions {
     display:flex;
@@ -274,6 +277,11 @@ button {
     align-items:center;
 
     gap:6px;
+
+    flex:
+        0
+        0
+        auto;
 }
 
 
@@ -304,12 +312,81 @@ button {
 }
 
 
+.action-button:active {
+    opacity:.72;
+}
+
+
 .action-button:disabled {
     opacity:.38;
 
     cursor:default;
 }
 
+
+/* ============================================================
+   SCROLLBEREICH
+============================================================ */
+
+/*
+ * WICHTIG:
+ *
+ * Nur dieser Datenbereich scrollt.
+ *
+ * Header + Grossbutton + Einstellungsbutton bleiben immer sichtbar.
+ *
+ * Kein overscroll-behavior:contain:
+ * damit die mobile Gesamtvisualisierung am Scrollende nicht
+ * unnötig eingeschlossen wird.
+ */
+
+.compact-scroll {
+    flex:
+        1
+        1
+        auto;
+
+    min-height:0;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    -webkit-overflow-scrolling:touch;
+
+    touch-action:pan-y;
+
+    scrollbar-width:thin;
+
+    padding-right:2px;
+    padding-bottom:4px;
+}
+
+
+.compact-scroll::-webkit-scrollbar {
+    width:5px;
+}
+
+
+.compact-scroll::-webkit-scrollbar-thumb {
+    border-radius:10px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--sb-text) 24%,
+            transparent
+        );
+}
+
+
+.compact-scroll::-webkit-scrollbar-track {
+    background:transparent;
+}
+
+
+/* ============================================================
+   DATENKARTEN
+============================================================ */
 
 .compact-grid {
     display:grid;
@@ -323,6 +400,20 @@ button {
     gap:6px;
 
     min-height:0;
+}
+
+
+.card {
+    background:var(--sb-card);
+
+    border:
+        1px
+        solid
+        var(--sb-border);
+
+    border-radius:9px;
+
+    min-width:0;
 }
 
 
@@ -340,6 +431,20 @@ button {
     justify-content:center;
 }
 
+
+.value {
+    margin-top:3px;
+
+    font-size:17px;
+    line-height:1.15;
+
+    font-weight:700;
+}
+
+
+/* ============================================================
+   RESPONSIVE TABLET / MOBILE
+============================================================ */
 
 @media (max-width:700px) {
 
@@ -412,10 +517,18 @@ button {
 
 
 
+<!-- ============================================================
+     COMPACT TEMPLATE
+============================================================ -->
+
 <template id="compactTemplate">
 
     <div class="view-shell compact">
 
+
+        <!-- ====================================================
+             KOPF BLEIBT IMMER SICHTBAR
+        ===================================================== -->
 
         <div class="compact-head">
 
@@ -449,6 +562,7 @@ button {
 
             <div class="actions">
 
+
                 <button
                     data-role="grossButton"
                     class="action-button"
@@ -470,208 +584,220 @@ button {
                     ⚙
                 </button>
 
+
             </div>
 
         </div>
 
 
 
-        <div class="compact-grid">
+        <!-- ====================================================
+             NUR DIESER BEREICH SCROLLT
+        ===================================================== -->
+
+        <div class="compact-scroll">
 
 
-            <div class="card compact-card">
+            <div class="compact-grid">
 
-                <div class="label">
-                    Aussentemperatur
+
+                <div class="card compact-card">
+
+                    <div class="label">
+                        Aussentemperatur
+                    </div>
+
+                    <div
+                        class="value"
+                        data-role="outside"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-                <div
-                    class="value"
-                    data-role="outside"
-                >
-                    —
+
+                <div class="card compact-card">
+
+                    <div class="label">
+                        WP Vorlauf
+                    </div>
+
+                    <div
+                        class="value"
+                        data-role="flow"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-            </div>
 
+                <div class="card compact-card">
 
-            <div class="card compact-card">
+                    <div class="label">
+                        WP Rücklauf
+                    </div>
 
-                <div class="label">
-                    WP Vorlauf
+                    <div
+                        class="value"
+                        data-role="return"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-                <div
-                    class="value"
-                    data-role="flow"
-                >
-                    —
+
+                <div class="card compact-card">
+
+                    <div class="label">
+                        Raumtemperatur Ø
+                    </div>
+
+                    <div
+                        class="value"
+                        data-role="roomAverage"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-            </div>
 
+                <div class="card compact-card">
 
-            <div class="card compact-card">
+                    <div class="label">
+                        FBH Ventile
+                    </div>
 
-                <div class="label">
-                    WP Rücklauf
+                    <div
+                        class="value"
+                        data-role="valvesOpen"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-                <div
-                    class="value"
-                    data-role="return"
-                >
-                    —
+
+                <div class="card compact-card">
+
+                    <div class="label">
+                        Stellwert max.
+                    </div>
+
+                    <div
+                        class="value"
+                        data-role="demandMaximum"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-            </div>
 
+                <div class="card compact-card">
 
-            <div class="card compact-card">
+                    <div class="label">
+                        Boiler oben
+                    </div>
 
-                <div class="label">
-                    Raumtemperatur Ø
+                    <div
+                        class="value"
+                        data-role="dhwTop"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-                <div
-                    class="value"
-                    data-role="roomAverage"
-                >
-                    —
+
+                <div class="card compact-card">
+
+                    <div class="label">
+                        Boiler unten
+                    </div>
+
+                    <div
+                        class="value"
+                        data-role="dhwBottom"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-            </div>
 
+                <div class="card compact-card">
 
-            <div class="card compact-card">
+                    <div class="label">
+                        Puffer oben
+                    </div>
 
-                <div class="label">
-                    FBH Ventile
+                    <div
+                        class="value"
+                        data-role="bufferTop"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-                <div
-                    class="value"
-                    data-role="valvesOpen"
-                >
-                    —
+
+                <div class="card compact-card">
+
+                    <div class="label">
+                        Puffer Mitte
+                    </div>
+
+                    <div
+                        class="value"
+                        data-role="bufferMiddle"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-            </div>
 
+                <div class="card compact-card">
 
-            <div class="card compact-card">
+                    <div class="label">
+                        Puffer unten
+                    </div>
 
-                <div class="label">
-                    Stellwert max.
+                    <div
+                        class="value"
+                        data-role="bufferBottom"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-                <div
-                    class="value"
-                    data-role="demandMaximum"
-                >
-                    —
+
+                <div class="card compact-card">
+
+                    <div class="label">
+                        WP Modulation
+                    </div>
+
+                    <div
+                        class="value"
+                        data-role="modulation"
+                    >
+                        —
+                    </div>
+
                 </div>
 
-            </div>
-
-
-            <div class="card compact-card">
-
-                <div class="label">
-                    Boiler oben
-                </div>
-
-                <div
-                    class="value"
-                    data-role="dhwTop"
-                >
-                    —
-                </div>
-
-            </div>
-
-
-            <div class="card compact-card">
-
-                <div class="label">
-                    Boiler unten
-                </div>
-
-                <div
-                    class="value"
-                    data-role="dhwBottom"
-                >
-                    —
-                </div>
-
-            </div>
-
-
-            <div class="card compact-card">
-
-                <div class="label">
-                    Puffer oben
-                </div>
-
-                <div
-                    class="value"
-                    data-role="bufferTop"
-                >
-                    —
-                </div>
-
-            </div>
-
-
-            <div class="card compact-card">
-
-                <div class="label">
-                    Puffer Mitte
-                </div>
-
-                <div
-                    class="value"
-                    data-role="bufferMiddle"
-                >
-                    —
-                </div>
-
-            </div>
-
-
-            <div class="card compact-card">
-
-                <div class="label">
-                    Puffer unten
-                </div>
-
-                <div
-                    class="value"
-                    data-role="bufferBottom"
-                >
-                    —
-                </div>
-
-            </div>
-
-
-            <div class="card compact-card">
-
-                <div class="label">
-                    WP Modulation
-                </div>
-
-                <div
-                    class="value"
-                    data-role="modulation"
-                >
-                    —
-                </div>
 
             </div>
 
 
         </div>
+
 
     </div>
 
@@ -700,8 +826,12 @@ let currentData =
         {};
 
 
-let refreshAttempts = 0;
-let refreshTimer = null;
+let refreshAttempts =
+    0;
+
+
+let refreshTimer =
+    null;
 
 
 /* ============================================================
@@ -736,7 +866,8 @@ function cloneValue(value) {
         isObject(value)
     ) {
 
-        const out = {};
+        const out =
+            {};
 
 
         Object.keys(
@@ -812,8 +943,8 @@ function mergeData(
 
 
             /*
-             * null / undefined darf einen bereits gültigen Wert
-             * nicht zerstören.
+             * null / undefined darf gültige bestehende
+             * Daten nicht löschen.
              */
             if (
                 next === null
@@ -845,9 +976,9 @@ function mergeData(
 
 
 /*
- * Nur Payloads aus unserer eigenen Visualisierung akzeptieren.
- * Fremde/leere Objekt-Nachrichten dürfen currentData nicht ersetzen.
+ * Nur erwartete WP-Regelungs-Payloads übernehmen.
  */
+
 function isExpectedPayload(data) {
 
     if (
@@ -884,8 +1015,9 @@ function isExpectedPayload(data) {
 
 
 /*
- * Prüft, ob fachlich brauchbare Kerndaten vorhanden sind.
+ * Prüft, ob fachliche Kerndaten vorhanden sind.
  */
+
 function hasCoreData() {
 
     const wp =
@@ -999,7 +1131,9 @@ function setRoleText(
 function isNumber(value) {
 
     return (
-        typeof value === "number"
+        typeof value
+        ===
+        "number"
         &&
         Number.isFinite(value)
     );
@@ -1074,6 +1208,7 @@ function renderCompact() {
 
 
     bindButtons();
+
     applyData();
 }
 
@@ -1108,8 +1243,7 @@ function openLocalObject(
     try {
 
         /*
-         * Offizieller HTML-SDK-Weg:
-         * öffnet im aktuell auslösenden Client.
+         * Nur der auslösende Client navigiert.
          */
         openObject(
             target
@@ -1148,6 +1282,7 @@ function bindButtons() {
                 event => {
 
                     event.preventDefault();
+
                     event.stopPropagation();
 
 
@@ -1157,10 +1292,6 @@ function bindButtons() {
                         )
                     ) {
 
-                        /*
-                         * Ziel-ID fehlt eventuell nur,
-                         * weil Livewerte noch nicht eingetroffen sind.
-                         */
                         requestRefresh(
                             true
                         );
@@ -1182,6 +1313,7 @@ function bindButtons() {
                 event => {
 
                     event.preventDefault();
+
                     event.stopPropagation();
 
 
@@ -1219,7 +1351,9 @@ function applyData() {
 
 
     const wp =
-        isObject(d.wp)
+        isObject(
+            d.wp
+        )
             ?
             d.wp
             :
@@ -1227,7 +1361,9 @@ function applyData() {
 
 
     const rooms =
-        isObject(d.rooms)
+        isObject(
+            d.rooms
+        )
             ?
             d.rooms
             :
@@ -1235,7 +1371,9 @@ function applyData() {
 
 
     const fbh =
-        isObject(d.fbh)
+        isObject(
+            d.fbh
+        )
             ?
             d.fbh
             :
@@ -1243,7 +1381,9 @@ function applyData() {
 
 
     const dhw =
-        isObject(d.dhw)
+        isObject(
+            d.dhw
+        )
             ?
             d.dhw
             :
@@ -1251,7 +1391,9 @@ function applyData() {
 
 
     const buffer =
-        isObject(d.buffer)
+        isObject(
+            d.buffer
+        )
             ?
             d.buffer
             :
@@ -1402,6 +1544,10 @@ function applyData() {
     );
 
 
+    /*
+     * Buttons erst aktivieren, wenn ID + openObject vorhanden.
+     */
+
     const settingsOK =
         Number(
             d.settingsObjectID
@@ -1475,7 +1621,9 @@ function applyData() {
    REFRESH / RETRY
 ============================================================ */
 
-function requestRefresh(force) {
+function requestRefresh(
+    force
+) {
 
     if (
         typeof requestAction
@@ -1505,7 +1653,9 @@ function requestRefresh(force) {
 function scheduleRefreshRetry() {
 
     if (
-        refreshTimer !== null
+        refreshTimer
+        !==
+        null
     ) {
         clearTimeout(
             refreshTimer
@@ -1592,9 +1742,9 @@ function handleMessage(data) {
 
 
     /*
-     * Leere/fremde Nachrichten dürfen gültige Initialdaten
-     * nicht mehr zerstören.
+     * Leere oder fremde Nachrichten ignorieren.
      */
+
     if (
         !isExpectedPayload(
             data
@@ -1603,6 +1753,11 @@ function handleMessage(data) {
         return;
     }
 
+
+    /*
+     * Gültige Daten ergänzen.
+     * Bestehende Initialdaten nicht blind überschreiben.
+     */
 
     currentData =
         mergeData(
@@ -1623,7 +1778,9 @@ function handleMessage(data) {
 
 
         if (
-            refreshTimer !== null
+            refreshTimer
+            !==
+            null
         ) {
 
             clearTimeout(
@@ -1647,20 +1804,24 @@ window.addEventListener(
     () => {
 
         /*
-         * Zuerst direkt die vom PHP eingebetteten Initialdaten
-         * darstellen.
+         * Initialdaten sofort anzeigen.
          */
+
         renderCompact();
 
 
         /*
-         * Nur wenn Daten fehlen, Refresh anfordern.
-         * Danach maximal zwei zeitversetzte Retries.
+         * Nur bei fehlenden Daten Refresh.
          */
+
         requestRefresh(
             false
         );
 
+
+        /*
+         * Maximal zwei kurze Retries.
+         */
 
         scheduleRefreshRetry();
     }
