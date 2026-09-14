@@ -1,0 +1,33 @@
+{
+    "elements": [
+        {
+            "type": "Label",
+            "caption": "Sulzbann WP Regelung Visualisierung"
+        },
+        {
+            "type": "Label",
+            "caption": "Eine HTMLBox: Compact-Kachel und direkte Grossansicht."
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "RenderDelay",
+            "caption": "Update-Sammelzeit in ms",
+            "minimum": 250,
+            "maximum": 5000
+        }
+    ],
+    "actions": [
+        {
+            "type": "Button",
+            "caption": "Visualisierung aktualisieren",
+            "onClick": "SBWRV_Update($id);"
+        }
+    ],
+    "status": [
+        {
+            "code": 102,
+            "icon": "active",
+            "caption": "Aktiv"
+        }
+    ]
+}
