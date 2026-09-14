@@ -414,166 +414,6 @@ button {
 
 
 /* ============================================================
-   DETAIL
-============================================================ */
-
-.detail {
-
-    height:100%;
-
-    overflow:auto;
-
-    padding-right:2px;
-}
-
-
-.detail-head {
-
-    display:flex;
-
-    align-items:center;
-    justify-content:space-between;
-
-    gap:16px;
-
-    margin-bottom:12px;
-
-    min-height:42px;
-}
-
-
-.detail-mode {
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    min-width:0;
-}
-
-
-.detail-mode-value {
-
-    font-size:21px;
-
-    font-weight:700;
-
-    line-height:1.2;
-}
-
-
-.summary-grid {
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            minmax(0,1fr)
-        );
-
-    gap:10px;
-
-    margin-bottom:10px;
-}
-
-
-.summary-card {
-
-    padding:
-        11px
-        12px;
-
-    min-height:76px;
-}
-
-
-.sections {
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0,1fr)
-        );
-
-    gap:10px;
-}
-
-
-.section {
-
-    padding:13px;
-}
-
-
-.section-title {
-
-    margin-bottom:12px;
-
-    font-size:15px;
-    line-height:1.25;
-
-    font-weight:700;
-
-    color:var(--sb-text);
-}
-
-
-.data-grid {
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0,1fr)
-        );
-
-    gap:
-        14px
-        24px;
-}
-
-
-.data-item {
-
-    min-width:0;
-
-    min-height:46px;
-}
-
-
-.peak-window {
-
-    margin-top:14px;
-
-    padding-top:12px;
-
-    border-top:
-        1px
-        solid
-        var(--sb-border);
-}
-
-
-.footer {
-
-    margin-top:10px;
-
-    text-align:right;
-
-    font-size:12px;
-    line-height:1.2;
-
-    color:var(--sb-muted);
-}
-
-
-/* ============================================================
    RESPONSIVE
 ============================================================ */
 
@@ -596,29 +436,6 @@ button {
 
     .value {
         font-size:18px;
-    }
-
-
-    .summary-grid {
-
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0,1fr)
-            );
-    }
-
-
-    .sections {
-        grid-template-columns:1fr;
-    }
-
-
-    .data-grid {
-
-        gap:
-            13px
-            16px;
     }
 
 
@@ -667,24 +484,6 @@ button {
         padding:
             8px
             9px;
-    }
-
-
-    .summary-grid {
-        gap:8px;
-    }
-
-
-    .section {
-        padding:11px;
-    }
-}
-
-
-@media (max-width:340px) {
-
-    .data-grid {
-        grid-template-columns:1fr;
     }
 }
 
@@ -831,296 +630,6 @@ button {
 
 
 
-<!-- ============================================================
-     DETAIL TEMPLATE
-============================================================ -->
-
-<template id="detailTemplate">
-
-    <div class="view-shell detail">
-
-
-        <div class="detail-head">
-
-
-            <div class="detail-mode">
-
-                <span
-                    data-role="modeDot"
-                    class="status-dot standby"
-                ></span>
-
-
-                <div>
-
-                    <div class="label">
-                        WP Master-Betriebsart
-                    </div>
-
-
-                    <div
-                        class="detail-mode-value"
-                        data-role="mode"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <button
-                data-role="settingsButton"
-                class="action-button settings-button"
-                type="button"
-                aria-label="Einstellungen"
-            >
-
-                <i class="fa-light fa-gear"></i>
-
-                <span class="settings-text">
-                    Einstellungen
-                </span>
-
-            </button>
-
-        </div>
-
-
-
-        <div class="summary-grid">
-
-            <div class="card summary-card">
-                <div class="label">Raumtemperatur Mittel</div>
-                <div class="value" data-role="roomAverage">—</div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="label">Raum Min. / Max.</div>
-                <div class="value" data-role="roomRange">—</div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="label">FBH Ventile offen</div>
-                <div class="value" data-role="valvesOpen">—</div>
-            </div>
-
-            <div class="card summary-card">
-                <div class="label">FBH Stellwert max.</div>
-                <div class="value" data-role="demandMaximum">—</div>
-            </div>
-
-        </div>
-
-
-
-        <div class="sections">
-
-
-            <div class="card section">
-
-                <div class="section-title">
-                    Wärmepumpe
-                </div>
-
-                <div class="data-grid">
-
-                    <div class="data-item">
-                        <div class="label">Aussentemperatur</div>
-                        <div class="value" data-role="outsideTemp">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Vorlauf</div>
-                        <div class="value" data-role="flowTemp">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Rücklauf</div>
-                        <div class="value" data-role="returnTemp">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Verdichtermodulation</div>
-                        <div class="value" data-role="modulation">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Leistungsaufnahme</div>
-                        <div class="value" data-role="wpPower">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Wärmeleistung</div>
-                        <div class="value" data-role="heatOutput">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">COP</div>
-                        <div class="value" data-role="cop">—</div>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="card section">
-
-                <div class="section-title">
-                    Speicher
-                </div>
-
-                <div class="data-grid">
-
-                    <div class="data-item">
-                        <div class="label">Boiler oben</div>
-                        <div class="value" data-role="dhwTop">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Boiler unten</div>
-                        <div class="value" data-role="dhwBottom">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Puffer oben</div>
-                        <div class="value" data-role="bufferTop">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Puffer Mitte</div>
-                        <div class="value" data-role="bufferMiddle">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Puffer unten</div>
-                        <div class="value" data-role="bufferBottom">—</div>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="card section">
-
-                <div class="section-title">
-                    Fussbodenheizung
-                </div>
-
-                <div class="data-grid">
-
-                    <div class="data-item">
-                        <div class="label">Ventile offen</div>
-                        <div class="value" data-role="valvesOpen">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Stellwert Mittel</div>
-                        <div class="value" data-role="demandAverage">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Stellwert Maximum</div>
-                        <div class="value" data-role="demandMaximum">—</div>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="card section">
-
-                <div class="section-title">
-                    Prognose
-                </div>
-
-                <div class="data-grid">
-
-                    <div class="data-item">
-                        <div class="label">Morgen Maximum</div>
-                        <div class="value" data-role="meteoMaximum">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Morgen Mittel</div>
-                        <div class="value" data-role="meteoMean">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Morgen Minimum</div>
-                        <div class="value" data-role="meteoMinimum">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Globalstrahlung</div>
-                        <div class="value" data-role="meteoSolar">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Solcast P50 0–24 h</div>
-                        <div class="value" data-role="solcastEnergy">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">PV Peak</div>
-                        <div class="value" data-role="solcastPeak">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Peak Zeitpunkt</div>
-                        <div class="value" data-role="solcastPeakTime">—</div>
-                    </div>
-
-                    <div class="data-item">
-                        <div class="label">Vertrauen</div>
-                        <div class="value" data-role="solcastConfidence">—</div>
-                    </div>
-
-                </div>
-
-
-                <div class="peak-window">
-
-                    <div class="label">
-                        Peakfenster
-                    </div>
-
-                    <div
-                        class="value"
-                        data-role="solcastPeakWindow"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-
-        <div
-            class="footer"
-            data-role="lastUpdate"
-        >
-            —
-        </div>
-
-
-    </div>
-
-</template>
-
-
-
 <script>
 
 "use strict";
@@ -1140,16 +649,6 @@ let currentData =
         INITIAL_DATA
         :
         {};
-
-
-/*
- * Wir zeigen im HTML-SDK selbst Compact.
- *
- * Die funktionierende Grossansicht dieses Rücksetzstandes
- * wird über WPRegelungGross geöffnet.
- */
-const currentMode =
-    "compact";
 
 
 /* ============================================================
@@ -1228,16 +727,6 @@ function fmtTemp(value) {
 }
 
 
-function fmtKW(value) {
-
-    return fmt(
-        value,
-        2,
-        " kW"
-    );
-}
-
-
 function fmtPercent(value) {
 
     return fmt(
@@ -1248,46 +737,8 @@ function fmtPercent(value) {
 }
 
 
-function fmtTime(timestamp) {
-
-    if (
-        !timestamp
-        ||
-        timestamp <= 0
-    ) {
-        return "—";
-    }
-
-
-    const d =
-        new Date(
-            timestamp
-            *
-            1000
-        );
-
-
-    if (
-        Number.isNaN(
-            d.getTime()
-        )
-    ) {
-        return "—";
-    }
-
-
-    return d.toLocaleTimeString(
-        "de-CH",
-        {
-            hour:"2-digit",
-            minute:"2-digit"
-        }
-    );
-}
-
-
 /* ============================================================
-   RENDER COMPACT
+   RENDER
 ============================================================ */
 
 function renderCompact() {
@@ -1322,11 +773,60 @@ function renderCompact() {
 
 
 /* ============================================================
+   CLIENT-LOKALE NAVIGATION
+============================================================ */
+
+function openLocalObject(
+    objectID
+) {
+
+    const target =
+        Number(
+            objectID
+            ||
+            0
+        );
+
+
+    if (
+        target <= 0
+        ||
+        typeof openObject
+        !==
+        "function"
+    ) {
+        return false;
+    }
+
+
+    /*
+     * WICHTIG:
+     *
+     * openObject() läuft direkt im aktuellen Client.
+     *
+     * Mobile-Klick:
+     * nur Mobile wechselt.
+     *
+     * Desktop bleibt unverändert.
+     */
+    openObject(
+        target
+    );
+
+
+    return true;
+}
+
+
+/* ============================================================
    BUTTONS
 ============================================================ */
 
 function bindButtons() {
 
+    /*
+     * EINSTELLUNGEN
+     */
     allRole(
         "settingsButton"
     )
@@ -1351,62 +851,26 @@ function bindButtons() {
 
 
                     if (
-                        target <= 0
+                        !openLocalObject(
+                            target
+                        )
                     ) {
 
                         button.disabled =
                             true;
 
                         button.title =
-                            "Einstellungen-Ziel wurde nicht gefunden";
-
-                        return;
+                            "Einstellungen-Ziel nicht verfügbar";
                     }
-
-
-                    /*
-                     * Bestätigter Primärweg.
-                     */
-                    if (
-                        typeof requestAction
-                        ===
-                        "function"
-                    ) {
-
-                        requestAction(
-                            "OpenSettings",
-                            true
-                        );
-
-                        return;
-                    }
-
-
-                    /*
-                     * Fallback.
-                     */
-                    if (
-                        typeof openObject
-                        ===
-                        "function"
-                    ) {
-
-                        openObject(
-                            target
-                        );
-
-                        return;
-                    }
-
-
-                    button.disabled =
-                        true;
                 }
             );
         }
     );
 
 
+    /*
+     * GROSSANSICHT
+     */
     allRole(
         "grossButton"
     )
@@ -1422,16 +886,25 @@ function bindButtons() {
                     event.stopPropagation();
 
 
+                    const target =
+                        Number(
+                            currentData.grossObjectID
+                            ||
+                            0
+                        );
+
+
                     if (
-                        typeof requestAction
-                        ===
-                        "function"
+                        !openLocalObject(
+                            target
+                        )
                     ) {
 
-                        requestAction(
-                            "OpenGross",
-                            true
-                        );
+                        button.disabled =
+                            true;
+
+                        button.title =
+                            "Grossansicht nicht verfügbar";
                     }
                 }
             );
@@ -1505,30 +978,6 @@ function applyData() {
 
 
     setRoleText(
-        "roomRange",
-        (
-            isNumber(
-                rooms.minimum
-            )
-            &&
-            isNumber(
-                rooms.maximum
-            )
-        )
-            ?
-            rooms.minimum.toFixed(1)
-            +
-            " / "
-            +
-            rooms.maximum.toFixed(1)
-            +
-            " °C"
-            :
-            "—"
-    );
-
-
-    setRoleText(
         "valvesOpen",
         (
             isNumber(
@@ -1551,14 +1000,6 @@ function applyData() {
 
 
     setRoleText(
-        "demandAverage",
-        fmtPercent(
-            fbh.demandAverage
-        )
-    );
-
-
-    setRoleText(
         "demandMaximum",
         fmtPercent(
             fbh.demandMaximum
@@ -1566,6 +1007,9 @@ function applyData() {
     );
 
 
+    /*
+     * SETTINGS BUTTON
+     */
     const settingsOK =
         Number(
             d.settingsObjectID
@@ -1573,7 +1017,11 @@ function applyData() {
             0
         )
         >
-        0;
+        0
+        &&
+        typeof openObject
+        ===
+        "function";
 
 
     allRole(
@@ -1592,6 +1040,43 @@ function applyData() {
                     "WP Regelung Einstellungen öffnen"
                     :
                     "Einstellungen-Ziel nicht verfügbar";
+        }
+    );
+
+
+    /*
+     * GROSS BUTTON
+     */
+    const grossOK =
+        Number(
+            d.grossObjectID
+            ||
+            0
+        )
+        >
+        0
+        &&
+        typeof openObject
+        ===
+        "function";
+
+
+    allRole(
+        "grossButton"
+    )
+    .forEach(
+        button => {
+
+            button.disabled =
+                !grossOK;
+
+
+            button.title =
+                grossOK
+                    ?
+                    "Grossansicht öffnen"
+                    :
+                    "Grossansicht nicht verfügbar";
         }
     );
 }
@@ -1653,6 +1138,10 @@ window.addEventListener(
         renderCompact();
 
 
+        /*
+         * Refresh ist weiterhin serverseitig erlaubt,
+         * weil dadurch keine Ansicht auf einem Client gewechselt wird.
+         */
         if (
             typeof requestAction
             ===
