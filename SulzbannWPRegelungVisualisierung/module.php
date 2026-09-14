@@ -6,30 +6,23 @@ class SulzbannWPRegelungVisu extends IPSModule
 {
     /*
      * ============================================================
-     * SULZBANN WP REGELUNG VISUALISIERUNG
+     * SULZBANN WP REGELUNG VISU
      * ============================================================
      *
-     * Architektur bewusst 1:1 nach der funktionierenden
-     * Sulzbann Heizung Visualisierung:
+     * Rücksetzstand:
      *
-     * - eine HTMLBox
-     * - Compact + Detail in derselben module.html
-     * - Umschaltung über Kachelhöhe
-     * - VM_UPDATE -> RenderTimer -> Update()
-     * - nur bei verändertem HTML SetValueString()
+     * - Compact = HTML-SDK
+     * - VisualizationType 1
+     * - Grossansicht = WebContent-Unterobjekt
+     * - Einstellungen funktionieren
+     * - Grossansicht wird über OpenGross geöffnet
      *
-     * KEIN:
-     * - HTML-SDK
-     * - SetVisualizationType()
-     * - separates Grossmodul
-     * - WebContent-Zwischenobjekt
-     * - openObject()
-     * - UpdateVisualizationValue()
-     *
+     * Dieser Stand wird bewusst zuerst wiederhergestellt.
      * ============================================================
      */
 
     private const SETTINGS_OBJECT_ID = 26699;
+    private const SOLCAST_PARENT_ID = 16397;
 
     /*
      * ============================================================
@@ -64,7 +57,7 @@ class SulzbannWPRegelungVisu extends IPSModule
 
     /*
      * ============================================================
-     * METEO TAG 2 / MORGEN
+     * METEO
      * ============================================================
      */
 
@@ -72,14 +65,6 @@ class SulzbannWPRegelungVisu extends IPSModule
     private const METEO_MEAN_ID = 11157;
     private const METEO_MIN_ID = 28499;
     private const METEO_SOLAR_ID = 36980;
-
-    /*
-     * ============================================================
-     * SOLCAST
-     * ============================================================
-     */
-
-    private const SOLCAST_PARENT_ID = 16397;
 
     /*
      * ============================================================
@@ -112,10 +97,6 @@ class SulzbannWPRegelungVisu extends IPSModule
     /*
      * ============================================================
      * FBH VENTILSTATUS
-     *
-     * physikalisch geprüft:
-     * false / 0 = geschlossen
-     * true  / 1 = offen
      * ============================================================
      */
 
@@ -144,8 +125,6 @@ class SulzbannWPRegelungVisu extends IPSModule
     /*
      * ============================================================
      * FBH STELLWERTE
-     *
-     * MDT PWM-Bedarf 0...100 %
      * ============================================================
      */
 
@@ -182,29 +161,22 @@ class SulzbannWPRegelungVisu extends IPSModule
         parent::Create();
 
         /*
-         * Genau wie bei der funktionierenden Heizungsvisu:
-         * sichtbarer Inhalt ist eine HTMLBox-Kindvariable.
+         * Dieser Typ hat die Compact-Kachel korrekt dargestellt.
          */
-        $this->RegisterVariableString(
-            'HTML',
-            'WP Regelung',
-            '~HTMLBox',
-            10
-        );
+        $this->SetVisualizationType(1);
 
         /*
-         * Änderungen werden gesammelt.
-         * Dadurch kein Rendern bei jedem einzelnen VM_UPDATE.
+         * Separate Grossansicht.
          */
-        $this->RegisterPropertyInteger(
-            'RenderDelay',
-            800
-        );
-
-        $this->RegisterTimer(
-            'RenderTimer',
-            0,
-            'SBWRV_Update($_IPS["TARGET"]);'
+        $this->RegisterVariableString(
+            'WPRegelungGross',
+            'WP Regelung Gross',
+            [
+                'PRESENTATION' => VARIABLE_PRESENTATION_WEB_CONTENT,
+                'HTML_TYPE' => 0,
+                'PADDING' => false
+            ],
+            20
         );
     }
 
@@ -218,8 +190,10 @@ class SulzbannWPRegelungVisu extends IPSModule
     {
         parent::ApplyChanges();
 
+        $this->SetVisualizationType(1);
+
         foreach (
-            $this->GetObservedVariableIDs()
+            $this->GetSourceVariableIDs()
             as $variableID
         ) {
             if (
@@ -234,64 +208,73 @@ class SulzbannWPRegelungVisu extends IPSModule
             }
         }
 
-        $this->SetTimerInterval(
-            'RenderTimer',
-            0
-        );
-
-        $this->Update();
+        $this->UpdateGrossVisualization();
     }
 
     /*
      * ============================================================
-     * UPDATE
+     * COMPACT HTML-SDK
      * ============================================================
      */
 
-    public function Update(): void
+    public function GetVisualizationTile(): string
     {
-        /*
-         * Timer sofort wieder stoppen.
-         */
-        $this->SetTimerInterval(
-            'RenderTimer',
-            0
-        );
+        $file =
+            __DIR__
+            .
+            '/module.html';
+
+        if (!file_exists($file)) {
+            return '
+                <div style="
+                    padding:20px;
+                    color:var(--content-color);
+                ">
+                    module.html fehlt.
+                </div>
+            ';
+        }
 
         $html =
-            $this->BuildVisualization();
-
-        $variableID =
-            $this->GetIDForIdent(
-                'HTML'
+            file_get_contents(
+                $file
             );
 
-        if (
-            $variableID <= 0
-            ||
-            !IPS_VariableExists($variableID)
-        ) {
-            return;
+        if ($html === false) {
+            return '
+                <div style="
+                    padding:20px;
+                    color:var(--content-color);
+                ">
+                    module.html konnte nicht geladen werden.
+                </div>
+            ';
         }
 
-        $current =
-            GetValueString(
-                $variableID
+        $json =
+            json_encode(
+                $this->BuildVisualizationData(),
+                JSON_UNESCAPED_UNICODE
+                |
+                JSON_UNESCAPED_SLASHES
+                |
+                JSON_HEX_TAG
+                |
+                JSON_HEX_AMP
+                |
+                JSON_HEX_APOS
+                |
+                JSON_HEX_QUOT
             );
 
-        /*
-         * Wichtig:
-         * nur schreiben, wenn sich das HTML wirklich geändert hat.
-         */
-        if ($current !== $html) {
-            SetValueString(
-                $variableID,
-                $html
-            );
+        if ($json === false) {
+            $json = '{}';
         }
 
-        $this->SetStatus(
-            102
+        return str_replace(
+            '__SBWRV_INITIAL_DATA__',
+            $json,
+            $html
         );
     }
 
@@ -318,35 +301,1418 @@ class SulzbannWPRegelungVisu extends IPSModule
             return;
         }
 
-        /*
-         * Mehrere Änderungen innerhalb kurzer Zeit zusammenfassen.
-         */
-        $delay =
-            max(
-                250,
-                $this->ReadPropertyInteger(
-                    'RenderDelay'
+        $this->SendLiveValues();
+
+        $this->UpdateGrossVisualization();
+    }
+
+    /*
+     * ============================================================
+     * ACTIONS
+     * ============================================================
+     */
+
+    public function RequestAction(
+        $Ident,
+        $Value
+    ): void {
+        switch ($Ident) {
+
+            case 'Refresh':
+
+                $this->SendLiveValues();
+
+                $this->UpdateGrossVisualization();
+
+                return;
+
+
+            case 'OpenSettings':
+
+                $this->OpenObjectInTileVisualization(
+                    self::SETTINGS_OBJECT_ID
+                );
+
+                return;
+
+
+            case 'OpenGross':
+
+                $grossID =
+                    $this->GetIDForIdent(
+                        'WPRegelungGross'
+                    );
+
+                if (
+                    $grossID > 0
+                    &&
+                    IPS_ObjectExists($grossID)
+                ) {
+                    $this->OpenObjectInTileVisualization(
+                        $grossID
+                    );
+                }
+
+                return;
+
+
+            default:
+
+                throw new Exception(
+                    'Ungültige Aktion: '
+                    .
+                    $Ident
+                );
+        }
+    }
+
+    /*
+     * ============================================================
+     * OBJEKT IN KACHELVISUALISIERUNG ÖFFNEN
+     * ============================================================
+     */
+
+    private function OpenObjectInTileVisualization(
+        int $objectID
+    ): void {
+        if (
+            $objectID <= 0
+            ||
+            !IPS_ObjectExists($objectID)
+        ) {
+            return;
+        }
+
+        foreach (
+            IPS_GetInstanceList()
+            as $instanceID
+        ) {
+            $instance =
+                IPS_GetInstance(
+                    $instanceID
+                );
+
+            $moduleName =
+                (string) (
+                    $instance['ModuleInfo']['ModuleName']
+                    ??
+                    ''
+                );
+
+            $isTileVisualization =
+                stripos(
+                    $moduleName,
+                    'Kachel Visualisierung'
                 )
+                !==
+                false
+                ||
+                stripos(
+                    $moduleName,
+                    'Tile Visualization'
+                )
+                !==
+                false;
+
+            if (!$isTileVisualization) {
+                continue;
+            }
+
+            try {
+
+                VISU_OpenObject(
+                    (int) $instanceID,
+                    $objectID,
+                    ''
+                );
+
+            } catch (Throwable $e) {
+
+                $this->SendDebug(
+                    'OpenObject',
+                    'VISU #'
+                    .
+                    $instanceID
+                    .
+                    ': '
+                    .
+                    $e->getMessage(),
+                    0
+                );
+            }
+        }
+    }
+
+    /*
+     * ============================================================
+     * COMPACT LIVEWERTE
+     * ============================================================
+     */
+
+    private function SendLiveValues(): void
+    {
+        $json =
+            json_encode(
+                $this->BuildVisualizationData(),
+                JSON_UNESCAPED_UNICODE
+                |
+                JSON_UNESCAPED_SLASHES
             );
 
-        $this->SetTimerInterval(
-            'RenderTimer',
-            $delay
+        if ($json === false) {
+            return;
+        }
+
+        $this->UpdateVisualizationValue(
+            $json
         );
     }
 
     /*
      * ============================================================
-     * BEOBACHTETE VARIABLEN
+     * GROSSANSICHT
      * ============================================================
      */
 
-    private function GetObservedVariableIDs(): array
+    private function UpdateGrossVisualization(): void
+    {
+        $grossID =
+            $this->GetIDForIdent(
+                'WPRegelungGross'
+            );
+
+        if (
+            $grossID <= 0
+            ||
+            !IPS_VariableExists($grossID)
+        ) {
+            return;
+        }
+
+        $html =
+            $this->BuildGrossVisualization();
+
+        $current =
+            GetValueString(
+                $grossID
+            );
+
+        if ($current !== $html) {
+            SetValueString(
+                $grossID,
+                $html
+            );
+        }
+    }
+
+    /*
+     * ============================================================
+     * GROSSANSICHT HTML
+     * ============================================================
+     */
+
+    private function BuildGrossVisualization(): string
+    {
+        $d =
+            $this->BuildVisualizationData();
+
+        $wp =
+            $d['wp'];
+
+        $rooms =
+            $d['rooms'];
+
+        $fbh =
+            $d['fbh'];
+
+        $dhw =
+            $d['dhw'];
+
+        $buffer =
+            $d['buffer'];
+
+        $meteo =
+            $d['meteo'];
+
+        $solcast =
+            $d['solcast'];
+
+        $mode =
+            htmlspecialchars(
+                (string) $wp['mode'],
+                ENT_QUOTES
+            );
+
+        $modeCode =
+            htmlspecialchars(
+                (string) $wp['modeCode'],
+                ENT_QUOTES
+            );
+
+        $roomAverage =
+            $this->FormatTemperature(
+                $rooms['average']
+            );
+
+        $roomRange =
+            (
+                $rooms['minimum'] !== null
+                &&
+                $rooms['maximum'] !== null
+            )
+                ?
+                number_format(
+                    (float) $rooms['minimum'],
+                    1,
+                    '.',
+                    ''
+                )
+                .
+                ' / '
+                .
+                number_format(
+                    (float) $rooms['maximum'],
+                    1,
+                    '.',
+                    ''
+                )
+                .
+                ' °C'
+                :
+                '—';
+
+        $valves =
+            (int) $fbh['open']
+            .
+            ' / '
+            .
+            (int) $fbh['total'];
+
+        $demandAverage =
+            $this->FormatPercent(
+                $fbh['demandAverage']
+            );
+
+        $demandMaximum =
+            $this->FormatPercent(
+                $fbh['demandMaximum']
+            );
+
+        $outside =
+            $this->FormatTemperature(
+                $wp['outside']
+            );
+
+        $flow =
+            $this->FormatTemperature(
+                $wp['flow']
+            );
+
+        $return =
+            $this->FormatTemperature(
+                $wp['return']
+            );
+
+        $modulation =
+            $this->FormatPercent(
+                $wp['modulation']
+            );
+
+        $wpPower =
+            $this->FormatPower(
+                $wp['power']
+            );
+
+        $heatOutput =
+            $this->FormatPower(
+                $wp['heatOutput']
+            );
+
+        $cop =
+            $wp['cop'] !== null
+                ?
+                number_format(
+                    (float) $wp['cop'],
+                    2,
+                    '.',
+                    ''
+                )
+                :
+                '—';
+
+        $dhwTop =
+            $this->FormatTemperature(
+                $dhw['top']
+            );
+
+        $dhwBottom =
+            $this->FormatTemperature(
+                $dhw['bottom']
+            );
+
+        $bufferTop =
+            $this->FormatTemperature(
+                $buffer['top']
+            );
+
+        $bufferMiddle =
+            $this->FormatTemperature(
+                $buffer['middle']
+            );
+
+        $bufferBottom =
+            $this->FormatTemperature(
+                $buffer['bottom']
+            );
+
+        $meteoMaximum =
+            $this->FormatTemperature(
+                $meteo['maximum']
+            );
+
+        $meteoMean =
+            $this->FormatTemperature(
+                $meteo['mean']
+            );
+
+        $meteoMinimum =
+            $this->FormatTemperature(
+                $meteo['minimum']
+            );
+
+        $meteoSolar =
+            $meteo['solar'] !== null
+                ?
+                number_format(
+                    (float) $meteo['solar'],
+                    2,
+                    '.',
+                    ''
+                )
+                .
+                ' kWh/m²'
+                :
+                '—';
+
+        $solcastEnergy =
+            $solcast['energyP50'] !== null
+                ?
+                number_format(
+                    (float) $solcast['energyP50'],
+                    1,
+                    '.',
+                    ''
+                )
+                .
+                ' kWh'
+                :
+                '—';
+
+        $solcastPeak =
+            $this->FormatPower(
+                $solcast['peak']
+            );
+
+        $solcastConfidence =
+            $this->FormatPercent(
+                $solcast['confidence']
+            );
+
+        $peakTime =
+            $this->FormatTimestamp(
+                $solcast['peakTime']
+            );
+
+        $peakWindow =
+            (
+                $solcast['peakWindowStart'] > 0
+                &&
+                $solcast['peakWindowEnd'] > 0
+            )
+                ?
+                $this->FormatTimestamp(
+                    $solcast['peakWindowStart']
+                )
+                .
+                ' – '
+                .
+                $this->FormatTimestamp(
+                    $solcast['peakWindowEnd']
+                )
+                :
+                '—';
+
+        $lastUpdate =
+            date(
+                'H:i',
+                (int) $d['timestamp']
+            );
+
+        return <<<HTML
+<!doctype html>
+<html lang="de">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+>
+
+<style>
+
+:root {
+    color-scheme: light dark;
+
+    --foreground:
+        var(
+            --content-color,
+            #202124
+        );
+
+    --muted:
+        color-mix(
+            in srgb,
+            var(--foreground) 62%,
+            transparent
+        );
+
+    --card:
+        color-mix(
+            in srgb,
+            var(--foreground) 7%,
+            transparent
+        );
+
+    --border:
+        color-mix(
+            in srgb,
+            var(--foreground) 16%,
+            transparent
+        );
+
+    --heating:#d97f2b;
+    --cooling:#2e8ec8;
+    --standby:#7e8b91;
+    --fault:#d84a4a;
+}
+
+
+@media (prefers-color-scheme: dark) {
+
+    :root {
+
+        --foreground:
+            var(
+                --content-color,
+                #f3f5f7
+            );
+    }
+}
+
+
+@media (prefers-color-scheme: light) {
+
+    :root {
+
+        --foreground:
+            var(
+                --content-color,
+                #202124
+            );
+    }
+}
+
+
+* {
+    box-sizing:border-box;
+}
+
+
+html,
+body {
+    margin:0;
+    padding:0;
+
+    width:100%;
+    min-height:100%;
+
+    background:transparent;
+
+    color:var(--foreground);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+
+.wp-gross {
+    width:100%;
+
+    min-height:100%;
+
+    padding:18px;
+
+    color:var(--foreground);
+}
+
+
+.head {
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:16px;
+
+    margin-bottom:14px;
+}
+
+
+.mode-wrap {
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+}
+
+
+.mode-dot {
+    width:12px;
+    height:12px;
+
+    border-radius:50%;
+
+    background:var(--standby);
+}
+
+
+.mode-dot.heating {
+    background:var(--heating);
+}
+
+
+.mode-dot.cooling {
+    background:var(--cooling);
+}
+
+
+.mode-dot.standby {
+    background:var(--standby);
+}
+
+
+.mode-dot.fault {
+    background:var(--fault);
+}
+
+
+.label {
+    font-size:13px;
+    line-height:1.25;
+
+    color:var(--muted);
+}
+
+
+.mode {
+    margin-top:3px;
+
+    font-size:22px;
+    line-height:1.2;
+
+    font-weight:700;
+}
+
+
+.summary-grid {
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0,1fr)
+        );
+
+    gap:10px;
+
+    margin-bottom:10px;
+}
+
+
+.sections {
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap:10px;
+}
+
+
+.card {
+    background:var(--card);
+
+    border:
+        1px
+        solid
+        var(--border);
+
+    border-radius:11px;
+}
+
+
+.summary-card {
+    min-height:78px;
+
+    padding:12px;
+}
+
+
+.section {
+    padding:14px;
+}
+
+
+.section-title {
+    margin-bottom:13px;
+
+    font-size:15px;
+
+    font-weight:700;
+}
+
+
+.data-grid {
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap:
+        15px
+        24px;
+}
+
+
+.data-item {
+    min-height:46px;
+}
+
+
+.value {
+    margin-top:4px;
+
+    font-size:18px;
+    line-height:1.2;
+
+    font-weight:700;
+}
+
+
+.peak-window {
+    margin-top:14px;
+
+    padding-top:13px;
+
+    border-top:
+        1px
+        solid
+        var(--border);
+}
+
+
+.footer {
+    margin-top:11px;
+
+    text-align:right;
+
+    font-size:12px;
+
+    color:var(--muted);
+}
+
+
+@media (max-width:800px) {
+
+    .wp-gross {
+        padding:12px;
+    }
+
+    .summary-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0,1fr)
+            );
+    }
+
+    .sections {
+        grid-template-columns:1fr;
+    }
+
+    .label {
+        font-size:12px;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="wp-gross">
+
+
+    <div class="head">
+
+        <div class="mode-wrap">
+
+            <div
+                class="mode-dot {$modeCode}"
+            ></div>
+
+            <div>
+
+                <div class="label">
+                    WP Master-Betriebsart
+                </div>
+
+                <div class="mode">
+                    {$mode}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="summary-grid">
+
+        <div class="card summary-card">
+
+            <div class="label">
+                Raumtemperatur Mittel
+            </div>
+
+            <div class="value">
+                {$roomAverage}
+            </div>
+
+        </div>
+
+
+        <div class="card summary-card">
+
+            <div class="label">
+                Raum Min. / Max.
+            </div>
+
+            <div class="value">
+                {$roomRange}
+            </div>
+
+        </div>
+
+
+        <div class="card summary-card">
+
+            <div class="label">
+                FBH Ventile offen
+            </div>
+
+            <div class="value">
+                {$valves}
+            </div>
+
+        </div>
+
+
+        <div class="card summary-card">
+
+            <div class="label">
+                FBH Stellwert max.
+            </div>
+
+            <div class="value">
+                {$demandMaximum}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="sections">
+
+
+        <div class="card section">
+
+            <div class="section-title">
+                Wärmepumpe
+            </div>
+
+            <div class="data-grid">
+
+                <div class="data-item">
+                    <div class="label">Aussentemperatur</div>
+                    <div class="value">{$outside}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Vorlauf</div>
+                    <div class="value">{$flow}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Rücklauf</div>
+                    <div class="value">{$return}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Verdichtermodulation</div>
+                    <div class="value">{$modulation}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Leistungsaufnahme</div>
+                    <div class="value">{$wpPower}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Wärmeleistung</div>
+                    <div class="value">{$heatOutput}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">COP</div>
+                    <div class="value">{$cop}</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card section">
+
+            <div class="section-title">
+                Speicher
+            </div>
+
+            <div class="data-grid">
+
+                <div class="data-item">
+                    <div class="label">Boiler oben</div>
+                    <div class="value">{$dhwTop}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Boiler unten</div>
+                    <div class="value">{$dhwBottom}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Puffer oben</div>
+                    <div class="value">{$bufferTop}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Puffer Mitte</div>
+                    <div class="value">{$bufferMiddle}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Puffer unten</div>
+                    <div class="value">{$bufferBottom}</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card section">
+
+            <div class="section-title">
+                Fussbodenheizung
+            </div>
+
+            <div class="data-grid">
+
+                <div class="data-item">
+                    <div class="label">Ventile offen</div>
+                    <div class="value">{$valves}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Stellwert Mittel</div>
+                    <div class="value">{$demandAverage}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Stellwert Maximum</div>
+                    <div class="value">{$demandMaximum}</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card section">
+
+            <div class="section-title">
+                Prognose
+            </div>
+
+            <div class="data-grid">
+
+                <div class="data-item">
+                    <div class="label">Morgen Maximum</div>
+                    <div class="value">{$meteoMaximum}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Morgen Mittel</div>
+                    <div class="value">{$meteoMean}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Morgen Minimum</div>
+                    <div class="value">{$meteoMinimum}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Globalstrahlung</div>
+                    <div class="value">{$meteoSolar}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Solcast P50 0–24 h</div>
+                    <div class="value">{$solcastEnergy}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">PV Peak</div>
+                    <div class="value">{$solcastPeak}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Peak Zeitpunkt</div>
+                    <div class="value">{$peakTime}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Vertrauen</div>
+                    <div class="value">{$solcastConfidence}</div>
+                </div>
+
+            </div>
+
+
+            <div class="peak-window">
+
+                <div class="label">
+                    Peakfenster
+                </div>
+
+                <div class="value">
+                    {$peakWindow}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        Aktualisiert {$lastUpdate}
+    </div>
+
+</div>
+
+</body>
+
+</html>
+HTML;
+    }
+
+    /*
+     * ============================================================
+     * DATEN
+     * ============================================================
+     */
+
+    private function BuildVisualizationData(): array
+    {
+        $heating =
+            $this->ReadBool(
+                self::WP_HEATING_ID
+            );
+
+        $cooling =
+            $this->ReadBool(
+                self::WP_COOLING_ID
+            );
+
+        if (
+            $heating
+            &&
+            !$cooling
+        ) {
+            $wpMode =
+                'Heizen';
+
+            $wpModeCode =
+                'heating';
+
+        } elseif (
+            $cooling
+            &&
+            !$heating
+        ) {
+            $wpMode =
+                'Kühlen';
+
+            $wpModeCode =
+                'cooling';
+
+        } elseif (
+            !$heating
+            &&
+            !$cooling
+        ) {
+            $wpMode =
+                'Standby';
+
+            $wpModeCode =
+                'standby';
+
+        } else {
+            $wpMode =
+                'Unplausibel';
+
+            $wpModeCode =
+                'fault';
+        }
+
+        /*
+         * Räume
+         */
+
+        $roomTemperatures = [];
+
+        foreach (
+            self::ROOM_TEMP_IDS
+            as $variableID
+        ) {
+            $value =
+                $this->ReadFloatNullable(
+                    $variableID
+                );
+
+            if (
+                $value !== null
+                &&
+                $value > -30
+                &&
+                $value < 60
+            ) {
+                $roomTemperatures[] =
+                    $value;
+            }
+        }
+
+        $roomAverage = null;
+        $roomMinimum = null;
+        $roomMaximum = null;
+
+        if (
+            count($roomTemperatures) > 0
+        ) {
+            $roomAverage =
+                array_sum(
+                    $roomTemperatures
+                )
+                /
+                count(
+                    $roomTemperatures
+                );
+
+            $roomMinimum =
+                min(
+                    $roomTemperatures
+                );
+
+            $roomMaximum =
+                max(
+                    $roomTemperatures
+                );
+        }
+
+        /*
+         * Ventile
+         */
+
+        $openValves = 0;
+
+        foreach (
+            self::VALVE_STATE_IDS
+            as $variableID
+        ) {
+            if (
+                $this->ReadBool(
+                    $variableID
+                )
+            ) {
+                $openValves++;
+            }
+        }
+
+        /*
+         * Stellwerte
+         */
+
+        $demands = [];
+
+        foreach (
+            self::VALVE_DEMAND_IDS
+            as $variableID
+        ) {
+            $value =
+                $this->ReadFloatNullable(
+                    $variableID
+                );
+
+            if ($value !== null) {
+                $demands[] =
+                    $value;
+            }
+        }
+
+        $demandAverage = null;
+        $demandMaximum = null;
+
+        if (
+            count($demands) > 0
+        ) {
+            $demandAverage =
+                array_sum(
+                    $demands
+                )
+                /
+                count(
+                    $demands
+                );
+
+            $demandMaximum =
+                max(
+                    $demands
+                );
+        }
+
+        return [
+            'timestamp' =>
+                time(),
+
+            'settingsObjectID' =>
+                self::SETTINGS_OBJECT_ID,
+
+            'wp' => [
+                'mode' =>
+                    $wpMode,
+
+                'modeCode' =>
+                    $wpModeCode,
+
+                'heating' =>
+                    $heating,
+
+                'cooling' =>
+                    $cooling,
+
+                'outside' =>
+                    $this->ReadFloatNullable(
+                        self::OUTSIDE_TEMP_ID
+                    ),
+
+                'flow' =>
+                    $this->ReadFloatNullable(
+                        self::WP_FLOW_TEMP_ID
+                    ),
+
+                'return' =>
+                    $this->ReadFloatNullable(
+                        self::WP_RETURN_TEMP_ID
+                    ),
+
+                'power' =>
+                    $this->ReadFloatNullable(
+                        self::WP_POWER_ID
+                    ),
+
+                'heatOutput' =>
+                    $this->ReadFloatNullable(
+                        self::WP_HEAT_OUTPUT_ID
+                    ),
+
+                'cop' =>
+                    $this->ReadFloatNullable(
+                        self::WP_COP_ID
+                    ),
+
+                'modulation' =>
+                    $this->ReadFloatNullable(
+                        self::WP_MODULATION_ID
+                    )
+            ],
+
+            'rooms' => [
+                'count' =>
+                    count(
+                        $roomTemperatures
+                    ),
+
+                'average' =>
+                    $roomAverage,
+
+                'minimum' =>
+                    $roomMinimum,
+
+                'maximum' =>
+                    $roomMaximum
+            ],
+
+            'fbh' => [
+                'open' =>
+                    $openValves,
+
+                'total' =>
+                    count(
+                        self::VALVE_STATE_IDS
+                    ),
+
+                'demandAverage' =>
+                    $demandAverage,
+
+                'demandMaximum' =>
+                    $demandMaximum
+            ],
+
+            'buffer' => [
+                'top' =>
+                    $this->ReadFloatNullable(
+                        self::BUFFER_TOP_ID
+                    ),
+
+                'middle' =>
+                    $this->ReadFloatNullable(
+                        self::BUFFER_MIDDLE_ID
+                    ),
+
+                'bottom' =>
+                    $this->ReadFloatNullable(
+                        self::BUFFER_BOTTOM_ID
+                    )
+            ],
+
+            'dhw' => [
+                'top' =>
+                    $this->ReadFloatNullable(
+                        self::DHW_TOP_ID
+                    ),
+
+                'bottom' =>
+                    $this->ReadFloatNullable(
+                        self::DHW_BOTTOM_ID
+                    )
+            ],
+
+            'meteo' => [
+                'maximum' =>
+                    $this->ReadFloatNullable(
+                        self::METEO_MAX_ID
+                    ),
+
+                'mean' =>
+                    $this->ReadFloatNullable(
+                        self::METEO_MEAN_ID
+                    ),
+
+                'minimum' =>
+                    $this->ReadFloatNullable(
+                        self::METEO_MIN_ID
+                    ),
+
+                'solar' =>
+                    $this->ReadFloatNullable(
+                        self::METEO_SOLAR_ID
+                    )
+            ],
+
+            'solcast' => [
+                'energyP50' =>
+                    $this->ReadSolcastFloat(
+                        'SolcastEnergy024P50'
+                    ),
+
+                'peak' =>
+                    $this->ReadSolcastFloat(
+                        'SolcastPeak024'
+                    ),
+
+                'confidence' =>
+                    $this->ReadSolcastFloat(
+                        'SolcastConfidence024'
+                    ),
+
+                'peakTime' =>
+                    $this->ReadSolcastInteger(
+                        'SolcastPeakTime024'
+                    ),
+
+                'peakWindowStart' =>
+                    $this->ReadSolcastInteger(
+                        'SolcastPeakWindowStart024'
+                    ),
+
+                'peakWindowEnd' =>
+                    $this->ReadSolcastInteger(
+                        'SolcastPeakWindowEnd024'
+                    )
+            ]
+        ];
+    }
+
+    /*
+     * ============================================================
+     * SOURCE IDS
+     * ============================================================
+     */
+
+    private function GetSourceVariableIDs(): array
     {
         $ids = [
-            /*
-             * WP
-             */
             self::WP_HEATING_ID,
             self::WP_COOLING_ID,
 
@@ -359,9 +1725,6 @@ class SulzbannWPRegelungVisu extends IPSModule
             self::WP_COP_ID,
             self::WP_MODULATION_ID,
 
-            /*
-             * Speicher
-             */
             self::BUFFER_TOP_ID,
             self::BUFFER_MIDDLE_ID,
             self::BUFFER_BOTTOM_ID,
@@ -369,18 +1732,12 @@ class SulzbannWPRegelungVisu extends IPSModule
             self::DHW_TOP_ID,
             self::DHW_BOTTOM_ID,
 
-            /*
-             * Wetter
-             */
             self::METEO_MAX_ID,
             self::METEO_MEAN_ID,
             self::METEO_MIN_ID,
             self::METEO_SOLAR_ID
         ];
 
-        /*
-         * Räume
-         */
         foreach (
             self::ROOM_TEMP_IDS
             as $id
@@ -388,9 +1745,6 @@ class SulzbannWPRegelungVisu extends IPSModule
             $ids[] = $id;
         }
 
-        /*
-         * Ventile
-         */
         foreach (
             self::VALVE_STATE_IDS
             as $id
@@ -398,42 +1752,12 @@ class SulzbannWPRegelungVisu extends IPSModule
             $ids[] = $id;
         }
 
-        /*
-         * Stellwerte
-         */
         foreach (
             self::VALVE_DEMAND_IDS
             as $id
         ) {
             $ids[] = $id;
         }
-
-        /*
-         * Solcast dynamisch über Ident.
-         */
-        foreach (
-            $this->GetSolcastVariableIDs()
-            as $id
-        ) {
-            $ids[] = $id;
-        }
-
-        return array_values(
-            array_unique(
-                $ids
-            )
-        );
-    }
-
-    /*
-     * ============================================================
-     * SOLCAST IDs
-     * ============================================================
-     */
-
-    private function GetSolcastVariableIDs(): array
-    {
-        $result = [];
 
         foreach (
             [
@@ -452,12 +1776,22 @@ class SulzbannWPRegelungVisu extends IPSModule
                 );
 
             if ($id > 0) {
-                $result[] = $id;
+                $ids[] = $id;
             }
         }
 
-        return $result;
+        return array_values(
+            array_unique(
+                $ids
+            )
+        );
     }
+
+    /*
+     * ============================================================
+     * SOLCAST
+     * ============================================================
+     */
 
     private function GetSolcastVariableID(
         string $ident
@@ -489,76 +1823,6 @@ class SulzbannWPRegelungVisu extends IPSModule
         return (int) $id;
     }
 
-    /*
-     * ============================================================
-     * SICHER LESEN
-     * ============================================================
-     */
-
-    private function ReadValueSafe(
-        int $variableID,
-        mixed $default = null
-    ): mixed {
-        if (
-            $variableID <= 0
-            ||
-            !IPS_VariableExists($variableID)
-        ) {
-            return $default;
-        }
-
-        try {
-            return GetValue(
-                $variableID
-            );
-
-        } catch (Throwable $e) {
-            return $default;
-        }
-    }
-
-    private function ReadFloat(
-        int $variableID
-    ): ?float {
-        $value =
-            $this->ReadValueSafe(
-                $variableID,
-                null
-            );
-
-        if (
-            $value === null
-            ||
-            !is_numeric($value)
-        ) {
-            return null;
-        }
-
-        return (float) $value;
-    }
-
-    private function ReadBool(
-        int $variableID
-    ): bool {
-        $value =
-            $this->ReadValueSafe(
-                $variableID,
-                false
-            );
-
-        if (is_bool($value)) {
-            return $value;
-        }
-
-        if (is_numeric($value)) {
-            return
-                ((float) $value)
-                !==
-                0.0;
-        }
-
-        return false;
-    }
 
     private function ReadSolcastFloat(
         string $ident
@@ -572,10 +1836,12 @@ class SulzbannWPRegelungVisu extends IPSModule
             return null;
         }
 
-        return $this->ReadFloat(
-            $id
-        );
+        return
+            $this->ReadFloatNullable(
+                $id
+            );
     }
+
 
     private function ReadSolcastInteger(
         string $ident
@@ -589,671 +1855,15 @@ class SulzbannWPRegelungVisu extends IPSModule
             return 0;
         }
 
-        $value =
-            $this->ReadValueSafe(
-                $id,
-                0
+        return
+            (int) GetValue(
+                $id
             );
-
-        if (!is_numeric($value)) {
-            return 0;
-        }
-
-        return (int) $value;
     }
 
     /*
      * ============================================================
-     * AUSWERTUNG
-     * ============================================================
-     */
-
-    private function BuildData(): array
-    {
-        /*
-         * --------------------------------------------------------
-         * WP IST MASTER
-         * --------------------------------------------------------
-         */
-
-        $heating =
-            $this->ReadBool(
-                self::WP_HEATING_ID
-            );
-
-        $cooling =
-            $this->ReadBool(
-                self::WP_COOLING_ID
-            );
-
-        if (
-            $heating
-            &&
-            !$cooling
-        ) {
-            $mode =
-                'Heizen';
-
-            $modeClass =
-                'heating';
-
-        } elseif (
-            $cooling
-            &&
-            !$heating
-        ) {
-            $mode =
-                'Kühlen';
-
-            $modeClass =
-                'cooling';
-
-        } elseif (
-            !$heating
-            &&
-            !$cooling
-        ) {
-            $mode =
-                'Standby';
-
-            $modeClass =
-                'standby';
-
-        } else {
-            $mode =
-                'Unplausibel';
-
-            $modeClass =
-                'fault';
-        }
-
-        /*
-         * --------------------------------------------------------
-         * RAUMTEMPERATUREN
-         * --------------------------------------------------------
-         */
-
-        $roomValues = [];
-
-        foreach (
-            self::ROOM_TEMP_IDS
-            as $id
-        ) {
-            $value =
-                $this->ReadFloat(
-                    $id
-                );
-
-            if (
-                $value !== null
-                &&
-                $value > -30
-                &&
-                $value < 60
-            ) {
-                $roomValues[] =
-                    $value;
-            }
-        }
-
-        $roomAverage = null;
-        $roomMinimum = null;
-        $roomMaximum = null;
-
-        if (
-            count($roomValues) > 0
-        ) {
-            $roomAverage =
-                array_sum(
-                    $roomValues
-                )
-                /
-                count(
-                    $roomValues
-                );
-
-            $roomMinimum =
-                min(
-                    $roomValues
-                );
-
-            $roomMaximum =
-                max(
-                    $roomValues
-                );
-        }
-
-        /*
-         * --------------------------------------------------------
-         * VENTILE
-         * --------------------------------------------------------
-         */
-
-        $openValves = 0;
-
-        foreach (
-            self::VALVE_STATE_IDS
-            as $id
-        ) {
-            if (
-                $this->ReadBool($id)
-            ) {
-                $openValves++;
-            }
-        }
-
-        /*
-         * --------------------------------------------------------
-         * STELLWERTE
-         * --------------------------------------------------------
-         */
-
-        $demands = [];
-
-        foreach (
-            self::VALVE_DEMAND_IDS
-            as $id
-        ) {
-            $value =
-                $this->ReadFloat(
-                    $id
-                );
-
-            if ($value !== null) {
-                $demands[] =
-                    max(
-                        0.0,
-                        min(
-                            100.0,
-                            $value
-                        )
-                    );
-            }
-        }
-
-        $demandAverage = null;
-        $demandMaximum = null;
-
-        if (
-            count($demands) > 0
-        ) {
-            $demandAverage =
-                array_sum(
-                    $demands
-                )
-                /
-                count(
-                    $demands
-                );
-
-            $demandMaximum =
-                max(
-                    $demands
-                );
-        }
-
-        return [
-            'mode' =>
-                $mode,
-
-            'modeClass' =>
-                $modeClass,
-
-            'outside' =>
-                $this->ReadFloat(
-                    self::OUTSIDE_TEMP_ID
-                ),
-
-            'flow' =>
-                $this->ReadFloat(
-                    self::WP_FLOW_TEMP_ID
-                ),
-
-            'return' =>
-                $this->ReadFloat(
-                    self::WP_RETURN_TEMP_ID
-                ),
-
-            'power' =>
-                $this->ReadFloat(
-                    self::WP_POWER_ID
-                ),
-
-            'heatOutput' =>
-                $this->ReadFloat(
-                    self::WP_HEAT_OUTPUT_ID
-                ),
-
-            'cop' =>
-                $this->ReadFloat(
-                    self::WP_COP_ID
-                ),
-
-            'modulation' =>
-                $this->ReadFloat(
-                    self::WP_MODULATION_ID
-                ),
-
-            'roomsCount' =>
-                count(
-                    $roomValues
-                ),
-
-            'roomsAverage' =>
-                $roomAverage,
-
-            'roomsMinimum' =>
-                $roomMinimum,
-
-            'roomsMaximum' =>
-                $roomMaximum,
-
-            'openValves' =>
-                $openValves,
-
-            'totalValves' =>
-                count(
-                    self::VALVE_STATE_IDS
-                ),
-
-            'demandAverage' =>
-                $demandAverage,
-
-            'demandMaximum' =>
-                $demandMaximum,
-
-            'dhwTop' =>
-                $this->ReadFloat(
-                    self::DHW_TOP_ID
-                ),
-
-            'dhwBottom' =>
-                $this->ReadFloat(
-                    self::DHW_BOTTOM_ID
-                ),
-
-            'bufferTop' =>
-                $this->ReadFloat(
-                    self::BUFFER_TOP_ID
-                ),
-
-            'bufferMiddle' =>
-                $this->ReadFloat(
-                    self::BUFFER_MIDDLE_ID
-                ),
-
-            'bufferBottom' =>
-                $this->ReadFloat(
-                    self::BUFFER_BOTTOM_ID
-                ),
-
-            'meteoMax' =>
-                $this->ReadFloat(
-                    self::METEO_MAX_ID
-                ),
-
-            'meteoMean' =>
-                $this->ReadFloat(
-                    self::METEO_MEAN_ID
-                ),
-
-            'meteoMin' =>
-                $this->ReadFloat(
-                    self::METEO_MIN_ID
-                ),
-
-            'meteoSolar' =>
-                $this->ReadFloat(
-                    self::METEO_SOLAR_ID
-                ),
-
-            'solcastEnergy' =>
-                $this->ReadSolcastFloat(
-                    'SolcastEnergy024P50'
-                ),
-
-            'solcastPeak' =>
-                $this->ReadSolcastFloat(
-                    'SolcastPeak024'
-                ),
-
-            'solcastConfidence' =>
-                $this->ReadSolcastFloat(
-                    'SolcastConfidence024'
-                ),
-
-            'solcastPeakTime' =>
-                $this->ReadSolcastInteger(
-                    'SolcastPeakTime024'
-                ),
-
-            'solcastWindowStart' =>
-                $this->ReadSolcastInteger(
-                    'SolcastPeakWindowStart024'
-                ),
-
-            'solcastWindowEnd' =>
-                $this->ReadSolcastInteger(
-                    'SolcastPeakWindowEnd024'
-                ),
-
-            'timestamp' =>
-                time()
-        ];
-    }
-
-    /*
-     * ============================================================
-     * TEMPLATE
-     * ============================================================
-     */
-
-    private function LoadTemplate(): string
-    {
-        $file =
-            __DIR__
-            .
-            '/module.html';
-
-        if (!is_file($file)) {
-            return
-                '<div style="padding:20px;color:red;">'
-                .
-                'module.html fehlt'
-                .
-                '</div>';
-        }
-
-        $html =
-            file_get_contents(
-                $file
-            );
-
-        if ($html === false) {
-            return
-                '<div style="padding:20px;color:red;">'
-                .
-                'module.html konnte nicht geladen werden'
-                .
-                '</div>';
-        }
-
-        return $html;
-    }
-
-    /*
-     * ============================================================
-     * BUILD VISUALIZATION
-     * ============================================================
-     */
-
-    private function BuildVisualization(): string
-    {
-        $template =
-            $this->LoadTemplate();
-
-        $d =
-            $this->BuildData();
-
-        $roomRange =
-            (
-                $d['roomsMinimum'] !== null
-                &&
-                $d['roomsMaximum'] !== null
-            )
-                ?
-                number_format(
-                    (float) $d['roomsMinimum'],
-                    1,
-                    '.',
-                    ''
-                )
-                .
-                ' / '
-                .
-                number_format(
-                    (float) $d['roomsMaximum'],
-                    1,
-                    '.',
-                    ''
-                )
-                .
-                ' °C'
-                :
-                '—';
-
-        $valves =
-            (int) $d['openValves']
-            .
-            ' / '
-            .
-            (int) $d['totalValves'];
-
-        $peakWindow =
-            (
-                $d['solcastWindowStart'] > 0
-                &&
-                $d['solcastWindowEnd'] > 0
-            )
-                ?
-                $this->FormatTime(
-                    $d['solcastWindowStart']
-                )
-                .
-                ' – '
-                .
-                $this->FormatTime(
-                    $d['solcastWindowEnd']
-                )
-                :
-                '—';
-
-        $replace = [
-            '{{MODE}}' =>
-                $this->H(
-                    $d['mode']
-                ),
-
-            '{{MODE_CLASS}}' =>
-                $this->H(
-                    $d['modeClass']
-                ),
-
-            '{{OUTSIDE}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['outside']
-                    )
-                ),
-
-            '{{FLOW}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['flow']
-                    )
-                ),
-
-            '{{RETURN}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['return']
-                    )
-                ),
-
-            '{{POWER}}' =>
-                $this->H(
-                    $this->FormatPower(
-                        $d['power']
-                    )
-                ),
-
-            '{{HEAT_OUTPUT}}' =>
-                $this->H(
-                    $this->FormatPower(
-                        $d['heatOutput']
-                    )
-                ),
-
-            '{{COP}}' =>
-                $this->H(
-                    $this->FormatCOP(
-                        $d['cop']
-                    )
-                ),
-
-            '{{MODULATION}}' =>
-                $this->H(
-                    $this->FormatPercent(
-                        $d['modulation']
-                    )
-                ),
-
-            '{{ROOM_COUNT}}' =>
-                (string) $d['roomsCount'],
-
-            '{{ROOM_AVERAGE}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['roomsAverage']
-                    )
-                ),
-
-            '{{ROOM_RANGE}}' =>
-                $this->H(
-                    $roomRange
-                ),
-
-            '{{VALVES}}' =>
-                $this->H(
-                    $valves
-                ),
-
-            '{{DEMAND_AVERAGE}}' =>
-                $this->H(
-                    $this->FormatPercent(
-                        $d['demandAverage']
-                    )
-                ),
-
-            '{{DEMAND_MAXIMUM}}' =>
-                $this->H(
-                    $this->FormatPercent(
-                        $d['demandMaximum']
-                    )
-                ),
-
-            '{{DHW_TOP}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['dhwTop']
-                    )
-                ),
-
-            '{{DHW_BOTTOM}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['dhwBottom']
-                    )
-                ),
-
-            '{{BUFFER_TOP}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['bufferTop']
-                    )
-                ),
-
-            '{{BUFFER_MIDDLE}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['bufferMiddle']
-                    )
-                ),
-
-            '{{BUFFER_BOTTOM}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['bufferBottom']
-                    )
-                ),
-
-            '{{METEO_MAX}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['meteoMax']
-                    )
-                ),
-
-            '{{METEO_MEAN}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['meteoMean']
-                    )
-                ),
-
-            '{{METEO_MIN}}' =>
-                $this->H(
-                    $this->FormatTemperature(
-                        $d['meteoMin']
-                    )
-                ),
-
-            '{{METEO_SOLAR}}' =>
-                $this->H(
-                    $this->FormatSolar(
-                        $d['meteoSolar']
-                    )
-                ),
-
-            '{{SOLCAST_ENERGY}}' =>
-                $this->H(
-                    $this->FormatEnergy(
-                        $d['solcastEnergy']
-                    )
-                ),
-
-            '{{SOLCAST_PEAK}}' =>
-                $this->H(
-                    $this->FormatPower(
-                        $d['solcastPeak']
-                    )
-                ),
-
-            '{{SOLCAST_CONFIDENCE}}' =>
-                $this->H(
-                    $this->FormatPercent(
-                        $d['solcastConfidence']
-                    )
-                ),
-
-            '{{SOLCAST_PEAK_TIME}}' =>
-                $this->H(
-                    $this->FormatTime(
-                        $d['solcastPeakTime']
-                    )
-                ),
-
-            '{{SOLCAST_PEAK_WINDOW}}' =>
-                $this->H(
-                    $peakWindow
-                ),
-
-            '{{UPDATED}}' =>
-                date(
-                    'H:i',
-                    $d['timestamp']
-                )
-        ];
-
-        return strtr(
-            $template,
-            $replace
-        );
-    }
-
-    /*
-     * ============================================================
-     * FORMATIERUNG
+     * FORMAT
      * ============================================================
      */
 
@@ -1275,6 +1885,7 @@ class SulzbannWPRegelungVisu extends IPSModule
             ' °C';
     }
 
+
     private function FormatPower(
         ?float $value
     ): string {
@@ -1292,6 +1903,7 @@ class SulzbannWPRegelungVisu extends IPSModule
             .
             ' kW';
     }
+
 
     private function FormatPercent(
         ?float $value
@@ -1311,59 +1923,8 @@ class SulzbannWPRegelungVisu extends IPSModule
             ' %';
     }
 
-    private function FormatCOP(
-        ?float $value
-    ): string {
-        if ($value === null) {
-            return '—';
-        }
 
-        return
-            number_format(
-                $value,
-                2,
-                '.',
-                ''
-            );
-    }
-
-    private function FormatSolar(
-        ?float $value
-    ): string {
-        if ($value === null) {
-            return '—';
-        }
-
-        return
-            number_format(
-                $value,
-                2,
-                '.',
-                ''
-            )
-            .
-            ' kWh/m²';
-    }
-
-    private function FormatEnergy(
-        ?float $value
-    ): string {
-        if ($value === null) {
-            return '—';
-        }
-
-        return
-            number_format(
-                $value,
-                1,
-                '.',
-                ''
-            )
-            .
-            ' kWh';
-    }
-
-    private function FormatTime(
+    private function FormatTimestamp(
         int $timestamp
     ): string {
         if ($timestamp <= 0) {
@@ -1377,16 +1938,51 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
     }
 
-    private function H(
-        string $value
-    ): string {
+    /*
+     * ============================================================
+     * SAFE READ
+     * ============================================================
+     */
+
+    private function ReadBool(
+        int $variableID
+    ): bool {
+        if (
+            $variableID <= 0
+            ||
+            !IPS_VariableExists($variableID)
+        ) {
+            return false;
+        }
+
         return
-            htmlspecialchars(
-                $value,
-                ENT_QUOTES
-                |
-                ENT_SUBSTITUTE,
-                'UTF-8'
+            (bool) GetValue(
+                $variableID
             );
+    }
+
+
+    private function ReadFloatNullable(
+        int $variableID
+    ): ?float {
+        if (
+            $variableID <= 0
+            ||
+            !IPS_VariableExists($variableID)
+        ) {
+            return null;
+        }
+
+        $value =
+            GetValue(
+                $variableID
+            );
+
+        if (!is_numeric($value)) {
+            return null;
+        }
+
+        return
+            (float) $value;
     }
 }
