@@ -1,2554 +1,1093 @@
-<!DOCTYPE html>
-
-<html lang="de">
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
->
-
-
-<style>
-
-/* ============================================================
-   THEME
-============================================================ */
-
-:root {
-
-    --text: #17191c;
-    --muted: #5d6870;
-
-    --background: transparent;
-
-    --card:
-        rgba(
-            0,
-            0,
-            0,
-            0.055
-        );
-
-    --card-strong:
-        rgba(
-            0,
-            0,
-            0,
-            0.085
-        );
-
-    --border:
-        rgba(
-            80,
-            100,
-            112,
-            0.30
-        );
-
-    --heating: #e58b35;
-
-    --cooling: #3e9bd8;
-
-    --standby: #7e8c93;
-
-    --fault: #d84a4a;
-}
-
-
-@media (prefers-color-scheme: dark) {
-
-    :root {
-
-        --text: #ffffff;
-
-        --muted: #bac6cd;
-
-        --background: transparent;
-
-        --card:
-            rgba(
-                255,
-                255,
-                255,
-                0.075
-            );
-
-        --card-strong:
-            rgba(
-                255,
-                255,
-                255,
-                0.105
-            );
-
-        --border:
-            rgba(
-                220,
-                235,
-                243,
-                0.18
-            );
-
-        --heating: #ff9c48;
-
-        --cooling: #46a9e5;
-
-        --standby: #91a0a8;
-
-        --fault: #ef6262;
-    }
-}
-
-
-/* ============================================================
-   BASIS
-============================================================ */
-
-* {
-    box-sizing: border-box;
-}
-
-
-html,
-body {
-
-    width: 100%;
-    height: 100%;
-
-    margin: 0;
-    padding: 0;
-
-    overflow: hidden;
-
-    background:
-        transparent;
-
-    color:
-        var(--text);
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
-}
-
-
-button {
-    font: inherit;
-}
-
-
-#app {
-
-    width: 100%;
-    height: 100%;
-
-    overflow: hidden;
-}
-
-
-/* ============================================================
-   GEMEINSAM
-============================================================ */
-
-.status-dot {
-
-    width: 11px;
-    height: 11px;
-
-    min-width: 11px;
-
-    border-radius: 50%;
-
-    background:
-        var(--standby);
-}
-
-
-.status-dot.heating {
-    background: var(--heating);
-}
-
-
-.status-dot.cooling {
-    background: var(--cooling);
-}
-
-
-.status-dot.standby {
-    background: var(--standby);
-}
-
-
-.status-dot.fault {
-    background: var(--fault);
-}
-
-
-.settings-button {
-
-    border:
-        1px solid
-        var(--border);
-
-    background:
-        var(--card-strong);
-
-    color:
-        var(--text);
-
-    border-radius:
-        9px;
-
-    min-height:
-        38px;
-
-    padding:
-        0 12px;
-
-    cursor:
-        pointer;
-
-    font-size:
-        13px;
-
-    font-weight:
-        600;
-
-    white-space:
-        nowrap;
-}
-
-
-.settings-button:active {
-    opacity: 0.70;
-}
-
-
-.settings-button.disabled {
-
-    opacity: 0.40;
-
-    cursor: default;
-}
-
-
-.label {
-
-    color:
-        var(--muted);
-
-    font-size:
-        13px;
-
-    line-height:
-        1.30;
-}
-
-
-.value {
-
-    color:
-        var(--text);
-
-    font-size:
-        18px;
-
-    font-weight:
-        700;
-
-    line-height:
-        1.25;
-
-    margin-top:
-        4px;
-}
-
-
-/* ============================================================
-   COMPACT
-============================================================ */
-
-.compact {
-
-    width: 100%;
-    height: 100%;
-
-    padding:
-        8px
-        10px
-        10px
-        10px;
-
-    display:
-        flex;
-
-    flex-direction:
-        column;
-
-    gap:
-        9px;
-}
-
-
-.compact-head {
-
-    min-height:
-        42px;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    gap:
-        12px;
-}
-
-
-.compact-mode {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        9px;
-
-    min-width:
-        0;
-}
-
-
-.compact-mode-text {
-
-    min-width:
-        0;
-}
-
-
-.compact-mode-label {
-
-    color:
-        var(--muted);
-
-    font-size:
-        12px;
-
-    line-height:
-        1.20;
-}
-
-
-.compact-mode-value {
-
-    color:
-        var(--text);
-
-    font-size:
-        16px;
-
-    font-weight:
-        700;
-
-    line-height:
-        1.25;
-
-    margin-top:
-        2px;
-}
-
-
-.compact-grid {
-
-    min-height:
-        0;
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(
-            3,
-            minmax(
-                0,
-                1fr
-            )
-        );
-
-    gap:
-        8px;
-}
-
-
-.compact-card {
-
-    min-width:
-        0;
-
-    min-height:
-        72px;
-
-    background:
-        var(--card);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius:
-        11px;
-
-    padding:
-        9px 10px;
-
-    display:
-        flex;
-
-    flex-direction:
-        column;
-
-    justify-content:
-        center;
-}
-
-
-.compact-card .label {
-
-    font-size:
-        12px;
-}
-
-
-.compact-card .value {
-
-    font-size:
-        18px;
-}
-
-
-/* ============================================================
-   DETAIL
-============================================================ */
-
-.detail {
-
-    display:
-        none;
-
-    width:
-        100%;
-
-    height:
-        100%;
-
-    overflow:
-        auto;
-
-    padding:
-        14px;
-}
-
-
-.detail-inner {
-
-    width:
-        100%;
-
-    max-width:
-        1250px;
-
-    margin:
-        0 auto;
-}
-
-
-.detail-head {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    gap:
-        18px;
-
-    min-height:
-        50px;
-
-    margin-bottom:
-        12px;
-}
-
-
-.detail-mode {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        11px;
-}
-
-
-.detail-mode-title {
-
-    font-size:
-        13px;
-
-    color:
-        var(--muted);
-}
-
-
-.detail-mode-value {
-
-    margin-top:
-        3px;
-
-    font-size:
-        21px;
-
-    font-weight:
-        700;
-}
-
-
-.summary-grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            minmax(
-                0,
-                1fr
-            )
-        );
-
-    gap:
-        10px;
-
-    margin-bottom:
-        10px;
-}
-
-
-.summary-card {
-
-    min-width:
-        0;
-
-    min-height:
-        76px;
-
-    padding:
-        12px 13px;
-
-    background:
-        var(--card-strong);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius:
-        12px;
-}
-
-
-.sections {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(
-                0,
-                1fr
-            )
-        );
-
-    gap:
-        10px;
-}
-
-
-.section {
-
-    min-width:
-        0;
-
-    padding:
-        14px;
-
-    background:
-        var(--card);
-
-    border:
-        1px solid
-        var(--border);
-
-    border-radius:
-        12px;
-}
-
-
-.section-title {
-
-    color:
-        var(--text);
-
-    font-size:
-        15px;
-
-    font-weight:
-        700;
-
-    line-height:
-        1.25;
-
-    margin-bottom:
-        13px;
-}
-
-
-.data-grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(
-                0,
-                1fr
-            )
-        );
-
-    gap:
-        15px
-        28px;
-}
-
-
-.data-item {
-
-    min-width:
-        0;
-
-    min-height:
-        47px;
-}
-
-
-.data-item .label {
-
-    font-size:
-        13px;
-}
-
-
-.data-item .value {
-
-    font-size:
-        18px;
-}
-
-
-.peak-block {
-
-    margin-top:
-        14px;
-
-    padding-top:
-        14px;
-
-    border-top:
-        1px solid
-        var(--border);
-}
-
-
-.footer {
-
-    margin-top:
-        10px;
-
-    text-align:
-        right;
-
-    color:
-        var(--muted);
-
-    font-size:
-        11px;
-}
-
-
-/* ============================================================
-   AUTOMATISCH COMPACT / DETAIL
-============================================================ */
-
-/*
- * Wichtig:
- *
- * Kleine Kachel:
- * Compact
- *
- * Sobald Symcon die Kachel nach dem ersten Klick vergrössert,
- * wird ihre tatsächliche Höhe gross genug.
- *
- * Dann blendet JS direkt die Detailansicht ein.
- *
- * Das ist derselbe Mechanismus wie bei der bestätigten
- * WP-/Hydraulik-Visu.
- */
-
-
-/* ============================================================
-   MOBILE DETAIL
-============================================================ */
-
-@media (max-width: 700px) {
-
-    .detail {
-
-        padding:
-            10px;
+<?php
+
+declare(strict_types=1);
+
+class SulzbannWPRegelungVisu extends IPSModule
+{
+    private const OZW_ROOT_ID = 28320;
+    private const SOLCAST_PARENT_ID = 16397;
+
+    private const WP_HEATING_ID = 44357;
+    private const WP_COOLING_ID = 17689;
+    private const OUTSIDE_TEMP_ID = 50237;
+    private const WP_FLOW_TEMP_ID = 27923;
+    private const WP_RETURN_TEMP_ID = 45419;
+    private const WP_POWER_ID = 50450;
+    private const WP_HEAT_OUTPUT_ID = 32403;
+    private const WP_COP_ID = 37700;
+    private const WP_MODULATION_ID = 20837;
+
+    private const BUFFER_TOP_ID = 27553;
+    private const BUFFER_MIDDLE_ID = 52270;
+    private const BUFFER_BOTTOM_ID = 18594;
+    private const DHW_TOP_ID = 39112;
+    private const DHW_BOTTOM_ID = 40096;
+
+    private const METEO_MAX_ID = 42622;
+    private const METEO_MEAN_ID = 11157;
+    private const METEO_MIN_ID = 28499;
+    private const METEO_SOLAR_ID = 36980;
+
+    private const ROOM_TEMP_IDS = [
+        47619,
+        43486,
+        20056,
+        59980,
+
+        52271,
+        51361,
+        43453,
+        16944,
+        26539,
+        12860,
+
+        32416,
+        25829,
+        45373,
+        29653
+    ];
+
+    private const VALVE_STATE_IDS = [
+        18344,
+        50892,
+        37309,
+        57721,
+
+        52749,
+        46861,
+        49967,
+        15602,
+        27850,
+        10375,
+
+        33924,
+        19131,
+        58629,
+        12822
+    ];
+
+    private const VALVE_DEMAND_IDS = [
+        39391,
+        22281,
+        49588,
+        51260,
+
+        26389,
+        43578,
+        36459,
+        26819,
+        39276,
+        16937,
+
+        19263,
+        17140,
+        14321,
+        20806
+    ];
+
+
+    public function Create()
+    {
+        parent::Create();
+
+        /*
+         * IP-Symcon 9.0
+         *
+         * Typ 2:
+         * HTML-SDK in normaler Kachel UND Vollbild.
+         */
+        $this->SetVisualizationType(2);
     }
 
 
-    .summary-grid {
+    public function ApplyChanges()
+    {
+        parent::ApplyChanges();
 
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(
-                    0,
-                    1fr
+        $this->SetVisualizationType(2);
+
+        /*
+         * Relevante Messwerte abonnieren.
+         */
+        foreach (
+            $this->GetSourceVariableIDs()
+            as $variableID
+        ) {
+
+            if (
+                $variableID > 0
+                &&
+                IPS_VariableExists(
+                    $variableID
                 )
-            );
-    }
-
-
-    .sections {
-
-        grid-template-columns:
-            1fr;
-    }
-
-
-    .data-grid {
-
-        gap:
-            13px
-            16px;
-    }
-
-}
-
-
-@media (max-width: 430px) {
-
-    .settings-text {
-        display: none;
-    }
-
-
-    .settings-button {
-
-        min-width:
-            42px;
-
-        padding:
-            0 10px;
-    }
-
-
-    .compact {
-
-        padding:
-            7px;
-    }
-
-
-    .compact-grid {
-
-        gap:
-            6px;
-    }
-
-
-    .compact-card {
-
-        padding:
-            8px;
-    }
-
-
-    .compact-card .label {
-
-        font-size:
-            12px;
-    }
-
-
-    .compact-card .value {
-
-        font-size:
-            17px;
-    }
-
-
-    .data-grid {
-
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(
-                    0,
-                    1fr
-                )
-            );
-    }
-
-}
-
-
-@media (max-width: 340px) {
-
-    .data-grid {
-
-        grid-template-columns:
-            1fr;
-    }
-
-}
-
-</style>
-
-</head>
-
-
-<body>
-
-<div id="app">
-
-
-<!-- ============================================================
-     COMPACT
-============================================================ -->
-
-<div
-    id="compactView"
-    class="compact"
->
-
-    <div class="compact-head">
-
-        <div class="compact-mode">
-
-            <span
-                id="compactModeDot"
-                class="status-dot standby"
-            ></span>
-
-
-            <div class="compact-mode-text">
-
-                <div class="compact-mode-label">
-                    WP Master-Betriebsart
-                </div>
-
-                <div
-                    id="compactMode"
-                    class="compact-mode-value"
-                >
-                    —
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <button
-            id="compactSettingsButton"
-            class="settings-button"
-            type="button"
-            onclick="openSettings(event)"
-        >
-            ⚙
-            <span class="settings-text">
-                Einstellungen
-            </span>
-        </button>
-
-    </div>
-
-
-    <div class="compact-grid">
-
-        <div class="compact-card">
-
-            <div class="label">
-                Raumtemperatur
-            </div>
-
-            <div
-                id="compactRoomAverage"
-                class="value"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="compact-card">
-
-            <div class="label">
-                FBH Ventile
-            </div>
-
-            <div
-                id="compactValves"
-                class="value"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="compact-card">
-
-            <div class="label">
-                Stellwert max.
-            </div>
-
-            <div
-                id="compactDemand"
-                class="value"
-            >
-                —
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
-<!-- ============================================================
-     DETAIL
-============================================================ -->
-
-<div
-    id="detailView"
-    class="detail"
->
-
-<div class="detail-inner">
-
-
-    <div class="detail-head">
-
-        <div class="detail-mode">
-
-            <span
-                id="detailModeDot"
-                class="status-dot standby"
-            ></span>
-
-
-            <div>
-
-                <div class="detail-mode-title">
-                    WP Master-Betriebsart
-                </div>
-
-                <div
-                    id="detailMode"
-                    class="detail-mode-value"
-                >
-                    —
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <button
-            id="detailSettingsButton"
-            class="settings-button"
-            type="button"
-            onclick="openSettings(event)"
-        >
-            ⚙
-            <span class="settings-text">
-                Einstellungen
-            </span>
-        </button>
-
-    </div>
-
-
-    <!-- ========================================================
-         ÜBERSICHT
-    ========================================================= -->
-
-    <div class="summary-grid">
-
-        <div class="summary-card">
-
-            <div class="label">
-                Raumtemperatur Mittel
-            </div>
-
-            <div
-                id="roomAverage"
-                class="value"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <div class="label">
-                Raum Min. / Max.
-            </div>
-
-            <div
-                id="roomRange"
-                class="value"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <div class="label">
-                FBH Ventile offen
-            </div>
-
-            <div
-                id="valvesOpen"
-                class="value"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="summary-card">
-
-            <div class="label">
-                FBH Stellwert max.
-            </div>
-
-            <div
-                id="demandMaximum"
-                class="value"
-            >
-                —
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ========================================================
-         SEKTIONEN
-    ========================================================= -->
-
-    <div class="sections">
-
-
-        <!-- ====================================================
-             WÄRMEPUMPE
-        ===================================================== -->
-
-        <div class="section">
-
-            <div class="section-title">
-                Wärmepumpe
-            </div>
-
-
-            <div class="data-grid">
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Aussentemperatur
-                    </div>
-
-                    <div
-                        id="outsideTemp"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Vorlauf
-                    </div>
-
-                    <div
-                        id="flowTemp"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Rücklauf
-                    </div>
-
-                    <div
-                        id="returnTemp"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Verdichtermodulation
-                    </div>
-
-                    <div
-                        id="modulation"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Leistungsaufnahme
-                    </div>
-
-                    <div
-                        id="wpPower"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Wärmeleistung
-                    </div>
-
-                    <div
-                        id="heatOutput"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        COP
-                    </div>
-
-                    <div
-                        id="cop"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ====================================================
-             SPEICHER
-        ===================================================== -->
-
-        <div class="section">
-
-            <div class="section-title">
-                Speicher
-            </div>
-
-
-            <div class="data-grid">
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Boiler oben
-                    </div>
-
-                    <div
-                        id="dhwTop"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Boiler unten
-                    </div>
-
-                    <div
-                        id="dhwBottom"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Puffer oben
-                    </div>
-
-                    <div
-                        id="bufferTop"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Puffer Mitte
-                    </div>
-
-                    <div
-                        id="bufferMiddle"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Puffer unten
-                    </div>
-
-                    <div
-                        id="bufferBottom"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ====================================================
-             FBH
-        ===================================================== -->
-
-        <div class="section">
-
-            <div class="section-title">
-                Fussbodenheizung
-            </div>
-
-
-            <div class="data-grid">
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Ventile offen
-                    </div>
-
-                    <div
-                        id="fbhOpen"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Stellwert Mittel
-                    </div>
-
-                    <div
-                        id="fbhDemandAverage"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Stellwert Maximum
-                    </div>
-
-                    <div
-                        id="fbhDemandMaximum"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ====================================================
-             PROGNOSE
-        ===================================================== -->
-
-        <div class="section">
-
-            <div class="section-title">
-                Prognose
-            </div>
-
-
-            <div class="data-grid">
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Morgen Maximum
-                    </div>
-
-                    <div
-                        id="meteoMaximum"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Morgen Mittel
-                    </div>
-
-                    <div
-                        id="meteoMean"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Morgen Minimum
-                    </div>
-
-                    <div
-                        id="meteoMinimum"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Globalstrahlung
-                    </div>
-
-                    <div
-                        id="meteoSolar"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Solcast P50 0–24 h
-                    </div>
-
-                    <div
-                        id="solcastEnergy"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        PV Peak
-                    </div>
-
-                    <div
-                        id="solcastPeak"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Peak Zeitpunkt
-                    </div>
-
-                    <div
-                        id="solcastPeakTime"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Vertrauen
-                    </div>
-
-                    <div
-                        id="solcastConfidence"
-                        class="value"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="peak-block">
-
-                <div class="label">
-                    Peakfenster
-                </div>
-
-                <div
-                    id="solcastPeakWindow"
-                    class="value"
-                >
-                    —
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div
-        id="lastUpdate"
-        class="footer"
-    >
-        —
-    </div>
-
-</div>
-
-</div>
-
-
-</div>
-
-
-<script>
-
-/* ============================================================
-   DATEN
-============================================================ */
-
-let currentData =
-    {};
-
-
-let currentMode =
-    null;
-
-
-let settingsObjectID =
-    0;
-
-
-/* ============================================================
-   HILFSFUNKTIONEN
-============================================================ */
-
-function isNumber(value) {
-
-    return (
-        typeof value === "number"
-        &&
-        Number.isFinite(
-            value
-        )
-    );
-}
-
-
-function formatNumber(
-    value,
-    digits,
-    suffix
-) {
-
-    if (
-        !isNumber(
-            value
-        )
-    ) {
-
-        return "—";
-    }
-
-
-    return (
-        value.toFixed(
-            digits
-        )
-        +
-        suffix
-    );
-}
-
-
-function formatTemperature(value) {
-
-    return formatNumber(
-        value,
-        1,
-        " °C"
-    );
-}
-
-
-function formatKW(value) {
-
-    return formatNumber(
-        value,
-        2,
-        " kW"
-    );
-}
-
-
-function formatPercent(value) {
-
-    return formatNumber(
-        value,
-        0,
-        " %"
-    );
-}
-
-
-function formatTimestamp(
-    timestamp
-) {
-
-    if (
-        !timestamp
-        ||
-        timestamp <= 0
-    ) {
-
-        return "—";
-    }
-
-
-    const date =
-        new Date(
-            timestamp * 1000
-        );
-
-
-    if (
-        Number.isNaN(
-            date.getTime()
-        )
-    ) {
-
-        return "—";
-    }
-
-
-    return date.toLocaleTimeString(
-        "de-CH",
-        {
-            hour: "2-digit",
-            minute: "2-digit"
+            ) {
+
+                $this->RegisterMessage(
+                    $variableID,
+                    VM_UPDATE
+                );
+            }
         }
-    );
-}
-
-
-function setText(
-    id,
-    value
-) {
-
-    const element =
-        document.getElementById(
-            id
-        );
-
-
-    if (
-        !element
-    ) {
-
-        return;
     }
 
 
-    element.textContent =
-        value;
-}
+    public function GetVisualizationTile()
+    {
+        $file =
+            __DIR__
+            .
+            '/module.html';
 
 
-function setModeDot(
-    id,
-    modeCode
-) {
+        if (
+            !file_exists(
+                $file
+            )
+        ) {
 
-    const element =
-        document.getElementById(
-            id
-        );
+            return
+                '<div style="padding:60px 12px;color:var(--content-color)">'
+                .
+                'module.html fehlt.'
+                .
+                '</div>';
+        }
 
 
-    if (
-        !element
-    ) {
+        $html =
+            file_get_contents(
+                $file
+            );
 
-        return;
+
+        if (
+            $html === false
+        ) {
+
+            return
+                '<div style="padding:60px 12px;color:var(--content-color)">'
+                .
+                'module.html konnte nicht geladen werden.'
+                .
+                '</div>';
+        }
+
+
+        /*
+         * Ganz wichtig:
+         *
+         * Die Kachel bekommt sofort Initialdaten.
+         *
+         * Dadurch sind:
+         *
+         * - Werte
+         * - Betriebsart
+         * - Einstellungen-Ziel
+         *
+         * schon beim ersten Render vorhanden.
+         *
+         * Der Settings-Button muss nicht erst auf
+         * einen späteren Refresh warten.
+         */
+
+        $initialData =
+            $this->BuildVisualizationData();
+
+
+        $initialJson =
+            json_encode(
+                $initialData,
+                JSON_UNESCAPED_UNICODE
+                |
+                JSON_UNESCAPED_SLASHES
+                |
+                JSON_HEX_TAG
+                |
+                JSON_HEX_AMP
+                |
+                JSON_HEX_APOS
+                |
+                JSON_HEX_QUOT
+            );
+
+
+        if (
+            $initialJson === false
+        ) {
+
+            $initialJson =
+                '{}';
+        }
+
+
+        return
+            str_replace(
+                '__SBWRV_INITIAL_DATA__',
+                $initialJson,
+                $html
+            );
     }
 
 
-    element.className =
-        "status-dot "
-        +
-        (
-            modeCode
-            ||
-            "standby"
+    public function MessageSink(
+        $TimeStamp,
+        $SenderID,
+        $Message,
+        $Data
+    ) {
+
+        parent::MessageSink(
+            $TimeStamp,
+            $SenderID,
+            $Message,
+            $Data
         );
-}
 
 
-/* ============================================================
-   COMPACT / DETAIL
-============================================================ */
+        if (
+            $Message
+            ===
+            VM_UPDATE
+        ) {
 
-function determineMode() {
-
-    const width =
-        document.documentElement
-            .clientWidth;
-
-
-    const height =
-        document.documentElement
-            .clientHeight;
+            $this->SendLiveValues();
+        }
+    }
 
 
-    /*
-     * Bewährte Logik aus der WP-Visu:
-     *
-     * Kleine Kachel -> Compact
-     *
-     * Sobald Symcon die Kachel beim normalen Öffnen vergrössert,
-     * ist die Höhe gross genug -> sofort Detail.
-     *
-     * Kein zusätzlicher Vollbild-Klick nötig.
-     */
+    public function RequestAction(
+        $Ident,
+        $Value
+    ) {
 
-    if (
-        height < 500
-        ||
-        (
-            width < 760
+        switch (
+            $Ident
+        ) {
+
+            case 'Refresh':
+
+                $this->SendLiveValues();
+
+                return;
+
+
+            default:
+
+                throw new Exception(
+                    'Invalid Ident: '
+                    .
+                    $Ident
+                );
+        }
+    }
+
+
+    private function SendLiveValues(): void
+    {
+        $json =
+            json_encode(
+                $this->BuildVisualizationData(),
+                JSON_UNESCAPED_UNICODE
+                |
+                JSON_UNESCAPED_SLASHES
+            );
+
+
+        if (
+            $json
+            !==
+            false
+        ) {
+
+            $this->UpdateVisualizationValue(
+                $json
+            );
+        }
+    }
+
+
+    private function BuildVisualizationData(): array
+    {
+        /*
+         * ==============================================================
+         * WP MASTER-BETRIEBSART
+         * ==============================================================
+         */
+
+        $heating =
+            $this->ReadBool(
+                self::WP_HEATING_ID
+            );
+
+
+        $cooling =
+            $this->ReadBool(
+                self::WP_COOLING_ID
+            );
+
+
+        if (
+            $heating
             &&
-            height < 560
-        )
-    ) {
+            !$cooling
+        ) {
 
-        return "compact";
-    }
+            $wpMode =
+                'Heizen';
 
+            $wpModeCode =
+                'heating';
 
-    return "detail";
-}
+        } elseif (
+            $cooling
+            &&
+            !$heating
+        ) {
 
+            $wpMode =
+                'Kühlen';
 
-function renderMode() {
+            $wpModeCode =
+                'cooling';
 
-    const newMode =
-        determineMode();
+        } elseif (
+            !$heating
+            &&
+            !$cooling
+        ) {
 
+            $wpMode =
+                'Standby';
 
-    if (
-        newMode === currentMode
-    ) {
+            $wpModeCode =
+                'standby';
 
-        return;
-    }
+        } else {
 
+            $wpMode =
+                'Unplausibel';
 
-    currentMode =
-        newMode;
-
-
-    const compact =
-        document.getElementById(
-            "compactView"
-        );
-
-
-    const detail =
-        document.getElementById(
-            "detailView"
-        );
-
-
-    if (
-        newMode === "compact"
-    ) {
-
-        compact.style.display =
-            "flex";
-
-        detail.style.display =
-            "none";
-
-    } else {
-
-        compact.style.display =
-            "none";
-
-        detail.style.display =
-            "block";
-    }
+            $wpModeCode =
+                'fault';
+        }
 
 
-    applyData();
-}
+        /*
+         * ==============================================================
+         * RAUMTEMPERATUREN
+         * ==============================================================
+         */
+
+        $roomTemperatures =
+            [];
 
 
-/* ============================================================
-   DATEN DARSTELLEN
-============================================================ */
+        foreach (
+            self::ROOM_TEMP_IDS
+            as $variableID
+        ) {
 
-function applyData() {
-
-    const data =
-        currentData
-        ||
-        {};
-
-
-    const wp =
-        data.wp
-        ||
-        {};
-
-
-    const rooms =
-        data.rooms
-        ||
-        {};
-
-
-    const fbh =
-        data.fbh
-        ||
-        {};
-
-
-    const dhw =
-        data.dhw
-        ||
-        {};
-
-
-    const buffer =
-        data.buffer
-        ||
-        {};
-
-
-    const meteo =
-        data.meteo
-        ||
-        {};
-
-
-    const solcast =
-        data.solcast
-        ||
-        {};
-
-
-    /*
-     * Einstellungen-ID
-     */
-
-    settingsObjectID =
-        Number(
-            data.settingsObjectID
-            ||
-            0
-        );
-
-
-    const settingsAvailable =
-        (
-            settingsObjectID > 0
-        );
-
-
-    [
-        "compactSettingsButton",
-        "detailSettingsButton"
-    ].forEach(
-
-        function (id) {
-
-            const button =
-                document.getElementById(
-                    id
+            $value =
+                $this->ReadFloatNullable(
+                    $variableID
                 );
 
 
             if (
-                !button
+                $value !== null
+                &&
+                $value > -30.0
+                &&
+                $value < 60.0
             ) {
 
-                return;
+                $roomTemperatures[] =
+                    $value;
             }
-
-
-            button.classList.toggle(
-                "disabled",
-                !settingsAvailable
-            );
-
-
-            button.disabled =
-                !settingsAvailable;
         }
-    );
 
 
-    /*
-     * Mode
-     */
+        $roomAverage =
+            null;
 
-    setText(
-        "compactMode",
-        wp.mode
-        ||
-        "—"
-    );
+        $roomMinimum =
+            null;
 
+        $roomMaximum =
+            null;
 
-    setText(
-        "detailMode",
-        wp.mode
-        ||
-        "—"
-    );
-
-
-    setModeDot(
-        "compactModeDot",
-        wp.modeCode
-    );
-
-
-    setModeDot(
-        "detailModeDot",
-        wp.modeCode
-    );
-
-
-    /*
-     * Compact
-     */
-
-    setText(
-        "compactRoomAverage",
-        formatTemperature(
-            rooms.average
-        )
-    );
-
-
-    setText(
-        "compactValves",
-        (
-            isNumber(
-                fbh.open
-            )
-            &&
-            isNumber(
-                fbh.total
-            )
-        )
-            ?
-            (
-                fbh.open
-                +
-                " / "
-                +
-                fbh.total
-            )
-            :
-            "—"
-    );
-
-
-    setText(
-        "compactDemand",
-        formatPercent(
-            fbh.demandMaximum
-        )
-    );
-
-
-    /*
-     * Räume
-     */
-
-    setText(
-        "roomAverage",
-        formatTemperature(
-            rooms.average
-        )
-    );
-
-
-    if (
-        isNumber(
-            rooms.minimum
-        )
-        &&
-        isNumber(
-            rooms.maximum
-        )
-    ) {
-
-        setText(
-            "roomRange",
-            rooms.minimum.toFixed(1)
-            +
-            " / "
-            +
-            rooms.maximum.toFixed(1)
-            +
-            " °C"
-        );
-
-    } else {
-
-        setText(
-            "roomRange",
-            "—"
-        );
-    }
-
-
-    /*
-     * FBH
-     */
-
-    const valvesText =
-        (
-            isNumber(
-                fbh.open
-            )
-            &&
-            isNumber(
-                fbh.total
-            )
-        )
-            ?
-            (
-                fbh.open
-                +
-                " / "
-                +
-                fbh.total
-            )
-            :
-            "—";
-
-
-    setText(
-        "valvesOpen",
-        valvesText
-    );
-
-
-    setText(
-        "fbhOpen",
-        valvesText
-    );
-
-
-    setText(
-        "demandMaximum",
-        formatPercent(
-            fbh.demandMaximum
-        )
-    );
-
-
-    setText(
-        "fbhDemandAverage",
-        formatPercent(
-            fbh.demandAverage
-        )
-    );
-
-
-    setText(
-        "fbhDemandMaximum",
-        formatPercent(
-            fbh.demandMaximum
-        )
-    );
-
-
-    /*
-     * WP
-     */
-
-    setText(
-        "outsideTemp",
-        formatTemperature(
-            wp.outside
-        )
-    );
-
-
-    setText(
-        "flowTemp",
-        formatTemperature(
-            wp.flow
-        )
-    );
-
-
-    setText(
-        "returnTemp",
-        formatTemperature(
-            wp.return
-        )
-    );
-
-
-    setText(
-        "modulation",
-        formatPercent(
-            wp.modulation
-        )
-    );
-
-
-    setText(
-        "wpPower",
-        formatKW(
-            wp.power
-        )
-    );
-
-
-    setText(
-        "heatOutput",
-        formatKW(
-            wp.heatOutput
-        )
-    );
-
-
-    setText(
-        "cop",
-        isNumber(
-            wp.cop
-        )
-            ?
-            wp.cop.toFixed(
-                2
-            )
-            :
-            "—"
-    );
-
-
-    /*
-     * Speicher
-     */
-
-    setText(
-        "dhwTop",
-        formatTemperature(
-            dhw.top
-        )
-    );
-
-
-    setText(
-        "dhwBottom",
-        formatTemperature(
-            dhw.bottom
-        )
-    );
-
-
-    setText(
-        "bufferTop",
-        formatTemperature(
-            buffer.top
-        )
-    );
-
-
-    setText(
-        "bufferMiddle",
-        formatTemperature(
-            buffer.middle
-        )
-    );
-
-
-    setText(
-        "bufferBottom",
-        formatTemperature(
-            buffer.bottom
-        )
-    );
-
-
-    /*
-     * Meteo
-     */
-
-    setText(
-        "meteoMaximum",
-        formatTemperature(
-            meteo.maximum
-        )
-    );
-
-
-    setText(
-        "meteoMean",
-        formatTemperature(
-            meteo.mean
-        )
-    );
-
-
-    setText(
-        "meteoMinimum",
-        formatTemperature(
-            meteo.minimum
-        )
-    );
-
-
-    setText(
-        "meteoSolar",
-        formatNumber(
-            meteo.solar,
-            2,
-            " kWh/m²"
-        )
-    );
-
-
-    /*
-     * Solcast
-     */
-
-    setText(
-        "solcastEnergy",
-        formatNumber(
-            solcast.energyP50,
-            1,
-            " kWh"
-        )
-    );
-
-
-    setText(
-        "solcastPeak",
-        formatKW(
-            solcast.peak
-        )
-    );
-
-
-    setText(
-        "solcastPeakTime",
-        formatTimestamp(
-            solcast.peakTime
-        )
-    );
-
-
-    setText(
-        "solcastConfidence",
-        formatPercent(
-            solcast.confidence
-        )
-    );
-
-
-    if (
-        solcast.peakWindowStart > 0
-        &&
-        solcast.peakWindowEnd > 0
-    ) {
-
-        setText(
-            "solcastPeakWindow",
-            formatTimestamp(
-                solcast.peakWindowStart
-            )
-            +
-            " – "
-            +
-            formatTimestamp(
-                solcast.peakWindowEnd
-            )
-        );
-
-    } else {
-
-        setText(
-            "solcastPeakWindow",
-            "—"
-        );
-    }
-
-
-    /*
-     * Aktualisierung
-     */
-
-    setText(
-        "lastUpdate",
-        "Aktualisiert "
-        +
-        formatTimestamp(
-            data.timestamp
-        )
-    );
-}
-
-
-/* ============================================================
-   SYMCON LIVE MESSAGE
-============================================================ */
-
-function handleMessage(data) {
-
-    if (
-        typeof data ===
-        "string"
-    ) {
-
-        try {
-
-            data =
-                JSON.parse(
-                    data
-                );
-
-        } catch (error) {
-
-            console.error(
-                "Sulzbann WP Regelung Visu: JSON Fehler",
-                error
-            );
-
-            return;
-        }
-    }
-
-
-    if (
-        !data
-        ||
-        typeof data !==
-        "object"
-    ) {
-
-        return;
-    }
-
-
-    currentData =
-        data;
-
-
-    applyData();
-}
-
-
-/* ============================================================
-   EINSTELLUNGEN
-============================================================ */
-
-function openSettings(event) {
-
-    /*
-     * Verhindert, dass der Klick auf den Button
-     * gleichzeitig als Klick auf die Kachel interpretiert wird.
-     */
-
-    if (
-        event
-    ) {
-
-        event.preventDefault();
-
-        event.stopPropagation();
-    }
-
-
-    if (
-        !settingsObjectID
-        ||
-        settingsObjectID <= 0
-    ) {
-
-        console.warn(
-            "WP Regelung: Einstellungen-Ziel nicht gefunden."
-        );
-
-        return;
-    }
-
-
-    /*
-     * HTML-SDK Funktion von IP-Symcon.
-     */
-
-    if (
-        typeof openObject ===
-        "function"
-    ) {
-
-        openObject(
-            settingsObjectID
-        );
-
-        return;
-    }
-
-
-    /*
-     * Zusätzlicher Browser-Scope-Fallback.
-     */
-
-    if (
-        typeof window.openObject ===
-        "function"
-    ) {
-
-        window.openObject(
-            settingsObjectID
-        );
-
-        return;
-    }
-
-
-    console.warn(
-        "IP-Symcon openObject() ist in dieser Ansicht nicht verfügbar."
-    );
-}
-
-
-/* ============================================================
-   RESIZE
-============================================================ */
-
-const resizeObserver =
-    new ResizeObserver(
-
-        function () {
-
-            renderMode();
-
-        }
-    );
-
-
-resizeObserver.observe(
-    document.documentElement
-);
-
-
-/* ============================================================
-   START
-============================================================ */
-
-window.addEventListener(
-
-    "load",
-
-    function () {
-
-        /*
-         * Ansicht aufgrund tatsächlicher Kachelgrösse.
-         */
-
-        renderMode();
-
-
-        /*
-         * Werte einmal beim Modul anfordern.
-         */
 
         if (
-            typeof requestAction ===
-            "function"
+            count(
+                $roomTemperatures
+            ) > 0
         ) {
 
-            requestAction(
-                "Refresh",
-                true
-            );
+            $roomAverage =
+                array_sum(
+                    $roomTemperatures
+                )
+                /
+                count(
+                    $roomTemperatures
+                );
+
+
+            $roomMinimum =
+                min(
+                    $roomTemperatures
+                );
+
+
+            $roomMaximum =
+                max(
+                    $roomTemperatures
+                );
         }
 
+
+        /*
+         * ==============================================================
+         * FBH VENTILE
+         * ==============================================================
+         */
+
+        $openValves =
+            0;
+
+
+        foreach (
+            self::VALVE_STATE_IDS
+            as $variableID
+        ) {
+
+            if (
+                $this->ReadBool(
+                    $variableID
+                )
+            ) {
+
+                $openValves++;
+            }
+        }
+
+
+        /*
+         * ==============================================================
+         * FBH STELLWERTE
+         * ==============================================================
+         */
+
+        $demands =
+            [];
+
+
+        foreach (
+            self::VALVE_DEMAND_IDS
+            as $variableID
+        ) {
+
+            $value =
+                $this->ReadFloatNullable(
+                    $variableID
+                );
+
+
+            if (
+                $value !== null
+            ) {
+
+                $demands[] =
+                    $value;
+            }
+        }
+
+
+        $demandAverage =
+            null;
+
+        $demandMaximum =
+            null;
+
+
+        if (
+            count(
+                $demands
+            ) > 0
+        ) {
+
+            $demandAverage =
+                array_sum(
+                    $demands
+                )
+                /
+                count(
+                    $demands
+                );
+
+
+            $demandMaximum =
+                max(
+                    $demands
+                );
+        }
+
+
+        /*
+         * ==============================================================
+         * RÜCKGABE
+         * ==============================================================
+         */
+
+        return [
+
+            'timestamp' =>
+                time(),
+
+
+            /*
+             * Settings-Ziel wird bereits mit Initialdaten gesendet.
+             */
+            'settingsObjectID' =>
+                $this->FindSettingsObject(),
+
+
+            'wp' => [
+
+                'mode' =>
+                    $wpMode,
+
+                'modeCode' =>
+                    $wpModeCode,
+
+                'heating' =>
+                    $heating,
+
+                'cooling' =>
+                    $cooling,
+
+                'outside' =>
+                    $this->ReadFloatNullable(
+                        self::OUTSIDE_TEMP_ID
+                    ),
+
+                'flow' =>
+                    $this->ReadFloatNullable(
+                        self::WP_FLOW_TEMP_ID
+                    ),
+
+                'return' =>
+                    $this->ReadFloatNullable(
+                        self::WP_RETURN_TEMP_ID
+                    ),
+
+                'power' =>
+                    $this->ReadFloatNullable(
+                        self::WP_POWER_ID
+                    ),
+
+                'heatOutput' =>
+                    $this->ReadFloatNullable(
+                        self::WP_HEAT_OUTPUT_ID
+                    ),
+
+                'cop' =>
+                    $this->ReadFloatNullable(
+                        self::WP_COP_ID
+                    ),
+
+                'modulation' =>
+                    $this->ReadFloatNullable(
+                        self::WP_MODULATION_ID
+                    )
+            ],
+
+
+            'rooms' => [
+
+                'count' =>
+                    count(
+                        $roomTemperatures
+                    ),
+
+                'average' =>
+                    $roomAverage,
+
+                'minimum' =>
+                    $roomMinimum,
+
+                'maximum' =>
+                    $roomMaximum
+            ],
+
+
+            'fbh' => [
+
+                'open' =>
+                    $openValves,
+
+                'total' =>
+                    count(
+                        self::VALVE_STATE_IDS
+                    ),
+
+                'demandAverage' =>
+                    $demandAverage,
+
+                'demandMaximum' =>
+                    $demandMaximum
+            ],
+
+
+            'buffer' => [
+
+                'top' =>
+                    $this->ReadFloatNullable(
+                        self::BUFFER_TOP_ID
+                    ),
+
+                'middle' =>
+                    $this->ReadFloatNullable(
+                        self::BUFFER_MIDDLE_ID
+                    ),
+
+                'bottom' =>
+                    $this->ReadFloatNullable(
+                        self::BUFFER_BOTTOM_ID
+                    )
+            ],
+
+
+            'dhw' => [
+
+                'top' =>
+                    $this->ReadFloatNullable(
+                        self::DHW_TOP_ID
+                    ),
+
+                'bottom' =>
+                    $this->ReadFloatNullable(
+                        self::DHW_BOTTOM_ID
+                    )
+            ],
+
+
+            'meteo' => [
+
+                'maximum' =>
+                    $this->ReadFloatNullable(
+                        self::METEO_MAX_ID
+                    ),
+
+                'mean' =>
+                    $this->ReadFloatNullable(
+                        self::METEO_MEAN_ID
+                    ),
+
+                'minimum' =>
+                    $this->ReadFloatNullable(
+                        self::METEO_MIN_ID
+                    ),
+
+                'solar' =>
+                    $this->ReadFloatNullable(
+                        self::METEO_SOLAR_ID
+                    )
+            ],
+
+
+            'solcast' => [
+
+                'energyP50' =>
+                    $this->ReadSolcastFloat(
+                        'SolcastEnergy024P50'
+                    ),
+
+                'peak' =>
+                    $this->ReadSolcastFloat(
+                        'SolcastPeak024'
+                    ),
+
+                'confidence' =>
+                    $this->ReadSolcastFloat(
+                        'SolcastConfidence024'
+                    ),
+
+                'peakTime' =>
+                    $this->ReadSolcastInteger(
+                        'SolcastPeakTime024'
+                    ),
+
+                'peakWindowStart' =>
+                    $this->ReadSolcastInteger(
+                        'SolcastPeakWindowStart024'
+                    ),
+
+                'peakWindowEnd' =>
+                    $this->ReadSolcastInteger(
+                        'SolcastPeakWindowEnd024'
+                    )
+            ]
+        ];
     }
-);
-
-</script>
 
 
-</body>
+    private function GetSourceVariableIDs(): array
+    {
+        $ids = [
 
-</html>
+            self::WP_HEATING_ID,
+            self::WP_COOLING_ID,
+
+            self::OUTSIDE_TEMP_ID,
+
+            self::WP_FLOW_TEMP_ID,
+            self::WP_RETURN_TEMP_ID,
+
+            self::BUFFER_TOP_ID,
+            self::BUFFER_MIDDLE_ID,
+            self::BUFFER_BOTTOM_ID,
+
+            self::DHW_TOP_ID,
+            self::DHW_BOTTOM_ID,
+
+            self::WP_POWER_ID,
+            self::WP_HEAT_OUTPUT_ID,
+            self::WP_COP_ID,
+            self::WP_MODULATION_ID,
+
+            self::METEO_MAX_ID,
+            self::METEO_MEAN_ID,
+            self::METEO_MIN_ID,
+            self::METEO_SOLAR_ID
+        ];
+
+
+        foreach (
+            self::ROOM_TEMP_IDS
+            as $id
+        ) {
+
+            $ids[] =
+                $id;
+        }
+
+
+        foreach (
+            self::VALVE_STATE_IDS
+            as $id
+        ) {
+
+            $ids[] =
+                $id;
+        }
+
+
+        foreach (
+            self::VALVE_DEMAND_IDS
+            as $id
+        ) {
+
+            $ids[] =
+                $id;
+        }
+
+
+        foreach (
+            [
+                'SolcastEnergy024P50',
+                'SolcastPeak024',
+                'SolcastConfidence024',
+                'SolcastPeakTime024',
+                'SolcastPeakWindowStart024',
+                'SolcastPeakWindowEnd024'
+            ]
+            as $ident
+        ) {
+
+            $id =
+                $this->GetSolcastVariableID(
+                    $ident
+                );
+
+
+            if (
+                $id > 0
+            ) {
+
+                $ids[] =
+                    $id;
+            }
+        }
+
+
+        return
+            array_values(
+                array_unique(
+                    $ids
+                )
+            );
+    }
+
+
+    private function GetSolcastVariableID(
+        string $ident
+    ): int {
+
+        if (
+            !IPS_ObjectExists(
+                self::SOLCAST_PARENT_ID
+            )
+        ) {
+
+            return 0;
+        }
+
+
+        $id =
+            @IPS_GetObjectIDByIdent(
+                $ident,
+                self::SOLCAST_PARENT_ID
+            );
+
+
+        if (
+            $id === false
+            ||
+            !IPS_VariableExists(
+                (int) $id
+            )
+        ) {
+
+            return 0;
+        }
+
+
+        return
+            (int) $id;
+    }
+
+
+    private function ReadSolcastFloat(
+        string $ident
+    ): ?float {
+
+        $id =
+            $this->GetSolcastVariableID(
+                $ident
+            );
+
+
+        return
+            (
+                $id > 0
+            )
+                ?
+                $this->ReadFloatNullable(
+                    $id
+                )
+                :
+                null;
+    }
+
+
+    private function ReadSolcastInteger(
+        string $ident
+    ): int {
+
+        $id =
+            $this->GetSolcastVariableID(
+                $ident
+            );
+
+
+        return
+            (
+                $id > 0
+            )
+                ?
+                (int) GetValue(
+                    $id
+                )
+                :
+                0;
+    }
+
+
+    /*
+     * ==============================================================
+     * SETTINGS-ZIEL
+     * ==============================================================
+     *
+     * Gesucht wird:
+     *
+     * Siemens OWZ
+     *   > WP Regelung
+     *       > Parameter
+     */
+
+    private function FindSettingsObject(): int
+    {
+        if (
+            !IPS_ObjectExists(
+                self::OZW_ROOT_ID
+            )
+        ) {
+
+            return 0;
+        }
+
+
+        $wpRegulation =
+            $this->FindRecursiveByName(
+                self::OZW_ROOT_ID,
+                'WP Regelung'
+            );
+
+
+        if (
+            $wpRegulation <= 0
+        ) {
+
+            return 0;
+        }
+
+
+        $parameters =
+            $this->FindRecursiveByName(
+                $wpRegulation,
+                'Parameter'
+            );
+
+
+        return
+            (
+                $parameters > 0
+            )
+                ?
+                $parameters
+                :
+                $wpRegulation;
+    }
+
+
+    private function FindRecursiveByName(
+        int $parentID,
+        string $name
+    ): int {
+
+        if (
+            $parentID <= 0
+            ||
+            !IPS_ObjectExists(
+                $parentID
+            )
+        ) {
+
+            return 0;
+        }
+
+
+        $queue =
+            [
+                $parentID
+            ];
+
+
+        while (
+            count(
+                $queue
+            ) > 0
+        ) {
+
+            $current =
+                array_shift(
+                    $queue
+                );
+
+
+            foreach (
+                IPS_GetChildrenIDs(
+                    $current
+                )
+                as $childID
+            ) {
+
+                if (
+                    IPS_GetName(
+                        $childID
+                    )
+                    ===
+                    $name
+                ) {
+
+                    return
+                        (int) $childID;
+                }
+
+
+                $queue[] =
+                    (int) $childID;
+            }
+        }
+
+
+        return 0;
+    }
+
+
+    private function ReadBool(
+        int $variableID
+    ): bool {
+
+        if (
+            $variableID <= 0
+            ||
+            !IPS_VariableExists(
+                $variableID
+            )
+        ) {
+
+            return false;
+        }
+
+
+        return
+            (bool) GetValue(
+                $variableID
+            );
+    }
+
+
+    private function ReadFloatNullable(
+        int $variableID
+    ): ?float {
+
+        if (
+            $variableID <= 0
+            ||
+            !IPS_VariableExists(
+                $variableID
+            )
+        ) {
+
+            return null;
+        }
+
+
+        $value =
+            GetValue(
+                $variableID
+            );
+
+
+        return
+            is_numeric(
+                $value
+            )
+                ?
+                (float) $value
+                :
+                null;
+    }
+}
