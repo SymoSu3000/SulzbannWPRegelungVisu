@@ -14,12 +14,7 @@
 
 <style>
 
-/* ============================================================
-   THEME
-============================================================ */
-
 :root {
-
     color-scheme: light dark;
 
     --sb-text:
@@ -66,7 +61,6 @@
 @media (prefers-color-scheme:dark) {
 
     :root {
-
         --sb-text:
             var(
                 --content-color,
@@ -119,7 +113,6 @@
 
 html,
 body {
-
     margin:0;
     padding:0;
 
@@ -142,15 +135,12 @@ body {
 
 
 button {
-
     font:inherit;
-
     color:inherit;
 }
 
 
 #app {
-
     width:100%;
     height:100%;
 
@@ -158,12 +148,7 @@ button {
 }
 
 
-/* ============================================================
-   SAFE AREA
-============================================================ */
-
 .view-shell {
-
     width:100%;
     height:100%;
 
@@ -175,12 +160,41 @@ button {
 }
 
 
-/* ============================================================
-   BASIS
-============================================================ */
+.compact {
+    display:flex;
+
+    flex-direction:column;
+
+    gap:7px;
+
+    min-height:0;
+}
+
+
+.compact-head {
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:10px;
+
+    min-height:34px;
+}
+
+
+.compact-mode {
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    min-width:0;
+}
+
 
 .status-dot {
-
     width:10px;
     height:10px;
 
@@ -213,31 +227,34 @@ button {
 
 
 .label {
-
-    font-size:12px;
-
+    font-size:13px;
     line-height:1.18;
 
     color:var(--sb-muted);
 }
 
 
-.value {
+.compact-mode-value {
+    margin-top:2px;
 
+    font-size:17px;
+    font-weight:700;
+
+    line-height:1.15;
+}
+
+
+.value {
     margin-top:3px;
 
-    font-size:16px;
-
+    font-size:17px;
     line-height:1.15;
 
     font-weight:700;
-
-    color:var(--sb-text);
 }
 
 
 .card {
-
     background:var(--sb-card);
 
     border:
@@ -251,63 +268,7 @@ button {
 }
 
 
-/* ============================================================
-   HEADER
-============================================================ */
-
-.compact {
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:7px;
-
-    min-height:0;
-}
-
-
-.compact-head {
-
-    display:flex;
-
-    align-items:center;
-    justify-content:space-between;
-
-    gap:10px;
-
-    min-height:34px;
-}
-
-
-.compact-mode {
-
-    display:flex;
-
-    align-items:center;
-
-    gap:7px;
-
-    min-width:0;
-}
-
-
-.compact-mode-value {
-
-    font-size:16px;
-
-    font-weight:700;
-
-    line-height:1.15;
-}
-
-
-/* ============================================================
-   BUTTONS
-============================================================ */
-
 .actions {
-
     display:flex;
 
     align-items:center;
@@ -317,7 +278,6 @@ button {
 
 
 .action-button {
-
     width:36px;
     height:36px;
 
@@ -340,25 +300,18 @@ button {
     cursor:pointer;
 
     font-size:14px;
-
     font-weight:600;
 }
 
 
 .action-button:disabled {
-
     opacity:.38;
 
     cursor:default;
 }
 
 
-/* ============================================================
-   DATEN
-============================================================ */
-
 .compact-grid {
-
     display:grid;
 
     grid-template-columns:
@@ -374,11 +327,10 @@ button {
 
 
 .compact-card {
-
-    min-height:61px;
+    min-height:55px;
 
     padding:
-        8px
+        7px
         9px;
 
     display:flex;
@@ -389,64 +341,9 @@ button {
 }
 
 
-.span-2 {
-
-    grid-column:
-        span 2;
-}
-
-
-/* ============================================================
-   DIAGNOSE
-============================================================ */
-
-.mobile-diagnostic {
-
-    display:none;
-
-    margin-top:1px;
-
-    padding:
-        5px
-        7px;
-
-    border:
-        1px
-        solid
-        var(--sb-border);
-
-    border-radius:7px;
-
-    background:var(--sb-soft);
-
-    font-size:10px;
-
-    line-height:1.3;
-
-    color:var(--sb-muted);
-}
-
-
-.mobile-diagnostic.active {
-
-    display:block;
-}
-
-
-.mobile-diagnostic strong {
-
-    color:var(--sb-text);
-}
-
-
-/* ============================================================
-   RESPONSIVE
-============================================================ */
-
 @media (max-width:700px) {
 
     .view-shell {
-
         padding:
             48px
             7px
@@ -456,7 +353,6 @@ button {
 
 
     .compact-grid {
-
         grid-template-columns:
             repeat(
                 2,
@@ -468,8 +364,7 @@ button {
 
 
     .compact-card {
-
-        min-height:58px;
+        min-height:53px;
 
         padding:
             7px
@@ -478,48 +373,30 @@ button {
 
 
     .label {
-        font-size:11px;
+        font-size:12px;
     }
 
 
     .value {
-        font-size:15px;
+        font-size:16px;
     }
 
 
-    .span-2 {
-
-        grid-column:
-            auto;
+    .compact-mode-value {
+        font-size:16px;
     }
 }
 
 
 @media (max-width:380px) {
 
-    .compact-grid {
-
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0,1fr)
-            );
-    }
-
-
     .compact-card {
-
-        min-height:55px;
-    }
-
-
-    .label {
-        font-size:10px;
+        min-height:51px;
     }
 
 
     .value {
-        font-size:14px;
+        font-size:15px;
     }
 }
 
@@ -535,279 +412,268 @@ button {
 
 
 
-<!-- ============================================================
-     COMPACT TEMPLATE
-============================================================ -->
-
 <template id="compactTemplate">
 
-<div class="view-shell compact">
+    <div class="view-shell compact">
 
 
-    <div class="compact-head">
+        <div class="compact-head">
 
 
-        <div class="compact-mode">
+            <div class="compact-mode">
 
-            <span
-                data-role="modeDot"
-                class="status-dot standby"
-            ></span>
+                <span
+                    data-role="modeDot"
+                    class="status-dot standby"
+                ></span>
 
 
-            <div>
+                <div>
 
-                <div class="label">
-                    WP Master-Betriebsart
+                    <div class="label">
+                        WP Master-Betriebsart
+                    </div>
+
+
+                    <div
+                        class="compact-mode-value"
+                        data-role="mode"
+                    >
+                        —
+                    </div>
+
                 </div>
 
+            </div>
+
+
+            <div class="actions">
+
+                <button
+                    data-role="grossButton"
+                    class="action-button"
+                    type="button"
+                    title="Grossansicht"
+                    aria-label="Grossansicht"
+                >
+                    ↗
+                </button>
+
+
+                <button
+                    data-role="settingsButton"
+                    class="action-button"
+                    type="button"
+                    title="Einstellungen"
+                    aria-label="Einstellungen"
+                >
+                    ⚙
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="compact-grid">
+
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    Aussentemperatur
+                </div>
 
                 <div
-                    class="compact-mode-value"
-                    data-role="mode"
+                    class="value"
+                    data-role="outside"
                 >
                     —
                 </div>
 
             </div>
 
-        </div>
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    WP Vorlauf
+                </div>
+
+                <div
+                    class="value"
+                    data-role="flow"
+                >
+                    —
+                </div>
+
+            </div>
 
 
-        <div class="actions">
+            <div class="card compact-card">
 
-            <button
-                data-role="grossButton"
-                class="action-button"
-                type="button"
-                title="Grossansicht"
-            >
-                ↗
-            </button>
+                <div class="label">
+                    WP Rücklauf
+                </div>
+
+                <div
+                    class="value"
+                    data-role="return"
+                >
+                    —
+                </div>
+
+            </div>
 
 
-            <button
-                data-role="settingsButton"
-                class="action-button"
-                type="button"
-                title="Einstellungen"
-            >
-                ⚙
-            </button>
+            <div class="card compact-card">
+
+                <div class="label">
+                    Raumtemperatur Ø
+                </div>
+
+                <div
+                    class="value"
+                    data-role="roomAverage"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    FBH Ventile
+                </div>
+
+                <div
+                    class="value"
+                    data-role="valvesOpen"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    Stellwert max.
+                </div>
+
+                <div
+                    class="value"
+                    data-role="demandMaximum"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    Boiler oben
+                </div>
+
+                <div
+                    class="value"
+                    data-role="dhwTop"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    Boiler unten
+                </div>
+
+                <div
+                    class="value"
+                    data-role="dhwBottom"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    Puffer oben
+                </div>
+
+                <div
+                    class="value"
+                    data-role="bufferTop"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    Puffer Mitte
+                </div>
+
+                <div
+                    class="value"
+                    data-role="bufferMiddle"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    Puffer unten
+                </div>
+
+                <div
+                    class="value"
+                    data-role="bufferBottom"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="card compact-card">
+
+                <div class="label">
+                    WP Modulation
+                </div>
+
+                <div
+                    class="value"
+                    data-role="modulation"
+                >
+                    —
+                </div>
+
+            </div>
+
 
         </div>
 
     </div>
-
-
-
-    <div class="compact-grid">
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Aussentemperatur
-            </div>
-
-            <div
-                class="value"
-                data-role="outside"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                WP Vorlauf
-            </div>
-
-            <div
-                class="value"
-                data-role="flow"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                WP Rücklauf
-            </div>
-
-            <div
-                class="value"
-                data-role="return"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Raumtemperatur Ø
-            </div>
-
-            <div
-                class="value"
-                data-role="roomAverage"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                FBH Ventile
-            </div>
-
-            <div
-                class="value"
-                data-role="valvesOpen"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Stellwert max.
-            </div>
-
-            <div
-                class="value"
-                data-role="demandMaximum"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Boiler oben
-            </div>
-
-            <div
-                class="value"
-                data-role="dhwTop"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Boiler unten
-            </div>
-
-            <div
-                class="value"
-                data-role="dhwBottom"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Puffer oben
-            </div>
-
-            <div
-                class="value"
-                data-role="bufferTop"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Puffer Mitte
-            </div>
-
-            <div
-                class="value"
-                data-role="bufferMiddle"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Puffer unten
-            </div>
-
-            <div
-                class="value"
-                data-role="bufferBottom"
-            >
-                —
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                WP Modulation
-            </div>
-
-            <div
-                class="value"
-                data-role="modulation"
-            >
-                —
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-
-    <div
-        class="mobile-diagnostic"
-        data-role="mobileDiagnostic"
-    >
-    </div>
-
-
-</div>
 
 </template>
 
@@ -823,19 +689,271 @@ const INITIAL_DATA =
 
 
 let currentData =
-    (
+    isObject(
         INITIAL_DATA
-        &&
-        typeof INITIAL_DATA === "object"
     )
         ?
-        INITIAL_DATA
+        cloneValue(
+            INITIAL_DATA
+        )
         :
         {};
 
 
+let refreshAttempts = 0;
+let refreshTimer = null;
+
+
 /* ============================================================
-   HELPERS
+   OBJECT / MERGE
+============================================================ */
+
+function isObject(value) {
+
+    return (
+        value !== null
+        &&
+        typeof value === "object"
+        &&
+        !Array.isArray(value)
+    );
+}
+
+
+function cloneValue(value) {
+
+    if (
+        Array.isArray(value)
+    ) {
+
+        return value.map(
+            cloneValue
+        );
+    }
+
+
+    if (
+        isObject(value)
+    ) {
+
+        const out = {};
+
+
+        Object.keys(
+            value
+        )
+        .forEach(
+            key => {
+
+                out[key] =
+                    cloneValue(
+                        value[key]
+                    );
+            }
+        );
+
+
+        return out;
+    }
+
+
+    return value;
+}
+
+
+function mergeData(
+    base,
+    incoming
+) {
+
+    const result =
+        isObject(base)
+            ?
+            cloneValue(base)
+            :
+            {};
+
+
+    if (
+        !isObject(incoming)
+    ) {
+        return result;
+    }
+
+
+    Object.keys(
+        incoming
+    )
+    .forEach(
+        key => {
+
+            const next =
+                incoming[key];
+
+
+            if (
+                isObject(next)
+            ) {
+
+                result[key] =
+                    mergeData(
+                        isObject(
+                            result[key]
+                        )
+                            ?
+                            result[key]
+                            :
+                            {},
+                        next
+                    );
+
+                return;
+            }
+
+
+            /*
+             * null / undefined darf einen bereits gültigen Wert
+             * nicht zerstören.
+             */
+            if (
+                next === null
+                ||
+                typeof next
+                ===
+                "undefined"
+            ) {
+
+                if (
+                    !(key in result)
+                ) {
+                    result[key] =
+                        next;
+                }
+
+                return;
+            }
+
+
+            result[key] =
+                next;
+        }
+    );
+
+
+    return result;
+}
+
+
+/*
+ * Nur Payloads aus unserer eigenen Visualisierung akzeptieren.
+ * Fremde/leere Objekt-Nachrichten dürfen currentData nicht ersetzen.
+ */
+function isExpectedPayload(data) {
+
+    if (
+        !isObject(data)
+    ) {
+        return false;
+    }
+
+
+    return (
+        isObject(data.wp)
+        ||
+        isObject(data.rooms)
+        ||
+        isObject(data.fbh)
+        ||
+        isObject(data.dhw)
+        ||
+        isObject(data.buffer)
+        ||
+        isObject(data.meteo)
+        ||
+        isObject(data.solcast)
+        ||
+        typeof data.settingsObjectID
+        ===
+        "number"
+        ||
+        typeof data.grossObjectID
+        ===
+        "number"
+    );
+}
+
+
+/*
+ * Prüft, ob fachlich brauchbare Kerndaten vorhanden sind.
+ */
+function hasCoreData() {
+
+    const wp =
+        isObject(
+            currentData.wp
+        )
+            ?
+            currentData.wp
+            :
+            {};
+
+
+    const rooms =
+        isObject(
+            currentData.rooms
+        )
+            ?
+            currentData.rooms
+            :
+            {};
+
+
+    const fbh =
+        isObject(
+            currentData.fbh
+        )
+            ?
+            currentData.fbh
+            :
+            {};
+
+
+    return (
+        typeof wp.mode
+        ===
+        "string"
+        &&
+        wp.mode.length
+        >
+        0
+        &&
+        (
+            Number.isFinite(
+                wp.outside
+            )
+            ||
+            Number.isFinite(
+                wp.flow
+            )
+            ||
+            Number.isFinite(
+                wp.return
+            )
+            ||
+            Number.isFinite(
+                rooms.average
+            )
+            ||
+            Number.isFinite(
+                fbh.total
+            )
+        )
+    );
+}
+
+
+/* ============================================================
+   DOM
 ============================================================ */
 
 function allRole(role) {
@@ -861,12 +979,22 @@ function setRoleText(
     .forEach(
         element => {
 
-            element.textContent =
-                value;
+            if (
+                element.textContent
+                !==
+                value
+            ) {
+                element.textContent =
+                    value;
+            }
         }
     );
 }
 
+
+/* ============================================================
+   FORMAT
+============================================================ */
 
 function isNumber(value) {
 
@@ -886,7 +1014,9 @@ function fmt(
 
     return isNumber(value)
         ?
-        value.toFixed(digits)
+        value.toFixed(
+            digits
+        )
         +
         suffix
         :
@@ -911,121 +1041,6 @@ function fmtPercent(value) {
         0,
         " %"
     );
-}
-
-
-/* ============================================================
-   MOBILE ERKENNUNG
-============================================================ */
-
-function isLikelyMobileClient() {
-
-    const ua =
-        navigator.userAgent
-        ||
-        "";
-
-
-    const byUA =
-        /Android|iPhone|iPad|iPod|Mobile/i.test(
-            ua
-        );
-
-
-    const byWidth =
-        window.innerWidth
-        <=
-        700;
-
-
-    return (
-        byUA
-        ||
-        byWidth
-    );
-}
-
-
-/* ============================================================
-   DIAGNOSE
-============================================================ */
-
-function showDiagnostic(
-    message
-) {
-
-    const box =
-        document.querySelector(
-            '[data-role="mobileDiagnostic"]'
-        );
-
-
-    if (!box) {
-        return;
-    }
-
-
-    const openObjectAvailable =
-        typeof openObject
-        ===
-        "function";
-
-
-    const requestActionAvailable =
-        typeof requestAction
-        ===
-        "function";
-
-
-    const width =
-        window.innerWidth;
-
-
-    const height =
-        window.innerHeight;
-
-
-    box.classList.add(
-        "active"
-    );
-
-
-    box.innerHTML =
-        "<strong>"
-        +
-        message
-        +
-        "</strong>"
-        +
-        "<br>"
-        +
-        "openObject: "
-        +
-        (
-            openObjectAvailable
-                ?
-                "JA"
-                :
-                "NEIN"
-        )
-        +
-        " · requestAction: "
-        +
-        (
-            requestActionAvailable
-                ?
-                "JA"
-                :
-                "NEIN"
-        )
-        +
-        " · Viewport: "
-        +
-        width
-        +
-        " × "
-        +
-        height;
 }
 
 
@@ -1059,18 +1074,16 @@ function renderCompact() {
 
 
     bindButtons();
-
     applyData();
 }
 
 
 /* ============================================================
-   NAVIGATION
+   CLIENTLOKALE NAVIGATION
 ============================================================ */
 
 function openLocalObject(
-    objectID,
-    label
+    objectID
 ) {
 
     const target =
@@ -1081,63 +1094,23 @@ function openLocalObject(
         );
 
 
-    if (target <= 0) {
-
-        showDiagnostic(
-            label
-            +
-            ": Ziel-ID fehlt"
-        );
-
-        return false;
-    }
-
-
     if (
+        target <= 0
+        ||
         typeof openObject
         !==
         "function"
     ) {
-
-        showDiagnostic(
-            label
-            +
-            ": openObject nicht verfügbar"
-        );
-
         return false;
     }
 
 
-    /*
-     * MOBILE:
-     *
-     * Der bisherige Test führte dazu,
-     * dass die Werte aus der Kachel verschwanden.
-     *
-     * Deshalb wird Mobile in diesem Diagnose-Stand
-     * bewusst NICHT erneut blind umgeschaltet.
-     */
-    if (
-        isLikelyMobileClient()
-    ) {
-
-        showDiagnostic(
-            label
-            +
-            ": Mobile-Navigation vorerst blockiert"
-        );
-
-        return false;
-    }
-
-
-    /*
-     * DESKTOP / BROWSER:
-     * bestätigter funktionierender clientlokaler Weg.
-     */
     try {
 
+        /*
+         * Offizieller HTML-SDK-Weg:
+         * öffnet im aktuell auslösenden Client.
+         */
         openObject(
             target
         );
@@ -1147,12 +1120,9 @@ function openLocalObject(
 
     } catch (error) {
 
-        showDiagnostic(
-            label
-            +
-            ": "
-            +
-            String(error)
+        console.error(
+            "SBWRV openObject failed",
+            error
         );
 
 
@@ -1178,14 +1148,23 @@ function bindButtons() {
                 event => {
 
                     event.preventDefault();
-
                     event.stopPropagation();
 
 
-                    openLocalObject(
-                        currentData.settingsObjectID,
-                        "Einstellungen"
-                    );
+                    if (
+                        !openLocalObject(
+                            currentData.settingsObjectID
+                        )
+                    ) {
+
+                        /*
+                         * Ziel-ID fehlt eventuell nur,
+                         * weil Livewerte noch nicht eingetroffen sind.
+                         */
+                        requestRefresh(
+                            true
+                        );
+                    }
                 }
             );
         }
@@ -1203,14 +1182,19 @@ function bindButtons() {
                 event => {
 
                     event.preventDefault();
-
                     event.stopPropagation();
 
 
-                    openLocalObject(
-                        currentData.grossObjectID,
-                        "Grossansicht"
-                    );
+                    if (
+                        !openLocalObject(
+                            currentData.grossObjectID
+                        )
+                    ) {
+
+                        requestRefresh(
+                            true
+                        );
+                    }
                 }
             );
         }
@@ -1219,52 +1203,70 @@ function bindButtons() {
 
 
 /* ============================================================
-   APPLY DATA
+   DATEN ANZEIGEN
 ============================================================ */
 
 function applyData() {
 
     const d =
-        currentData
-        ||
-        {};
+        isObject(
+            currentData
+        )
+            ?
+            currentData
+            :
+            {};
 
 
     const wp =
-        d.wp
-        ||
-        {};
+        isObject(d.wp)
+            ?
+            d.wp
+            :
+            {};
 
 
     const rooms =
-        d.rooms
-        ||
-        {};
+        isObject(d.rooms)
+            ?
+            d.rooms
+            :
+            {};
 
 
     const fbh =
-        d.fbh
-        ||
-        {};
+        isObject(d.fbh)
+            ?
+            d.fbh
+            :
+            {};
 
 
     const dhw =
-        d.dhw
-        ||
-        {};
+        isObject(d.dhw)
+            ?
+            d.dhw
+            :
+            {};
 
 
     const buffer =
-        d.buffer
-        ||
-        {};
+        isObject(d.buffer)
+            ?
+            d.buffer
+            :
+            {};
 
 
     setRoleText(
         "mode",
-        wp.mode
-        ||
-        "—"
+        typeof wp.mode
+        ===
+        "string"
+            ?
+            wp.mode
+            :
+            "—"
     );
 
 
@@ -1278,9 +1280,13 @@ function applyData() {
                 "status-dot "
                 +
                 (
-                    wp.modeCode
-                    ||
-                    "standby"
+                    typeof wp.modeCode
+                    ===
+                    "string"
+                        ?
+                        wp.modeCode
+                        :
+                        "standby"
                 );
         }
     );
@@ -1394,6 +1400,168 @@ function applyData() {
             buffer.bottom
         )
     );
+
+
+    const settingsOK =
+        Number(
+            d.settingsObjectID
+            ||
+            0
+        )
+        >
+        0
+        &&
+        typeof openObject
+        ===
+        "function";
+
+
+    const grossOK =
+        Number(
+            d.grossObjectID
+            ||
+            0
+        )
+        >
+        0
+        &&
+        typeof openObject
+        ===
+        "function";
+
+
+    allRole(
+        "settingsButton"
+    )
+    .forEach(
+        button => {
+
+            button.disabled =
+                !settingsOK;
+
+
+            button.title =
+                settingsOK
+                    ?
+                    "WP Regelung Einstellungen öffnen"
+                    :
+                    "Einstellungen werden geladen";
+        }
+    );
+
+
+    allRole(
+        "grossButton"
+    )
+    .forEach(
+        button => {
+
+            button.disabled =
+                !grossOK;
+
+
+            button.title =
+                grossOK
+                    ?
+                    "Grossansicht öffnen"
+                    :
+                    "Grossansicht wird geladen";
+        }
+    );
+}
+
+
+/* ============================================================
+   REFRESH / RETRY
+============================================================ */
+
+function requestRefresh(force) {
+
+    if (
+        typeof requestAction
+        !==
+        "function"
+    ) {
+        return;
+    }
+
+
+    if (
+        !force
+        &&
+        hasCoreData()
+    ) {
+        return;
+    }
+
+
+    requestAction(
+        "Refresh",
+        true
+    );
+}
+
+
+function scheduleRefreshRetry() {
+
+    if (
+        refreshTimer !== null
+    ) {
+        clearTimeout(
+            refreshTimer
+        );
+    }
+
+
+    if (
+        hasCoreData()
+        ||
+        refreshAttempts >= 2
+    ) {
+
+        refreshTimer =
+            null;
+
+        return;
+    }
+
+
+    const delays = [
+        500,
+        1500
+    ];
+
+
+    const delay =
+        delays[
+            refreshAttempts
+        ]
+        ||
+        1500;
+
+
+    refreshAttempts +=
+        1;
+
+
+    refreshTimer =
+        setTimeout(
+            () => {
+
+                if (
+                    !hasCoreData()
+                ) {
+
+                    requestRefresh(
+                        true
+                    );
+
+
+                    scheduleRefreshRetry();
+                }
+            },
+            delay
+        );
 }
 
 
@@ -1423,22 +1591,50 @@ function handleMessage(data) {
     }
 
 
+    /*
+     * Leere/fremde Nachrichten dürfen gültige Initialdaten
+     * nicht mehr zerstören.
+     */
     if (
-        !data
-        ||
-        typeof data
-        !==
-        "object"
+        !isExpectedPayload(
+            data
+        )
     ) {
         return;
     }
 
 
     currentData =
-        data;
+        mergeData(
+            currentData,
+            data
+        );
 
 
     applyData();
+
+
+    if (
+        hasCoreData()
+    ) {
+
+        refreshAttempts =
+            0;
+
+
+        if (
+            refreshTimer !== null
+        ) {
+
+            clearTimeout(
+                refreshTimer
+            );
+
+
+            refreshTimer =
+                null;
+        }
+    }
 }
 
 
@@ -1450,20 +1646,23 @@ window.addEventListener(
     "load",
     () => {
 
+        /*
+         * Zuerst direkt die vom PHP eingebetteten Initialdaten
+         * darstellen.
+         */
         renderCompact();
 
 
-        if (
-            typeof requestAction
-            ===
-            "function"
-        ) {
+        /*
+         * Nur wenn Daten fehlen, Refresh anfordern.
+         * Danach maximal zwei zeitversetzte Retries.
+         */
+        requestRefresh(
+            false
+        );
 
-            requestAction(
-                "Refresh",
-                true
-            );
-        }
+
+        scheduleRefreshRetry();
     }
 );
 
