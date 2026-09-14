@@ -9,13 +9,18 @@ class SulzbannWPRegelungVisu extends IPSModule
      * SULZBANN WP REGELUNG VISU
      * ============================================================
      *
-     * RÜCKSETZSTAND 14.09.2026
+     * STABILER STAND 14.09.2026
      *
-     * Ziel:
-     * - sichtbare Compact-Kachel
-     * - korrektes Hell-/Dunkel-Theme
-     * - Einstellungen funktionieren
-     * - Grossansicht funktioniert über bekannten Zwischenweg
+     * - Compact = HTML-SDK
+     * - VisualizationType 1
+     * - Grossansicht = WebContent-Unterobjekt
+     * - Einstellungen und Grossansicht werden CLIENTSEITIG
+     *   mit openObject() geöffnet
+     *
+     * WICHTIG:
+     * VISU_OpenObject() wird NICHT mehr für Benutzer-Navigation
+     * verwendet, da sonst andere gleichzeitig geöffnete Clients
+     * ebenfalls umgeschaltet werden.
      *
      * Keine WP-/OZW-/KNX-Schreibzugriffe.
      * ============================================================
@@ -23,6 +28,12 @@ class SulzbannWPRegelungVisu extends IPSModule
 
     private const OZW_ROOT_ID = 28320;
     private const SOLCAST_PARENT_ID = 16397;
+
+    /*
+     * ============================================================
+     * WP / OZW
+     * ============================================================
+     */
 
     private const WP_HEATING_ID = 44357;
     private const WP_COOLING_ID = 17689;
@@ -36,6 +47,12 @@ class SulzbannWPRegelungVisu extends IPSModule
     private const WP_COP_ID = 37700;
     private const WP_MODULATION_ID = 20837;
 
+    /*
+     * ============================================================
+     * SPEICHER
+     * ============================================================
+     */
+
     private const BUFFER_TOP_ID = 27553;
     private const BUFFER_MIDDLE_ID = 52270;
     private const BUFFER_BOTTOM_ID = 18594;
@@ -43,10 +60,22 @@ class SulzbannWPRegelungVisu extends IPSModule
     private const DHW_TOP_ID = 39112;
     private const DHW_BOTTOM_ID = 40096;
 
+    /*
+     * ============================================================
+     * METEO
+     * ============================================================
+     */
+
     private const METEO_MAX_ID = 42622;
     private const METEO_MEAN_ID = 11157;
     private const METEO_MIN_ID = 28499;
     private const METEO_SOLAR_ID = 36980;
+
+    /*
+     * ============================================================
+     * RAUMTEMPERATUREN
+     * ============================================================
+     */
 
     private const ROOM_TEMP_IDS = [
         // EG
@@ -70,6 +99,12 @@ class SulzbannWPRegelungVisu extends IPSModule
         29653
     ];
 
+    /*
+     * ============================================================
+     * FBH VENTILSTATUS
+     * ============================================================
+     */
+
     private const VALVE_STATE_IDS = [
         // EG
         18344,
@@ -91,6 +126,12 @@ class SulzbannWPRegelungVisu extends IPSModule
         58629,
         12822
     ];
+
+    /*
+     * ============================================================
+     * FBH STELLWERTE
+     * ============================================================
+     */
 
     private const VALVE_DEMAND_IDS = [
         // EG
@@ -114,21 +155,23 @@ class SulzbannWPRegelungVisu extends IPSModule
         20806
     ];
 
+    /*
+     * ============================================================
+     * CREATE
+     * ============================================================
+     */
+
     public function Create(): void
     {
         parent::Create();
 
         /*
-         * Type 1 ist bei uns der bestätigte sichtbare Compact-Stand.
-         *
-         * Type 2 NICHT mehr verwenden:
-         * führte nach Entfernung der alten HTMLBox zu leerer Kachel.
+         * Funktionierende Compact-Kachel.
          */
         $this->SetVisualizationType(1);
 
         /*
-         * Grossansicht als eigener WebContent.
-         * Diesen bekannten Zwischenstand behalten wir vorerst bewusst.
+         * Bestehende Grossansicht.
          */
         $this->RegisterVariableString(
             'WPRegelungGross',
@@ -141,6 +184,12 @@ class SulzbannWPRegelungVisu extends IPSModule
             20
         );
     }
+
+    /*
+     * ============================================================
+     * APPLY CHANGES
+     * ============================================================
+     */
 
     public function ApplyChanges(): void
     {
@@ -266,6 +315,17 @@ class SulzbannWPRegelungVisu extends IPSModule
      * ============================================================
      * ACTIONS
      * ============================================================
+     *
+     * Benutzer-Navigation läuft NICHT mehr hier.
+     *
+     * Grossansicht:
+     * module.html -> openObject(grossObjectID)
+     *
+     * Einstellungen:
+     * module.html -> openObject(settingsObjectID)
+     *
+     * Dadurch bleibt die Navigation lokal auf dem Client.
+     * ============================================================
      */
 
     public function RequestAction(
@@ -283,33 +343,6 @@ class SulzbannWPRegelungVisu extends IPSModule
                 return;
 
 
-            case 'OpenSettings':
-
-                $this->OpenSettingsInVisualization();
-
-                return;
-
-
-            case 'OpenGross':
-
-                $grossID =
-                    $this->GetIDForIdent(
-                        'WPRegelungGross'
-                    );
-
-                if (
-                    $grossID > 0
-                    &&
-                    IPS_ObjectExists($grossID)
-                ) {
-                    $this->OpenObjectInVisualization(
-                        $grossID
-                    );
-                }
-
-                return;
-
-
             default:
 
                 throw new Exception(
@@ -318,127 +351,6 @@ class SulzbannWPRegelungVisu extends IPSModule
                     $Ident
                 );
         }
-    }
-
-    /*
-     * ============================================================
-     * SETTINGS
-     * ============================================================
-     */
-
-    private function OpenSettingsInVisualization(): void
-    {
-        $targetID =
-            $this->FindSettingsObject();
-
-        if (
-            $targetID <= 0
-            ||
-            !IPS_ObjectExists($targetID)
-        ) {
-            $this->SendDebug(
-                'OpenSettings',
-                'Einstellungen-Ziel nicht gefunden.',
-                0
-            );
-
-            return;
-        }
-
-        $this->OpenObjectInVisualization(
-            $targetID
-        );
-    }
-
-    /*
-     * ============================================================
-     * SYMCON NAVIGATION
-     * ============================================================
-     */
-
-    private function OpenObjectInVisualization(
-        int $targetID
-    ): void {
-        if (
-            $targetID <= 0
-            ||
-            !IPS_ObjectExists($targetID)
-        ) {
-            return;
-        }
-
-        $opened = 0;
-
-        foreach (
-            IPS_GetInstanceList()
-            as $instanceID
-        ) {
-            $instance =
-                IPS_GetInstance(
-                    $instanceID
-                );
-
-            $moduleName =
-                (string) (
-                    $instance['ModuleInfo']['ModuleName']
-                    ??
-                    ''
-                );
-
-            $isTileVisualization =
-                stripos(
-                    $moduleName,
-                    'Kachel Visualisierung'
-                )
-                !== false
-                ||
-                stripos(
-                    $moduleName,
-                    'Tile Visualization'
-                )
-                !== false;
-
-            if (!$isTileVisualization) {
-                continue;
-            }
-
-            try {
-
-                VISU_OpenObject(
-                    (int) $instanceID,
-                    $targetID,
-                    ''
-                );
-
-                $opened++;
-
-            } catch (Throwable $e) {
-
-                $this->SendDebug(
-                    'OpenObject',
-                    'VISU_OpenObject #'
-                    .
-                    $instanceID
-                    .
-                    ': '
-                    .
-                    $e->getMessage(),
-                    0
-                );
-            }
-        }
-
-        $this->SendDebug(
-            'OpenObject',
-            'Ziel #'
-            .
-            $targetID
-            .
-            ' | VISU-Aufrufe: '
-            .
-            $opened,
-            0
-        );
     }
 
     /*
@@ -502,6 +414,12 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
         }
     }
+
+    /*
+     * ============================================================
+     * GROSSANSICHT HTML
+     * ============================================================
+     */
 
     private function BuildGrossVisualization(): string
     {
@@ -746,10 +664,6 @@ class SulzbannWPRegelungVisu extends IPSModule
                 (int) $d['timestamp']
             );
 
-        /*
-         * WebContent erhält das Theme vom Betriebssystem/Symcon-Kontext.
-         * Hintergrund bleibt transparent.
-         */
         return <<<HTML
 <!doctype html>
 <html lang="de">
@@ -1346,6 +1260,9 @@ HTML;
             $wpModeCode = 'fault';
         }
 
+        /*
+         * Räume
+         */
         $roomTemperatures = [];
 
         foreach (
@@ -1396,6 +1313,9 @@ HTML;
                 );
         }
 
+        /*
+         * Ventile
+         */
         $openValves = 0;
 
         foreach (
@@ -1411,6 +1331,9 @@ HTML;
             }
         }
 
+        /*
+         * Stellwerte
+         */
         $demands = [];
 
         foreach (
@@ -1449,12 +1372,49 @@ HTML;
                 );
         }
 
+        /*
+         * IDs für lokale Client-Navigation.
+         */
+        $settingsObjectID =
+            $this->FindSettingsObject();
+
+        $grossObjectID =
+            $this->GetIDForIdent(
+                'WPRegelungGross'
+            );
+
         return [
             'timestamp' =>
                 time(),
 
+            /*
+             * Diese IDs verwendet module.html direkt mit openObject().
+             */
             'settingsObjectID' =>
-                $this->FindSettingsObject(),
+                (
+                    $settingsObjectID > 0
+                    &&
+                    IPS_ObjectExists(
+                        $settingsObjectID
+                    )
+                )
+                    ?
+                    $settingsObjectID
+                    :
+                    0,
+
+            'grossObjectID' =>
+                (
+                    $grossObjectID > 0
+                    &&
+                    IPS_ObjectExists(
+                        $grossObjectID
+                    )
+                )
+                    ?
+                    $grossObjectID
+                    :
+                    0,
 
             'wp' => [
                 'mode' =>
