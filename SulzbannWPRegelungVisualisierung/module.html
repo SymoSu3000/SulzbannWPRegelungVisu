@@ -268,7 +268,7 @@ button {
 
 
 /* ============================================================
-   BUTTONS
+   HAUPT-AKTIONEN
 ============================================================ */
 
 .actions {
@@ -325,22 +325,90 @@ button {
 
 
 /* ============================================================
-   SCROLLBEREICH
+   SEITENWAHL
+============================================================ */
+
+.page-selector {
+    flex:
+        0
+        0
+        auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap:5px;
+
+    padding:2px;
+
+    border:
+        1px
+        solid
+        var(--sb-border);
+
+    border-radius:8px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--sb-text) 4%,
+            transparent
+        );
+}
+
+
+.page-button {
+    min-height:30px;
+
+    padding:
+        4px
+        10px;
+
+    border:0;
+
+    border-radius:6px;
+
+    background:transparent;
+
+    color:var(--sb-muted);
+
+    cursor:pointer;
+
+    font-size:13px;
+    line-height:1.1;
+
+    font-weight:600;
+}
+
+
+.page-button.active {
+    background:var(--sb-soft);
+
+    color:var(--sb-text);
+}
+
+
+.page-button:active {
+    opacity:.72;
+}
+
+
+/* ============================================================
+   SEITENBEREICH
 ============================================================ */
 
 /*
- * WICHTIG:
+ * KEIN vertikales internes Scrollen.
  *
- * Nur dieser Datenbereich scrollt.
- *
- * Header + Grossbutton + Einstellungsbutton bleiben immer sichtbar.
- *
- * Kein overscroll-behavior:contain:
- * damit die mobile Gesamtvisualisierung am Scrollende nicht
- * unnötig eingeschlossen wird.
+ * Stattdessen immer genau eine Datenseite darstellen.
  */
 
-.compact-scroll {
+.compact-pages {
     flex:
         1
         1
@@ -348,39 +416,22 @@ button {
 
     min-height:0;
 
-    overflow-y:auto;
-    overflow-x:hidden;
-
-    -webkit-overflow-scrolling:touch;
-
-    touch-action:pan-y;
-
-    scrollbar-width:thin;
-
-    padding-right:2px;
-    padding-bottom:4px;
+    overflow:hidden;
 }
 
 
-.compact-scroll::-webkit-scrollbar {
-    width:5px;
+.page-panel {
+    width:100%;
+    height:100%;
+
+    min-height:0;
+
+    display:none;
 }
 
 
-.compact-scroll::-webkit-scrollbar-thumb {
-    border-radius:10px;
-
-    background:
-        color-mix(
-            in srgb,
-            var(--sb-text) 24%,
-            transparent
-        );
-}
-
-
-.compact-scroll::-webkit-scrollbar-track {
-    background:transparent;
+.page-panel.active {
+    display:block;
 }
 
 
@@ -389,6 +440,11 @@ button {
 ============================================================ */
 
 .compact-grid {
+    width:100%;
+    height:100%;
+
+    min-height:0;
+
     display:grid;
 
     grid-template-columns:
@@ -397,9 +453,13 @@ button {
             minmax(0,1fr)
         );
 
-    gap:6px;
+    grid-template-rows:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
 
-    min-height:0;
+    gap:6px;
 }
 
 
@@ -414,14 +474,13 @@ button {
     border-radius:9px;
 
     min-width:0;
+    min-height:0;
 }
 
 
 .compact-card {
-    min-height:55px;
-
     padding:
-        7px
+        6px
         9px;
 
     display:flex;
@@ -429,6 +488,8 @@ button {
     flex-direction:column;
 
     justify-content:center;
+
+    overflow:hidden;
 }
 
 
@@ -439,11 +500,13 @@ button {
     line-height:1.15;
 
     font-weight:700;
+
+    white-space:nowrap;
 }
 
 
 /* ============================================================
-   RESPONSIVE TABLET / MOBILE
+   MOBILE / TABLET
 ============================================================ */
 
 @media (max-width:700px) {
@@ -464,15 +527,19 @@ button {
                 minmax(0,1fr)
             );
 
+        grid-template-rows:
+            repeat(
+                3,
+                minmax(0,1fr)
+            );
+
         gap:5px;
     }
 
 
     .compact-card {
-        min-height:53px;
-
         padding:
-            7px
+            5px
             8px;
     }
 
@@ -490,18 +557,69 @@ button {
     .compact-mode-value {
         font-size:16px;
     }
+
+
+    .page-button {
+        min-height:29px;
+
+        font-size:12px;
+    }
 }
 
 
 @media (max-width:380px) {
 
     .compact-card {
-        min-height:51px;
+        padding:
+            4px
+            7px;
     }
 
 
     .value {
         font-size:15px;
+    }
+}
+
+
+/* ============================================================
+   SEHR NIEDRIGE KACHEL
+============================================================ */
+
+@media (max-height:330px) {
+
+    .view-shell {
+        padding-top:46px;
+    }
+
+
+    .compact {
+        gap:5px;
+    }
+
+
+    .compact-head {
+        min-height:30px;
+    }
+
+
+    .action-button {
+        width:32px;
+        height:32px;
+    }
+
+
+    .page-button {
+        min-height:26px;
+
+        padding-top:2px;
+        padding-bottom:2px;
+    }
+
+
+    .compact-card {
+        padding-top:3px;
+        padding-bottom:3px;
     }
 }
 
@@ -527,7 +645,7 @@ button {
 
 
         <!-- ====================================================
-             KOPF BLEIBT IMMER SICHTBAR
+             KOPF
         ===================================================== -->
 
         <div class="compact-head">
@@ -592,203 +710,265 @@ button {
 
 
         <!-- ====================================================
-             NUR DIESER BEREICH SCROLLT
+             SEITENWAHL
         ===================================================== -->
 
-        <div class="compact-scroll">
+        <div class="page-selector">
 
 
-            <div class="compact-grid">
+            <button
+                data-page-button="0"
+                class="page-button active"
+                type="button"
+            >
+                Betrieb
+            </button>
 
 
-                <div class="card compact-card">
+            <button
+                data-page-button="1"
+                class="page-button"
+                type="button"
+            >
+                Speicher
+            </button>
 
-                    <div class="label">
-                        Aussentemperatur
+
+        </div>
+
+
+
+        <!-- ====================================================
+             DATENSEITEN
+        ===================================================== -->
+
+        <div class="compact-pages">
+
+
+            <!-- ================================================
+                 SEITE 1 - BETRIEB
+            ================================================= -->
+
+            <div
+                data-page-panel="0"
+                class="page-panel active"
+            >
+
+
+                <div class="compact-grid">
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Aussentemperatur
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="outside"
+                        >
+                            —
+                        </div>
+
                     </div>
 
-                    <div
-                        class="value"
-                        data-role="outside"
-                    >
-                        —
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            WP Vorlauf
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="flow"
+                        >
+                            —
+                        </div>
+
                     </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            WP Rücklauf
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="return"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Raumtemperatur Ø
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="roomAverage"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            FBH Ventile
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="valvesOpen"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Stellwert max.
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="demandMaximum"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
 
                 </div>
 
 
-                <div class="card compact-card">
+            </div>
 
-                    <div class="label">
-                        WP Vorlauf
+
+
+            <!-- ================================================
+                 SEITE 2 - SPEICHER
+            ================================================= -->
+
+            <div
+                data-page-panel="1"
+                class="page-panel"
+            >
+
+
+                <div class="compact-grid">
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Boiler oben
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="dhwTop"
+                        >
+                            —
+                        </div>
+
                     </div>
 
-                    <div
-                        class="value"
-                        data-role="flow"
-                    >
-                        —
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Boiler unten
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="dhwBottom"
+                        >
+                            —
+                        </div>
+
                     </div>
 
-                </div>
 
+                    <div class="card compact-card">
 
-                <div class="card compact-card">
+                        <div class="label">
+                            Puffer oben
+                        </div>
 
-                    <div class="label">
-                        WP Rücklauf
+                        <div
+                            class="value"
+                            data-role="bufferTop"
+                        >
+                            —
+                        </div>
+
                     </div>
 
-                    <div
-                        class="value"
-                        data-role="return"
-                    >
-                        —
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Puffer Mitte
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="bufferMiddle"
+                        >
+                            —
+                        </div>
+
                     </div>
 
-                </div>
 
+                    <div class="card compact-card">
 
-                <div class="card compact-card">
+                        <div class="label">
+                            Puffer unten
+                        </div>
 
-                    <div class="label">
-                        Raumtemperatur Ø
+                        <div
+                            class="value"
+                            data-role="bufferBottom"
+                        >
+                            —
+                        </div>
+
                     </div>
 
-                    <div
-                        class="value"
-                        data-role="roomAverage"
-                    >
-                        —
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            WP Modulation
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="modulation"
+                        >
+                            —
+                        </div>
+
                     </div>
 
-                </div>
-
-
-                <div class="card compact-card">
-
-                    <div class="label">
-                        FBH Ventile
-                    </div>
-
-                    <div
-                        class="value"
-                        data-role="valvesOpen"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="card compact-card">
-
-                    <div class="label">
-                        Stellwert max.
-                    </div>
-
-                    <div
-                        class="value"
-                        data-role="demandMaximum"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="card compact-card">
-
-                    <div class="label">
-                        Boiler oben
-                    </div>
-
-                    <div
-                        class="value"
-                        data-role="dhwTop"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="card compact-card">
-
-                    <div class="label">
-                        Boiler unten
-                    </div>
-
-                    <div
-                        class="value"
-                        data-role="dhwBottom"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="card compact-card">
-
-                    <div class="label">
-                        Puffer oben
-                    </div>
-
-                    <div
-                        class="value"
-                        data-role="bufferTop"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="card compact-card">
-
-                    <div class="label">
-                        Puffer Mitte
-                    </div>
-
-                    <div
-                        class="value"
-                        data-role="bufferMiddle"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="card compact-card">
-
-                    <div class="label">
-                        Puffer unten
-                    </div>
-
-                    <div
-                        class="value"
-                        data-role="bufferBottom"
-                    >
-                        —
-                    </div>
-
-                </div>
-
-
-                <div class="card compact-card">
-
-                    <div class="label">
-                        WP Modulation
-                    </div>
-
-                    <div
-                        class="value"
-                        data-role="modulation"
-                    >
-                        —
-                    </div>
 
                 </div>
 
@@ -834,6 +1014,13 @@ let refreshTimer =
     null;
 
 
+/*
+ * Die Seitenauswahl ist rein lokal.
+ */
+let currentPage =
+    0;
+
+
 /* ============================================================
    OBJECT / MERGE
 ============================================================ */
@@ -843,7 +1030,9 @@ function isObject(value) {
     return (
         value !== null
         &&
-        typeof value === "object"
+        typeof value
+        ===
+        "object"
         &&
         !Array.isArray(value)
     );
@@ -943,8 +1132,8 @@ function mergeData(
 
 
             /*
-             * null / undefined darf gültige bestehende
-             * Daten nicht löschen.
+             * Null oder undefined darf einen vorhandenen
+             * gültigen Wert nicht zerstören.
              */
             if (
                 next === null
@@ -975,9 +1164,9 @@ function mergeData(
 }
 
 
-/*
- * Nur erwartete WP-Regelungs-Payloads übernehmen.
- */
+/* ============================================================
+   PAYLOAD PRÜFEN
+============================================================ */
 
 function isExpectedPayload(data) {
 
@@ -1013,10 +1202,6 @@ function isExpectedPayload(data) {
     );
 }
 
-
-/*
- * Prüft, ob fachliche Kerndaten vorhanden sind.
- */
 
 function hasCoreData() {
 
@@ -1209,7 +1394,112 @@ function renderCompact() {
 
     bindButtons();
 
+    bindPageButtons();
+
+    showPage(
+        currentPage
+    );
+
     applyData();
+}
+
+
+/* ============================================================
+   LOKALE SEITENWAHL
+============================================================ */
+
+function showPage(page) {
+
+    const requested =
+        Number(page);
+
+
+    currentPage =
+        requested === 1
+            ?
+            1
+            :
+            0;
+
+
+    document
+        .querySelectorAll(
+            "[data-page-panel]"
+        )
+        .forEach(
+            panel => {
+
+                const panelPage =
+                    Number(
+                        panel.getAttribute(
+                            "data-page-panel"
+                        )
+                    );
+
+
+                panel.classList.toggle(
+                    "active",
+                    panelPage
+                    ===
+                    currentPage
+                );
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            "[data-page-button]"
+        )
+        .forEach(
+            button => {
+
+                const buttonPage =
+                    Number(
+                        button.getAttribute(
+                            "data-page-button"
+                        )
+                    );
+
+
+                button.classList.toggle(
+                    "active",
+                    buttonPage
+                    ===
+                    currentPage
+                );
+            }
+        );
+}
+
+
+function bindPageButtons() {
+
+    document
+        .querySelectorAll(
+            "[data-page-button]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    event => {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+
+                        showPage(
+                            button.getAttribute(
+                                "data-page-button"
+                            )
+                        );
+                    }
+                );
+            }
+        );
 }
 
 
@@ -1243,7 +1533,7 @@ function openLocalObject(
     try {
 
         /*
-         * Nur der auslösende Client navigiert.
+         * Nur der aktuelle Client navigiert.
          */
         openObject(
             target
@@ -1335,7 +1625,7 @@ function bindButtons() {
 
 
 /* ============================================================
-   DATEN ANZEIGEN
+   DATEN
 ============================================================ */
 
 function applyData() {
@@ -1545,7 +1835,8 @@ function applyData() {
 
 
     /*
-     * Buttons erst aktivieren, wenn ID + openObject vorhanden.
+     * Navigationsbuttons erst aktivieren,
+     * wenn Ziel-ID und openObject vorhanden sind.
      */
 
     const settingsOK =
@@ -1657,6 +1948,7 @@ function scheduleRefreshRetry() {
         !==
         null
     ) {
+
         clearTimeout(
             refreshTimer
         );
@@ -1742,7 +2034,7 @@ function handleMessage(data) {
 
 
     /*
-     * Leere oder fremde Nachrichten ignorieren.
+     * Leere/fremde Nachrichten ignorieren.
      */
 
     if (
@@ -1755,8 +2047,7 @@ function handleMessage(data) {
 
 
     /*
-     * Gültige Daten ergänzen.
-     * Bestehende Initialdaten nicht blind überschreiben.
+     * Neue Werte in bestehenden Zustand mergen.
      */
 
     currentData =
@@ -1765,6 +2056,10 @@ function handleMessage(data) {
             data
         );
 
+
+    /*
+     * Aktuelle Seite bleibt beim Live-Update erhalten.
+     */
 
     applyData();
 
@@ -1811,7 +2106,7 @@ window.addEventListener(
 
 
         /*
-         * Nur bei fehlenden Daten Refresh.
+         * Nur bei fehlenden Daten Server-Refresh.
          */
 
         requestRefresh(
