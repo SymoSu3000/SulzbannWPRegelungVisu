@@ -165,9 +165,6 @@ class SulzbannWPRegelungVisu extends IPSModule
 
         /*
          * Initialdaten direkt einbetten.
-         *
-         * Dadurch funktionieren Werte und
-         * Einstellungen bereits beim ersten Öffnen.
          */
 
         $initialData =
@@ -716,27 +713,12 @@ class SulzbannWPRegelungVisu extends IPSModule
      * ================================================================
      * SETTINGS-ZIEL SUCHEN
      * ================================================================
-     *
-     * Neu bewusst robuster:
-     *
-     * Nicht nur unter #28320 suchen.
-     *
-     * Gesucht wird global:
-     *
-     *   Parameter
-     *
-     * dessen Eltern-/Vorfahrenstruktur
-     * "WP Regelung" enthält.
-     *
-     * Dadurch funktioniert der Button auch,
-     * falls die Kategorie nicht direkt dort hängt,
-     * wo wir sie zuletzt erwartet haben.
      */
 
     private function FindSettingsObject(): int
     {
         /*
-         * 1. Bevorzugt unter Siemens OWZ.
+         * Zuerst unter Siemens OWZ suchen.
          */
 
         $result =
@@ -755,7 +737,7 @@ class SulzbannWPRegelungVisu extends IPSModule
 
 
         /*
-         * 2. Globaler Fallback ab Root.
+         * Globaler Fallback.
          */
 
         $result =
@@ -774,7 +756,7 @@ class SulzbannWPRegelungVisu extends IPSModule
 
 
         /*
-         * 3. Falls Parameter nicht gefunden:
+         * Falls Parameter nicht gefunden:
          * wenigstens WP Regelung öffnen.
          */
 
