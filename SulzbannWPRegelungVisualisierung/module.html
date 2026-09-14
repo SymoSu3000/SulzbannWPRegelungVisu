@@ -125,9 +125,6 @@ button {
 }
 
 
-/*
- * Symcon zeichnet den Titel selbst.
- */
 .view-shell {
     width:100%;
     height:100%;
@@ -148,6 +145,8 @@ button {
     gap:10px;
 
     min-height:0;
+
+    cursor:pointer;
 }
 
 
@@ -227,18 +226,7 @@ button {
 }
 
 
-.actions {
-    display:flex;
-
-    align-items:center;
-
-    gap:7px;
-
-    flex-shrink:0;
-}
-
-
-.action-button {
+.settings-button {
     height:38px;
 
     padding:
@@ -274,21 +262,14 @@ button {
 }
 
 
-.action-button:active {
+.settings-button:active {
     opacity:.72;
 }
 
 
-.action-button:disabled {
+.settings-button:disabled {
     opacity:.38;
     cursor:default;
-}
-
-
-.expand-button {
-    width:38px;
-    min-width:38px;
-    padding:0;
 }
 
 
@@ -395,19 +376,6 @@ button {
             8px
             9px;
     }
-
-    .actions {
-        gap:5px;
-    }
-
-    .action-button {
-        height:36px;
-    }
-
-    .expand-button {
-        width:36px;
-        min-width:36px;
-    }
 }
 
 </style>
@@ -419,7 +387,11 @@ button {
 
 <div id="app">
 
-    <div class="view-shell compact">
+    <div
+        class="view-shell compact"
+        data-role="compactRoot"
+        title="Für Grossansicht in die Kachel klicken"
+    >
 
         <div class="compact-head">
 
@@ -448,35 +420,20 @@ button {
             </div>
 
 
-            <div class="actions">
+            <button
+                data-role="settingsButton"
+                class="settings-button"
+                type="button"
+                aria-label="Einstellungen"
+            >
 
-                <button
-                    data-role="grossButton"
-                    class="action-button expand-button"
-                    type="button"
-                    aria-label="Grossansicht"
-                    title="Grossansicht öffnen"
-                >
-                    ↗
-                </button>
+                <i class="fa-light fa-gear"></i>
 
+                <span class="settings-text">
+                    Einstellungen
+                </span>
 
-                <button
-                    data-role="settingsButton"
-                    class="action-button settings-button"
-                    type="button"
-                    aria-label="Einstellungen"
-                >
-
-                    <i class="fa-light fa-gear"></i>
-
-                    <span class="settings-text">
-                        Einstellungen
-                    </span>
-
-                </button>
-
-            </div>
+            </button>
 
         </div>
 
@@ -550,7 +507,9 @@ let currentData =
     (
         INITIAL_DATA
         &&
-        typeof INITIAL_DATA === "object"
+        typeof INITIAL_DATA
+        ===
+        "object"
     )
         ?
         INITIAL_DATA
@@ -559,9 +518,9 @@ let currentData =
 
 
 /*
- * ============================================================================
+ * ========================================================================
  * DOM
- * ============================================================================
+ * ========================================================================
  */
 
 function allRole(role) {
@@ -601,9 +560,9 @@ function setRoleText(
 
 
 /*
- * ============================================================================
- * FORMATIERUNG
- * ============================================================================
+ * ========================================================================
+ * FORMAT
+ * ========================================================================
  */
 
 function isNumber(value) {
@@ -661,9 +620,58 @@ function fmtPercent(value) {
 
 
 /*
- * ============================================================================
+ * ========================================================================
+ * GROSSANSICHT
+ * ========================================================================
+ */
+
+function openGrossView() {
+
+    const target =
+        Number(
+            currentData.grossObjectID
+            ||
+            0
+        );
+
+
+    if (
+        target <= 0
+    ) {
+        return;
+    }
+
+
+    /*
+     * WICHTIG:
+     *
+     * Direkt aus dem HTML-SDK öffnen.
+     *
+     * KEIN:
+     * requestAction("OpenGross")
+     *
+     * KEIN:
+     * VISU_OpenObject() über PHP.
+     *
+     * Dadurch entfällt der bisherige zusätzliche Zwischenschritt.
+     */
+    if (
+        typeof openObject
+        ===
+        "function"
+    ) {
+
+        openObject(
+            target
+        );
+    }
+}
+
+
+/*
+ * ========================================================================
  * BUTTONS
- * ============================================================================
+ * ========================================================================
  */
 
 function bindButtons() {
@@ -716,13 +724,7 @@ function bindButtons() {
                         openObject(
                             target
                         );
-
-                        return;
                     }
-
-
-                    button.disabled =
-                        true;
                 }
             );
         }
@@ -730,36 +732,28 @@ function bindButtons() {
 
 
     allRole(
-        "grossButton"
+        "compactRoot"
     )
     .forEach(
-        button => {
+        element => {
 
-            button.addEventListener(
+            element.addEventListener(
                 "click",
                 event => {
 
-                    event.preventDefault();
-                    event.stopPropagation();
-
-
+                    /*
+                     * Settings-Button nicht als Gross-Klick behandeln.
+                     */
                     if (
-                        typeof requestAction
-                        ===
-                        "function"
+                        event.target.closest(
+                            '[data-role="settingsButton"]'
+                        )
                     ) {
-
-                        requestAction(
-                            "OpenGross",
-                            true
-                        );
-
                         return;
                     }
 
 
-                    button.disabled =
-                        true;
+                    openGrossView();
                 }
             );
         }
@@ -768,9 +762,9 @@ function bindButtons() {
 
 
 /*
- * ============================================================================
- * LIVEWERTE
- * ============================================================================
+ * ========================================================================
+ * DATEN
+ * ========================================================================
  */
 
 function applyData() {
@@ -870,17 +864,7 @@ function applyData() {
             0
         )
         >
-        0
-        &&
-        (
-            typeof requestAction
-            ===
-            "function"
-            ||
-            typeof openObject
-            ===
-            "function"
-        );
+        0;
 
 
     allRole(
@@ -893,29 +877,13 @@ function applyData() {
                 !settingsOK;
         }
     );
-
-
-    allRole(
-        "grossButton"
-    )
-    .forEach(
-        button => {
-
-            button.disabled =
-                (
-                    typeof requestAction
-                    !==
-                    "function"
-                );
-        }
-    );
 }
 
 
 /*
- * ============================================================================
+ * ========================================================================
  * SYMCON LIVE MESSAGE
- * ============================================================================
+ * ========================================================================
  */
 
 function handleMessage(data) {
@@ -960,9 +928,9 @@ function handleMessage(data) {
 
 
 /*
- * ============================================================================
+ * ========================================================================
  * START
- * ============================================================================
+ * ========================================================================
  */
 
 window.addEventListener(
