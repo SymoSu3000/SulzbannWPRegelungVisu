@@ -7,101 +7,68 @@
 
 <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
+    content="width=device-width, initial-scale=1.0"
 >
 
-<script src="/icons.js"></script>
-
 <style>
+
+/* ============================================================
+   THEME
+============================================================ */
 
 :root {
     color-scheme: light dark;
 
-    --foreground:
-        var(
-            --content-color,
-            #202124
-        );
+    --text: #202124;
+    --muted: #64727a;
 
-    --muted:
-        color-mix(
-            in srgb,
-            var(--foreground) 62%,
-            transparent
-        );
+    --surface: rgba(255,255,255,.72);
+    --surface-soft: rgba(229,235,238,.80);
 
-    --card:
-        color-mix(
-            in srgb,
-            var(--foreground) 7%,
-            transparent
-        );
+    --border: rgba(70,85,95,.25);
 
-    --soft:
-        color-mix(
-            in srgb,
-            var(--foreground) 10%,
-            transparent
-        );
-
-    --border:
-        color-mix(
-            in srgb,
-            var(--foreground) 17%,
-            transparent
-        );
-
-    --heating:#d97f2b;
-    --cooling:#2e8ec8;
-    --standby:#7e8b91;
-    --fault:#d84a4a;
+    --heating: #d97f2b;
+    --cooling: #2e8ec8;
+    --standby: #7e8b91;
+    --fault: #d84a4a;
 }
 
 
 @media (prefers-color-scheme: dark) {
 
     :root {
+        --text: #f3f5f7;
+        --muted: #a9bac4;
 
-        --foreground:
-            var(
-                --content-color,
-                #f3f5f7
-            );
+        --surface: rgba(15,34,45,.72);
+        --surface-soft: rgba(18,44,57,.76);
+
+        --border: rgba(170,195,208,.20);
     }
 }
 
 
-@media (prefers-color-scheme: light) {
-
-    :root {
-
-        --foreground:
-            var(
-                --content-color,
-                #202124
-            );
-    }
-}
-
+/* ============================================================
+   BASIS
+============================================================ */
 
 * {
-    box-sizing:border-box;
+    box-sizing: border-box;
 }
-
 
 html,
 body {
-    margin:0;
-    padding:0;
+    width: 100%;
+    height: 100%;
 
-    width:100%;
-    height:100%;
+    margin: 0;
+    padding: 0;
 
-    overflow:hidden;
+    overflow: hidden;
 
-    background:transparent;
+    background: transparent;
 
-    color:var(--foreground);
+    color: var(--text);
 
     font-family:
         -apple-system,
@@ -111,270 +78,343 @@ body {
         sans-serif;
 }
 
-
-button {
-    font:inherit;
-    color:inherit;
-}
-
-
 #app {
-    width:100%;
-    height:100%;
-    overflow:hidden;
+    width: 100%;
+    height: 100%;
 }
 
 
-.view-shell {
-    width:100%;
-    height:100%;
-
-    padding:
-        54px
-        12px
-        12px
-        12px;
-}
-
-
-.compact {
-    display:flex;
-
-    flex-direction:column;
-
-    gap:10px;
-
-    min-height:0;
-
-    cursor:pointer;
-}
-
-
-.compact-head {
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    gap:12px;
-
-    min-height:40px;
-}
-
-
-.compact-mode {
-    display:flex;
-
-    align-items:center;
-
-    gap:9px;
-
-    min-width:0;
-}
-
+/* ============================================================
+   GEMEINSAM
+============================================================ */
 
 .status-dot {
-    width:11px;
-    height:11px;
+    width: 11px;
+    height: 11px;
 
-    min-width:11px;
+    flex: 0 0 11px;
 
-    border-radius:50%;
+    border-radius: 50%;
 
-    background:var(--standby);
+    background: var(--standby);
 }
-
 
 .status-dot.heating {
-    background:var(--heating);
+    background: var(--heating);
 }
-
 
 .status-dot.cooling {
-    background:var(--cooling);
+    background: var(--cooling);
 }
-
 
 .status-dot.standby {
-    background:var(--standby);
+    background: var(--standby);
 }
-
 
 .status-dot.fault {
-    background:var(--fault);
+    background: var(--fault);
 }
-
 
 .label {
-    font-size:13px;
-    line-height:1.25;
+    font-size: 13px;
+    line-height: 1.25;
 
-    color:var(--muted);
+    color: var(--muted);
 }
 
+.value {
+    margin-top: 4px;
 
-.compact-mode-value {
-    margin-top:2px;
+    font-size: 18px;
+    line-height: 1.2;
 
-    font-size:17px;
-    line-height:1.2;
-
-    font-weight:700;
-
-    color:var(--foreground);
+    font-weight: 700;
 }
 
-
-.settings-button {
-    height:38px;
-
-    padding:
-        0
-        12px;
+.card {
+    background: var(--surface);
 
     border:
         1px
         solid
         var(--border);
 
-    border-radius:9px;
-
-    background:var(--soft);
-
-    color:var(--foreground);
-
-    display:inline-flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:7px;
-
-    cursor:pointer;
-
-    white-space:nowrap;
-
-    font-size:13px;
-
-    font-weight:600;
+    border-radius: 11px;
 }
 
 
-.settings-button:active {
-    opacity:.72;
+/* ============================================================
+   COMPACT
+============================================================ */
+
+.compact {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    padding:
+        8px
+        10px
+        10px
+        10px;
 }
 
+.compact-head {
+    display: flex;
 
-.settings-button:disabled {
-    opacity:.38;
-    cursor:default;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    min-height: 42px;
 }
 
+.compact-mode {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+.compact-mode-value {
+    margin-top: 2px;
+
+    font-size: 18px;
+    line-height: 1.2;
+
+    font-weight: 700;
+}
+
+.compact-note {
+    text-align: right;
+
+    font-size: 12px;
+
+    color: var(--muted);
+}
 
 .compact-grid {
-    display:grid;
+    display: grid;
 
     grid-template-columns:
         repeat(
             3,
-            minmax(0,1fr)
+            minmax(0, 1fr)
         );
 
-    gap:9px;
+    gap: 9px;
+}
 
-    min-height:0;
+.compact-card {
+    min-height: 84px;
+
+    padding:
+        11px
+        12px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
 }
 
 
-.card {
-    background:var(--card);
+/* ============================================================
+   DETAIL
+============================================================ */
 
-    border:
+.detail {
+    display: none;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 12px;
+
+    overflow: hidden;
+}
+
+.detail-layout {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.detail-head {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    min-height: 48px;
+}
+
+.detail-mode {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.detail-mode-value {
+    margin-top: 2px;
+
+    font-size: 22px;
+    line-height: 1.2;
+
+    font-weight: 700;
+}
+
+.detail-update {
+    font-size: 12px;
+
+    color: var(--muted);
+}
+
+.summary-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+.summary-card {
+    min-height: 78px;
+
+    padding:
+        11px
+        12px;
+}
+
+.sections {
+    flex: 1;
+
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+.section {
+    min-height: 0;
+
+    padding: 13px;
+}
+
+.section-title {
+    margin-bottom: 12px;
+
+    font-size: 15px;
+    line-height: 1.2;
+
+    font-weight: 700;
+}
+
+.data-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap:
+        13px
+        20px;
+}
+
+.data-item {
+    min-height: 44px;
+}
+
+.section-note {
+    margin-top: 12px;
+
+    padding-top: 10px;
+
+    border-top:
         1px
         solid
         var(--border);
-
-    border-radius:11px;
-
-    min-width:0;
 }
 
 
-.compact-card {
-    padding:
-        10px
-        11px;
+/* ============================================================
+   RESPONSIVE
+============================================================ */
 
-    min-height:82px;
+@media (max-width: 520px) {
 
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-}
-
-
-.value {
-    margin-top:4px;
-
-    font-size:18px;
-    line-height:1.2;
-
-    font-weight:700;
-
-    color:var(--foreground);
-}
-
-
-@media (max-width:700px) {
-
-    .view-shell {
+    .compact {
         padding:
-            52px
-            9px
-            9px
-            9px;
+            7px
+            8px
+            8px
+            8px;
+    }
+
+    .compact-grid {
+        gap: 7px;
     }
 
     .label {
-        font-size:12px;
+        font-size: 12px;
     }
 
-    .settings-text {
-        display:none;
-    }
-
-    .settings-button {
-        min-width:40px;
-        padding:0 10px;
+    .value {
+        font-size: 17px;
     }
 }
 
 
-@media (max-width:420px) {
+/*
+ * ============================================================
+ * ENTSCHEIDENDER MECHANISMUS
+ *
+ * GENAU DAS PRINZIP DER FUNKTIONIERENDEN HEIZUNGSVISU:
+ *
+ * kleine / normale Kachel -> Compact
+ * hohe / geöffnete Kachel -> Detail
+ * ============================================================
+ */
 
-    .compact-grid {
-        grid-template-columns:
-            1fr
-            1fr;
+@media (min-height: 520px) {
 
-        gap:7px;
+    .compact {
+        display: none;
     }
 
-    .compact-grid
-    .compact-card:last-child {
-        grid-column:1/-1;
-    }
-
-    .compact-card {
-        min-height:68px;
-
-        padding:
-            8px
-            9px;
+    .detail {
+        display: block;
     }
 }
 
@@ -387,104 +427,79 @@ button {
 
 <div id="app">
 
-    <div
-        class="view-shell compact"
-        data-role="compactRoot"
-        title="Für Grossansicht in die Kachel klicken"
-    >
 
-        <div class="compact-head">
+<!-- ============================================================
+     COMPACT
+============================================================ -->
 
-            <div class="compact-mode">
+<div class="compact">
 
-                <span
-                    data-role="modeDot"
-                    class="status-dot standby"
-                ></span>
+    <div class="compact-head">
 
-                <div>
+        <div class="compact-mode">
 
-                    <div class="label">
-                        WP Master-Betriebsart
-                    </div>
+            <span
+                class="status-dot {{MODE_CLASS}}"
+            ></span>
 
-                    <div
-                        class="compact-mode-value"
-                        data-role="mode"
-                    >
-                        —
-                    </div>
+            <div>
 
+                <div class="label">
+                    WP Master-Betriebsart
+                </div>
+
+                <div class="compact-mode-value">
+                    {{MODE}}
                 </div>
 
             </div>
-
-
-            <button
-                data-role="settingsButton"
-                class="settings-button"
-                type="button"
-                aria-label="Einstellungen"
-            >
-
-                <i class="fa-light fa-gear"></i>
-
-                <span class="settings-text">
-                    Einstellungen
-                </span>
-
-            </button>
 
         </div>
 
 
-        <div class="compact-grid">
+        <div class="compact-note">
+            WP entscheidet Heizen / Kühlen
+        </div>
 
-            <div class="card compact-card">
+    </div>
 
-                <div class="label">
-                    Raumtemperatur
-                </div>
 
-                <div
-                    class="value"
-                    data-role="roomAverage"
-                >
-                    —
-                </div>
+    <div class="compact-grid">
 
+        <div class="card compact-card">
+
+            <div class="label">
+                Raumtemperatur
             </div>
 
-
-            <div class="card compact-card">
-
-                <div class="label">
-                    FBH Ventile offen
-                </div>
-
-                <div
-                    class="value"
-                    data-role="valvesOpen"
-                >
-                    —
-                </div>
-
+            <div class="value">
+                {{ROOM_AVERAGE}}
             </div>
 
+        </div>
 
-            <div class="card compact-card">
 
-                <div class="label">
-                    Stellwert max.
-                </div>
+        <div class="card compact-card">
 
-                <div
-                    class="value"
-                    data-role="demandMaximum"
-                >
-                    —
-                </div>
+            <div class="label">
+                FBH Ventile offen
+            </div>
 
+            <div class="value">
+                {{VALVES}}
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                Stellwert max.
+            </div>
+
+            <div class="value">
+                {{DEMAND_MAXIMUM}}
             </div>
 
         </div>
@@ -494,469 +509,541 @@ button {
 </div>
 
 
-<script>
-
-"use strict";
-
-
-const INITIAL_DATA =
-    __SBWRV_INITIAL_DATA__;
-
-
-let currentData =
-    (
-        INITIAL_DATA
-        &&
-        typeof INITIAL_DATA
-        ===
-        "object"
-    )
-        ?
-        INITIAL_DATA
-        :
-        {};
-
-
-/*
- * ========================================================================
- * DOM
- * ========================================================================
- */
-
-function allRole(role) {
-
-    return document.querySelectorAll(
-        '[data-role="'
-        +
-        role
-        +
-        '"]'
-    );
-}
-
-
-function setRoleText(
-    role,
-    value
-) {
-
-    allRole(
-        role
-    )
-    .forEach(
-        element => {
-
-            if (
-                element.textContent
-                !==
-                value
-            ) {
-                element.textContent =
-                    value;
-            }
-        }
-    );
-}
-
-
-/*
- * ========================================================================
- * FORMAT
- * ========================================================================
- */
-
-function isNumber(value) {
-
-    return (
-        typeof value
-        ===
-        "number"
-        &&
-        Number.isFinite(
-            value
-        )
-    );
-}
-
-
-function fmt(
-    value,
-    digits,
-    suffix
-) {
-
-    return isNumber(
-        value
-    )
-        ?
-        value.toFixed(
-            digits
-        )
-        +
-        suffix
-        :
-        "—";
-}
-
-
-function fmtTemp(value) {
-
-    return fmt(
-        value,
-        1,
-        " °C"
-    );
-}
-
-
-function fmtPercent(value) {
-
-    return fmt(
-        value,
-        0,
-        " %"
-    );
-}
-
-
-/*
- * ========================================================================
- * GROSSANSICHT
- * ========================================================================
- */
-
-function openGrossView() {
-
-    const target =
-        Number(
-            currentData.grossObjectID
-            ||
-            0
-        );
-
-
-    if (
-        target <= 0
-    ) {
-        return;
-    }
-
-
-    /*
-     * WICHTIG:
-     *
-     * Direkt aus dem HTML-SDK öffnen.
-     *
-     * KEIN:
-     * requestAction("OpenGross")
-     *
-     * KEIN:
-     * VISU_OpenObject() über PHP.
-     *
-     * Dadurch entfällt der bisherige zusätzliche Zwischenschritt.
-     */
-    if (
-        typeof openObject
-        ===
-        "function"
-    ) {
-
-        openObject(
-            target
-        );
-    }
-}
-
-
-/*
- * ========================================================================
- * BUTTONS
- * ========================================================================
- */
-
-function bindButtons() {
-
-    allRole(
-        "settingsButton"
-    )
-    .forEach(
-        button => {
-
-            button.addEventListener(
-                "click",
-                event => {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-
-                    if (
-                        typeof requestAction
-                        ===
-                        "function"
-                    ) {
-
-                        requestAction(
-                            "OpenSettings",
-                            true
-                        );
-
-                        return;
-                    }
-
-
-                    const target =
-                        Number(
-                            currentData.settingsObjectID
-                            ||
-                            0
-                        );
-
-
-                    if (
-                        target > 0
-                        &&
-                        typeof openObject
-                        ===
-                        "function"
-                    ) {
-
-                        openObject(
-                            target
-                        );
-                    }
-                }
-            );
-        }
-    );
-
-
-    allRole(
-        "compactRoot"
-    )
-    .forEach(
-        element => {
-
-            element.addEventListener(
-                "click",
-                event => {
-
-                    /*
-                     * Settings-Button nicht als Gross-Klick behandeln.
-                     */
-                    if (
-                        event.target.closest(
-                            '[data-role="settingsButton"]'
-                        )
-                    ) {
-                        return;
-                    }
-
-
-                    openGrossView();
-                }
-            );
-        }
-    );
-}
-
-
-/*
- * ========================================================================
- * DATEN
- * ========================================================================
- */
-
-function applyData() {
-
-    const d =
-        currentData
-        ||
-        {};
-
-
-    const wp =
-        d.wp
-        ||
-        {};
-
-
-    const rooms =
-        d.rooms
-        ||
-        {};
-
-
-    const fbh =
-        d.fbh
-        ||
-        {};
-
-
-    setRoleText(
-        "mode",
-        wp.mode
-        ||
-        "—"
-    );
-
-
-    allRole(
-        "modeDot"
-    )
-    .forEach(
-        element => {
-
-            element.className =
-                "status-dot "
-                +
-                (
-                    wp.modeCode
-                    ||
-                    "standby"
-                );
-        }
-    );
-
-
-    setRoleText(
-        "roomAverage",
-        fmtTemp(
-            rooms.average
-        )
-    );
-
-
-    setRoleText(
-        "valvesOpen",
-        (
-            isNumber(
-                fbh.open
-            )
-            &&
-            isNumber(
-                fbh.total
-            )
-        )
-            ?
-            fbh.open
-            +
-            " / "
-            +
-            fbh.total
-            :
-            "—"
-    );
-
-
-    setRoleText(
-        "demandMaximum",
-        fmtPercent(
-            fbh.demandMaximum
-        )
-    );
-
-
-    const settingsOK =
-        Number(
-            d.settingsObjectID
-            ||
-            0
-        )
-        >
-        0;
-
-
-    allRole(
-        "settingsButton"
-    )
-    .forEach(
-        button => {
-
-            button.disabled =
-                !settingsOK;
-        }
-    );
-}
-
-
-/*
- * ========================================================================
- * SYMCON LIVE MESSAGE
- * ========================================================================
- */
-
-function handleMessage(data) {
-
-    if (
-        typeof data
-        ===
-        "string"
-    ) {
-
-        try {
-
-            data =
-                JSON.parse(
-                    data
-                );
-
-        } catch (error) {
-
-            return;
-        }
-    }
-
-
-    if (
-        !data
-        ||
-        typeof data
-        !==
-        "object"
-    ) {
-        return;
-    }
-
-
-    currentData =
-        data;
-
-
-    applyData();
-}
-
-
-/*
- * ========================================================================
- * START
- * ========================================================================
- */
-
-window.addEventListener(
-    "load",
-    () => {
-
-        bindButtons();
-
-        applyData();
-
-
-        if (
-            typeof requestAction
-            ===
-            "function"
-        ) {
-
-            requestAction(
-                "Refresh",
-                true
-            );
-        }
-    }
-);
-
-</script>
+
+<!-- ============================================================
+     DETAIL / GROSS
+============================================================ -->
+
+<div class="detail">
+
+<div class="detail-layout">
+
+
+    <div class="detail-head">
+
+        <div class="detail-mode">
+
+            <span
+                class="status-dot {{MODE_CLASS}}"
+            ></span>
+
+            <div>
+
+                <div class="label">
+                    WP Master-Betriebsart
+                </div>
+
+                <div class="detail-mode-value">
+                    {{MODE}}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-update">
+            Aktualisiert {{UPDATED}}
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================================
+         SUMMARY
+    ========================================================= -->
+
+    <div class="summary-grid">
+
+        <div class="card summary-card">
+
+            <div class="label">
+                Raumtemperatur Mittel
+            </div>
+
+            <div class="value">
+                {{ROOM_AVERAGE}}
+            </div>
+
+        </div>
+
+
+        <div class="card summary-card">
+
+            <div class="label">
+                Raum Min. / Max.
+            </div>
+
+            <div class="value">
+                {{ROOM_RANGE}}
+            </div>
+
+        </div>
+
+
+        <div class="card summary-card">
+
+            <div class="label">
+                FBH Ventile offen
+            </div>
+
+            <div class="value">
+                {{VALVES}}
+            </div>
+
+        </div>
+
+
+        <div class="card summary-card">
+
+            <div class="label">
+                FBH Stellwert max.
+            </div>
+
+            <div class="value">
+                {{DEMAND_MAXIMUM}}
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================================
+         SEKTIONEN
+    ========================================================= -->
+
+    <div class="sections">
+
+
+        <!-- ====================================================
+             WÄRMEPUMPE
+        ===================================================== -->
+
+        <div class="card section">
+
+            <div class="section-title">
+                Wärmepumpe
+            </div>
+
+            <div class="data-grid">
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Aussentemperatur
+                    </div>
+
+                    <div class="value">
+                        {{OUTSIDE}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Vorlauf
+                    </div>
+
+                    <div class="value">
+                        {{FLOW}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Rücklauf
+                    </div>
+
+                    <div class="value">
+                        {{RETURN}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Verdichtermodulation
+                    </div>
+
+                    <div class="value">
+                        {{MODULATION}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Leistungsaufnahme
+                    </div>
+
+                    <div class="value">
+                        {{POWER}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Wärmeleistung
+                    </div>
+
+                    <div class="value">
+                        {{HEAT_OUTPUT}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        COP
+                    </div>
+
+                    <div class="value">
+                        {{COP}}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ====================================================
+             RÄUME / FBH
+        ===================================================== -->
+
+        <div class="card section">
+
+            <div class="section-title">
+                Räume / Fussbodenheizung
+            </div>
+
+            <div class="data-grid">
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Ausgewertete Räume
+                    </div>
+
+                    <div class="value">
+                        {{ROOM_COUNT}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Raum Mittel
+                    </div>
+
+                    <div class="value">
+                        {{ROOM_AVERAGE}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Raum Min. / Max.
+                    </div>
+
+                    <div class="value">
+                        {{ROOM_RANGE}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Ventile offen
+                    </div>
+
+                    <div class="value">
+                        {{VALVES}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Stellwert Mittel
+                    </div>
+
+                    <div class="value">
+                        {{DEMAND_AVERAGE}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Stellwert Maximum
+                    </div>
+
+                    <div class="value">
+                        {{DEMAND_MAXIMUM}}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ====================================================
+             SPEICHER
+        ===================================================== -->
+
+        <div class="card section">
+
+            <div class="section-title">
+                Speicher
+            </div>
+
+            <div class="data-grid">
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Boiler oben
+                    </div>
+
+                    <div class="value">
+                        {{DHW_TOP}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Boiler unten
+                    </div>
+
+                    <div class="value">
+                        {{DHW_BOTTOM}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Puffer oben
+                    </div>
+
+                    <div class="value">
+                        {{BUFFER_TOP}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Puffer Mitte
+                    </div>
+
+                    <div class="value">
+                        {{BUFFER_MIDDLE}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Puffer unten
+                    </div>
+
+                    <div class="value">
+                        {{BUFFER_BOTTOM}}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ====================================================
+             PROGNOSE
+        ===================================================== -->
+
+        <div class="card section">
+
+            <div class="section-title">
+                Wetter / PV Prognose
+            </div>
+
+            <div class="data-grid">
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Morgen Maximum
+                    </div>
+
+                    <div class="value">
+                        {{METEO_MAX}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Morgen Mittel
+                    </div>
+
+                    <div class="value">
+                        {{METEO_MEAN}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Morgen Minimum
+                    </div>
+
+                    <div class="value">
+                        {{METEO_MIN}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Globalstrahlung
+                    </div>
+
+                    <div class="value">
+                        {{METEO_SOLAR}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Solcast P50 0–24 h
+                    </div>
+
+                    <div class="value">
+                        {{SOLCAST_ENERGY}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        PV Peak
+                    </div>
+
+                    <div class="value">
+                        {{SOLCAST_PEAK}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Peak Zeitpunkt
+                    </div>
+
+                    <div class="value">
+                        {{SOLCAST_PEAK_TIME}}
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Vertrauen
+                    </div>
+
+                    <div class="value">
+                        {{SOLCAST_CONFIDENCE}}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="section-note">
+
+                <div class="label">
+                    Peakfenster
+                </div>
+
+                <div class="value">
+                    {{SOLCAST_PEAK_WINDOW}}
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+</div>
+
+
+</div>
 
 </body>
 
