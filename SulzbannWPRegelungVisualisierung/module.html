@@ -22,8 +22,6 @@
 
     color-scheme: light dark;
 
-    --sb-bg: transparent;
-
     --sb-text:
         var(
             --content-color,
@@ -56,12 +54,6 @@
             in srgb,
             var(--sb-text) 17%,
             transparent
-        );
-
-    --sb-accent:
-        var(
-            --accent-color,
-            #00cdab
         );
 
     --sb-heating:#d97f2b;
@@ -176,10 +168,10 @@ button {
     height:100%;
 
     padding:
-        54px
-        12px
-        12px
-        12px;
+        50px
+        10px
+        10px
+        10px;
 }
 
 
@@ -189,10 +181,10 @@ button {
 
 .status-dot {
 
-    width:11px;
-    height:11px;
+    width:10px;
+    height:10px;
 
-    min-width:11px;
+    min-width:10px;
 
     border-radius:50%;
 
@@ -222,8 +214,9 @@ button {
 
 .label {
 
-    font-size:13px;
-    line-height:1.25;
+    font-size:12px;
+
+    line-height:1.18;
 
     color:var(--sb-muted);
 }
@@ -231,10 +224,11 @@ button {
 
 .value {
 
-    margin-top:4px;
+    margin-top:3px;
 
-    font-size:18px;
-    line-height:1.2;
+    font-size:16px;
+
+    line-height:1.15;
 
     font-weight:700;
 
@@ -251,9 +245,60 @@ button {
         solid
         var(--sb-border);
 
-    border-radius:11px;
+    border-radius:9px;
 
     min-width:0;
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.compact {
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:7px;
+
+    min-height:0;
+}
+
+
+.compact-head {
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:10px;
+
+    min-height:34px;
+}
+
+
+.compact-mode {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    min-width:0;
+}
+
+
+.compact-mode-value {
+
+    font-size:16px;
+
+    font-weight:700;
+
+    line-height:1.15;
 }
 
 
@@ -267,47 +312,36 @@ button {
 
     align-items:center;
 
-    gap:7px;
+    gap:6px;
 }
 
 
 .action-button {
 
-    height:38px;
+    width:36px;
+    height:36px;
 
-    padding:
-        0
-        12px;
+    padding:0;
 
     border:
         1px
         solid
         var(--sb-border);
 
-    border-radius:9px;
+    border-radius:8px;
 
     background:var(--sb-soft);
 
-    color:var(--sb-text);
-
-    display:inline-flex;
+    display:flex;
 
     align-items:center;
     justify-content:center;
 
-    gap:7px;
-
     cursor:pointer;
 
-    white-space:nowrap;
+    font-size:14px;
 
-    font-size:13px;
     font-weight:600;
-}
-
-
-.action-button:active {
-    opacity:.72;
 }
 
 
@@ -319,67 +353,9 @@ button {
 }
 
 
-.expand-button {
-
-    width:38px;
-    min-width:38px;
-
-    padding:0;
-}
-
-
 /* ============================================================
-   COMPACT
+   DATEN
 ============================================================ */
-
-.compact {
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:10px;
-
-    min-height:0;
-}
-
-
-.compact-head {
-
-    display:flex;
-
-    align-items:center;
-    justify-content:space-between;
-
-    gap:12px;
-
-    min-height:40px;
-}
-
-
-.compact-mode {
-
-    display:flex;
-
-    align-items:center;
-
-    gap:9px;
-
-    min-width:0;
-}
-
-
-.compact-mode-value {
-
-    font-size:17px;
-
-    font-weight:700;
-
-    line-height:1.2;
-
-    color:var(--sb-text);
-}
-
 
 .compact-grid {
 
@@ -391,7 +367,7 @@ button {
             minmax(0,1fr)
         );
 
-    gap:9px;
+    gap:6px;
 
     min-height:0;
 }
@@ -399,17 +375,67 @@ button {
 
 .compact-card {
 
-    padding:
-        10px
-        11px;
+    min-height:61px;
 
-    min-height:82px;
+    padding:
+        8px
+        9px;
 
     display:flex;
 
     flex-direction:column;
 
     justify-content:center;
+}
+
+
+.span-2 {
+
+    grid-column:
+        span 2;
+}
+
+
+/* ============================================================
+   DIAGNOSE
+============================================================ */
+
+.mobile-diagnostic {
+
+    display:none;
+
+    margin-top:1px;
+
+    padding:
+        5px
+        7px;
+
+    border:
+        1px
+        solid
+        var(--sb-border);
+
+    border-radius:7px;
+
+    background:var(--sb-soft);
+
+    font-size:10px;
+
+    line-height:1.3;
+
+    color:var(--sb-muted);
+}
+
+
+.mobile-diagnostic.active {
+
+    display:block;
+}
+
+
+.mobile-diagnostic strong {
+
+    color:var(--sb-text);
 }
 
 
@@ -422,68 +448,78 @@ button {
     .view-shell {
 
         padding:
-            52px
-            9px
-            9px
-            9px;
+            48px
+            7px
+            7px
+            7px;
     }
 
-
-    .label {
-        font-size:12px;
-    }
-
-
-    .value {
-        font-size:18px;
-    }
-
-
-    .settings-text {
-        display:none;
-    }
-
-
-    .settings-button {
-
-        min-width:40px;
-
-        padding:
-            0
-            10px;
-    }
-}
-
-
-@media (max-width:420px) {
 
     .compact-grid {
 
         grid-template-columns:
-            1fr
-            1fr;
+            repeat(
+                2,
+                minmax(0,1fr)
+            );
 
-        gap:7px;
-    }
-
-
-    .compact-grid
-    .compact-card:last-child {
-
-        grid-column:
-            1
-            /
-            -1;
+        gap:5px;
     }
 
 
     .compact-card {
 
-        min-height:68px;
+        min-height:58px;
 
         padding:
-            8px
-            9px;
+            7px
+            8px;
+    }
+
+
+    .label {
+        font-size:11px;
+    }
+
+
+    .value {
+        font-size:15px;
+    }
+
+
+    .span-2 {
+
+        grid-column:
+            auto;
+    }
+}
+
+
+@media (max-width:380px) {
+
+    .compact-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0,1fr)
+            );
+    }
+
+
+    .compact-card {
+
+        min-height:55px;
+    }
+
+
+    .label {
+        font-size:10px;
+    }
+
+
+    .value {
+        font-size:14px;
     }
 }
 
@@ -505,126 +541,273 @@ button {
 
 <template id="compactTemplate">
 
-    <div class="view-shell compact">
+<div class="view-shell compact">
 
 
-        <div class="compact-head">
+    <div class="compact-head">
 
 
-            <div class="compact-mode">
+        <div class="compact-mode">
 
-                <span
-                    data-role="modeDot"
-                    class="status-dot standby"
-                ></span>
-
-
-                <div>
-
-                    <div class="label">
-                        WP Master-Betriebsart
-                    </div>
+            <span
+                data-role="modeDot"
+                class="status-dot standby"
+            ></span>
 
 
-                    <div
-                        class="compact-mode-value"
-                        data-role="mode"
-                    >
-                        —
-                    </div>
+            <div>
 
+                <div class="label">
+                    WP Master-Betriebsart
                 </div>
 
-            </div>
 
-
-            <div class="actions">
-
-                <button
-                    data-role="grossButton"
-                    class="action-button expand-button"
-                    type="button"
-                    title="Grossansicht"
-                    aria-label="Grossansicht"
+                <div
+                    class="compact-mode-value"
+                    data-role="mode"
                 >
-                    ↗
-                </button>
-
-
-                <button
-                    data-role="settingsButton"
-                    class="action-button settings-button"
-                    type="button"
-                    aria-label="Einstellungen"
-                >
-
-                    <i class="fa-light fa-gear"></i>
-
-                    <span class="settings-text">
-                        Einstellungen
-                    </span>
-
-                </button>
+                    —
+                </div>
 
             </div>
 
         </div>
 
 
-        <div class="compact-grid">
+        <div class="actions">
+
+            <button
+                data-role="grossButton"
+                class="action-button"
+                type="button"
+                title="Grossansicht"
+            >
+                ↗
+            </button>
 
 
-            <div class="card compact-card">
-
-                <div class="label">
-                    Raumtemperatur
-                </div>
-
-                <div
-                    class="value"
-                    data-role="roomAverage"
-                >
-                    —
-                </div>
-
-            </div>
-
-
-            <div class="card compact-card">
-
-                <div class="label">
-                    FBH Ventile offen
-                </div>
-
-                <div
-                    class="value"
-                    data-role="valvesOpen"
-                >
-                    —
-                </div>
-
-            </div>
-
-
-            <div class="card compact-card">
-
-                <div class="label">
-                    Stellwert max.
-                </div>
-
-                <div
-                    class="value"
-                    data-role="demandMaximum"
-                >
-                    —
-                </div>
-
-            </div>
-
+            <button
+                data-role="settingsButton"
+                class="action-button"
+                type="button"
+                title="Einstellungen"
+            >
+                ⚙
+            </button>
 
         </div>
 
     </div>
+
+
+
+    <div class="compact-grid">
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                Aussentemperatur
+            </div>
+
+            <div
+                class="value"
+                data-role="outside"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                WP Vorlauf
+            </div>
+
+            <div
+                class="value"
+                data-role="flow"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                WP Rücklauf
+            </div>
+
+            <div
+                class="value"
+                data-role="return"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                Raumtemperatur Ø
+            </div>
+
+            <div
+                class="value"
+                data-role="roomAverage"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                FBH Ventile
+            </div>
+
+            <div
+                class="value"
+                data-role="valvesOpen"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                Stellwert max.
+            </div>
+
+            <div
+                class="value"
+                data-role="demandMaximum"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                Boiler oben
+            </div>
+
+            <div
+                class="value"
+                data-role="dhwTop"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                Boiler unten
+            </div>
+
+            <div
+                class="value"
+                data-role="dhwBottom"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                Puffer oben
+            </div>
+
+            <div
+                class="value"
+                data-role="bufferTop"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                Puffer Mitte
+            </div>
+
+            <div
+                class="value"
+                data-role="bufferMiddle"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                Puffer unten
+            </div>
+
+            <div
+                class="value"
+                data-role="bufferBottom"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="card compact-card">
+
+            <div class="label">
+                WP Modulation
+            </div>
+
+            <div
+                class="value"
+                data-role="modulation"
+            >
+                —
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <div
+        class="mobile-diagnostic"
+        data-role="mobileDiagnostic"
+    >
+    </div>
+
+
+</div>
 
 </template>
 
@@ -678,14 +861,8 @@ function setRoleText(
     .forEach(
         element => {
 
-            if (
-                element.textContent
-                !==
-                value
-            ) {
-                element.textContent =
-                    value;
-            }
+            element.textContent =
+                value;
         }
     );
 }
@@ -738,6 +915,121 @@ function fmtPercent(value) {
 
 
 /* ============================================================
+   MOBILE ERKENNUNG
+============================================================ */
+
+function isLikelyMobileClient() {
+
+    const ua =
+        navigator.userAgent
+        ||
+        "";
+
+
+    const byUA =
+        /Android|iPhone|iPad|iPod|Mobile/i.test(
+            ua
+        );
+
+
+    const byWidth =
+        window.innerWidth
+        <=
+        700;
+
+
+    return (
+        byUA
+        ||
+        byWidth
+    );
+}
+
+
+/* ============================================================
+   DIAGNOSE
+============================================================ */
+
+function showDiagnostic(
+    message
+) {
+
+    const box =
+        document.querySelector(
+            '[data-role="mobileDiagnostic"]'
+        );
+
+
+    if (!box) {
+        return;
+    }
+
+
+    const openObjectAvailable =
+        typeof openObject
+        ===
+        "function";
+
+
+    const requestActionAvailable =
+        typeof requestAction
+        ===
+        "function";
+
+
+    const width =
+        window.innerWidth;
+
+
+    const height =
+        window.innerHeight;
+
+
+    box.classList.add(
+        "active"
+    );
+
+
+    box.innerHTML =
+        "<strong>"
+        +
+        message
+        +
+        "</strong>"
+        +
+        "<br>"
+        +
+        "openObject: "
+        +
+        (
+            openObjectAvailable
+                ?
+                "JA"
+                :
+                "NEIN"
+        )
+        +
+        " · requestAction: "
+        +
+        (
+            requestActionAvailable
+                ?
+                "JA"
+                :
+                "NEIN"
+        )
+        +
+        " · Viewport: "
+        +
+        width
+        +
+        " × "
+        +
+        height;
+}
+
+
+/* ============================================================
    RENDER
 ============================================================ */
 
@@ -773,11 +1065,12 @@ function renderCompact() {
 
 
 /* ============================================================
-   CLIENT-LOKALE NAVIGATION
+   NAVIGATION
 ============================================================ */
 
 function openLocalObject(
-    objectID
+    objectID,
+    label
 ) {
 
     const target =
@@ -788,33 +1081,83 @@ function openLocalObject(
         );
 
 
+    if (target <= 0) {
+
+        showDiagnostic(
+            label
+            +
+            ": Ziel-ID fehlt"
+        );
+
+        return false;
+    }
+
+
     if (
-        target <= 0
-        ||
         typeof openObject
         !==
         "function"
     ) {
+
+        showDiagnostic(
+            label
+            +
+            ": openObject nicht verfügbar"
+        );
+
         return false;
     }
 
 
     /*
-     * WICHTIG:
+     * MOBILE:
      *
-     * openObject() läuft direkt im aktuellen Client.
+     * Der bisherige Test führte dazu,
+     * dass die Werte aus der Kachel verschwanden.
      *
-     * Mobile-Klick:
-     * nur Mobile wechselt.
-     *
-     * Desktop bleibt unverändert.
+     * Deshalb wird Mobile in diesem Diagnose-Stand
+     * bewusst NICHT erneut blind umgeschaltet.
      */
-    openObject(
-        target
-    );
+    if (
+        isLikelyMobileClient()
+    ) {
+
+        showDiagnostic(
+            label
+            +
+            ": Mobile-Navigation vorerst blockiert"
+        );
+
+        return false;
+    }
 
 
-    return true;
+    /*
+     * DESKTOP / BROWSER:
+     * bestätigter funktionierender clientlokaler Weg.
+     */
+    try {
+
+        openObject(
+            target
+        );
+
+
+        return true;
+
+    } catch (error) {
+
+        showDiagnostic(
+            label
+            +
+            ": "
+            +
+            String(error)
+        );
+
+
+        return false;
+    }
 }
 
 
@@ -824,9 +1167,6 @@ function openLocalObject(
 
 function bindButtons() {
 
-    /*
-     * EINSTELLUNGEN
-     */
     allRole(
         "settingsButton"
     )
@@ -842,35 +1182,16 @@ function bindButtons() {
                     event.stopPropagation();
 
 
-                    const target =
-                        Number(
-                            currentData.settingsObjectID
-                            ||
-                            0
-                        );
-
-
-                    if (
-                        !openLocalObject(
-                            target
-                        )
-                    ) {
-
-                        button.disabled =
-                            true;
-
-                        button.title =
-                            "Einstellungen-Ziel nicht verfügbar";
-                    }
+                    openLocalObject(
+                        currentData.settingsObjectID,
+                        "Einstellungen"
+                    );
                 }
             );
         }
     );
 
 
-    /*
-     * GROSSANSICHT
-     */
     allRole(
         "grossButton"
     )
@@ -886,26 +1207,10 @@ function bindButtons() {
                     event.stopPropagation();
 
 
-                    const target =
-                        Number(
-                            currentData.grossObjectID
-                            ||
-                            0
-                        );
-
-
-                    if (
-                        !openLocalObject(
-                            target
-                        )
-                    ) {
-
-                        button.disabled =
-                            true;
-
-                        button.title =
-                            "Grossansicht nicht verfügbar";
-                    }
+                    openLocalObject(
+                        currentData.grossObjectID,
+                        "Grossansicht"
+                    );
                 }
             );
         }
@@ -943,6 +1248,18 @@ function applyData() {
         {};
 
 
+    const dhw =
+        d.dhw
+        ||
+        {};
+
+
+    const buffer =
+        d.buffer
+        ||
+        {};
+
+
     setRoleText(
         "mode",
         wp.mode
@@ -966,6 +1283,38 @@ function applyData() {
                     "standby"
                 );
         }
+    );
+
+
+    setRoleText(
+        "outside",
+        fmtTemp(
+            wp.outside
+        )
+    );
+
+
+    setRoleText(
+        "flow",
+        fmtTemp(
+            wp.flow
+        )
+    );
+
+
+    setRoleText(
+        "return",
+        fmtTemp(
+            wp.return
+        )
+    );
+
+
+    setRoleText(
+        "modulation",
+        fmtPercent(
+            wp.modulation
+        )
     );
 
 
@@ -1007,77 +1356,43 @@ function applyData() {
     );
 
 
-    /*
-     * SETTINGS BUTTON
-     */
-    const settingsOK =
-        Number(
-            d.settingsObjectID
-            ||
-            0
+    setRoleText(
+        "dhwTop",
+        fmtTemp(
+            dhw.top
         )
-        >
-        0
-        &&
-        typeof openObject
-        ===
-        "function";
-
-
-    allRole(
-        "settingsButton"
-    )
-    .forEach(
-        button => {
-
-            button.disabled =
-                !settingsOK;
-
-
-            button.title =
-                settingsOK
-                    ?
-                    "WP Regelung Einstellungen öffnen"
-                    :
-                    "Einstellungen-Ziel nicht verfügbar";
-        }
     );
 
 
-    /*
-     * GROSS BUTTON
-     */
-    const grossOK =
-        Number(
-            d.grossObjectID
-            ||
-            0
+    setRoleText(
+        "dhwBottom",
+        fmtTemp(
+            dhw.bottom
         )
-        >
-        0
-        &&
-        typeof openObject
-        ===
-        "function";
+    );
 
 
-    allRole(
-        "grossButton"
-    )
-    .forEach(
-        button => {
-
-            button.disabled =
-                !grossOK;
+    setRoleText(
+        "bufferTop",
+        fmtTemp(
+            buffer.top
+        )
+    );
 
 
-            button.title =
-                grossOK
-                    ?
-                    "Grossansicht öffnen"
-                    :
-                    "Grossansicht nicht verfügbar";
-        }
+    setRoleText(
+        "bufferMiddle",
+        fmtTemp(
+            buffer.middle
+        )
+    );
+
+
+    setRoleText(
+        "bufferBottom",
+        fmtTemp(
+            buffer.bottom
+        )
     );
 }
 
@@ -1138,10 +1453,6 @@ window.addEventListener(
         renderCompact();
 
 
-        /*
-         * Refresh ist weiterhin serverseitig erlaubt,
-         * weil dadurch keine Ansicht auf einem Client gewechselt wird.
-         */
         if (
             typeof requestAction
             ===
