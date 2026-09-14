@@ -17,27 +17,40 @@
 <style>
 
 /* ============================================================
-   SYMCON THEME
+   THEME
 ============================================================ */
+
+/*
+ * Standard = HELL.
+ *
+ * JavaScript setzt bei dunklem Symcon-Layout:
+ *
+ * <html data-sb-theme="dark">
+ */
 
 :root {
 
-    /*
-     * Diese Farben kommen direkt von der Symcon-Kachel.
-     *
-     * Kein prefers-color-scheme.
-     */
+    --sb-bg:
+        #ffffff;
 
     --sb-text:
-        var(
-            --content-color,
-            #ffffff
-        );
+        #14181b;
+
+    --sb-muted:
+        #64727a;
 
     --sb-card:
-        var(
-            --card-color,
-            #333438
+        #f3f6f7;
+
+    --sb-soft:
+        #eaf0f2;
+
+    --sb-border:
+        rgba(
+            35,
+            55,
+            65,
+            0.18
         );
 
     --sb-accent:
@@ -46,25 +59,43 @@
             #00cdab
         );
 
-    --sb-muted:
-        color-mix(
-            in srgb,
-            var(--sb-text) 68%,
-            transparent
-        );
+    --sb-heating:
+        #d97f2b;
 
-    --sb-border:
-        color-mix(
-            in srgb,
-            var(--sb-text) 18%,
-            transparent
-        );
+    --sb-cooling:
+        #2e8ec8;
+
+    --sb-standby:
+        #7e8b91;
+
+    --sb-fault:
+        #d84a4a;
+}
+
+
+html[data-sb-theme="dark"] {
+
+    --sb-bg:
+        #132f3b;
+
+    --sb-text:
+        #ffffff;
+
+    --sb-muted:
+        #b7c6cd;
+
+    --sb-card:
+        #183946;
 
     --sb-soft:
-        color-mix(
-            in srgb,
-            var(--sb-card) 82%,
-            transparent
+        #244552;
+
+    --sb-border:
+        rgba(
+            225,
+            240,
+            246,
+            0.18
         );
 
     --sb-heating:
@@ -74,7 +105,7 @@
         #46a9e5;
 
     --sb-standby:
-        #8c999f;
+        #91a0a8;
 
     --sb-fault:
         #ef6262;
@@ -151,14 +182,6 @@ button {
    KACHELTITEL SAFE AREA
 ============================================================ */
 
-/*
- * Symcon zeichnet den Titel selbst.
- *
- * Deshalb beginnen wir bewusst erst 54 px darunter.
- *
- * Kein eigener Titel in diesem Bereich.
- */
-
 .view-shell {
 
     width:
@@ -196,28 +219,24 @@ button {
 
 
 .status-dot.heating {
-
     background:
         var(--sb-heating);
 }
 
 
 .status-dot.cooling {
-
     background:
         var(--sb-cooling);
 }
 
 
 .status-dot.standby {
-
     background:
         var(--sb-standby);
 }
 
 
 .status-dot.fault {
-
     background:
         var(--sb-fault);
 }
@@ -260,7 +279,7 @@ button {
 
 
 /* ============================================================
-   SETTINGS
+   EINSTELLUNGEN
 ============================================================ */
 
 .settings-button {
@@ -311,7 +330,6 @@ button {
 
 
 .settings-button:active {
-
     opacity:
         0.72;
 }
@@ -423,7 +441,7 @@ button {
 .card {
 
     background:
-        var(--sb-soft);
+        var(--sb-card);
 
     border:
         1px solid
@@ -664,7 +682,7 @@ button {
 
 
 /* ============================================================
-   MOBILE
+   MOBILE / TABLET
 ============================================================ */
 
 @media (
@@ -815,28 +833,22 @@ button {
 
 <template id="compactTemplate">
 
-
 <div class="view-shell compact">
-
 
     <div class="compact-head">
 
-
         <div class="compact-mode">
-
 
             <span
                 data-role="modeDot"
                 class="status-dot standby"
             ></span>
 
-
             <div>
 
                 <div class="label">
                     WP Master-Betriebsart
                 </div>
-
 
                 <div
                     class="compact-mode-value"
@@ -846,7 +858,6 @@ button {
                 </div>
 
             </div>
-
 
         </div>
 
@@ -866,12 +877,10 @@ button {
 
         </button>
 
-
     </div>
 
 
     <div class="compact-grid">
-
 
         <div class="card compact-card">
 
@@ -920,12 +929,9 @@ button {
 
         </div>
 
-
     </div>
 
-
 </div>
-
 
 </template>
 
@@ -936,28 +942,22 @@ button {
 
 <template id="detailTemplate">
 
-
 <div class="view-shell detail">
-
 
     <div class="detail-head">
 
-
         <div class="detail-mode">
-
 
             <span
                 data-role="modeDot"
                 class="status-dot standby"
             ></span>
 
-
             <div>
 
                 <div class="label">
                     WP Master-Betriebsart
                 </div>
-
 
                 <div
                     class="detail-mode-value"
@@ -967,7 +967,6 @@ button {
                 </div>
 
             </div>
-
 
         </div>
 
@@ -987,16 +986,10 @@ button {
 
         </button>
 
-
     </div>
 
 
-    <!-- ========================================================
-         ÜBERSICHT
-    ========================================================= -->
-
     <div class="summary-grid">
-
 
         <div class="card summary-card">
 
@@ -1061,21 +1054,13 @@ button {
 
         </div>
 
-
     </div>
 
-
-    <!-- ========================================================
-         SEKTIONEN
-    ========================================================= -->
 
     <div class="sections">
 
 
-        <!-- WÄRMEPUMPE -->
-
         <div class="card section">
-
 
             <div class="section-title">
                 Wärmepumpe
@@ -1083,7 +1068,6 @@ button {
 
 
             <div class="data-grid">
-
 
                 <div class="data-item">
 
@@ -1196,17 +1180,12 @@ button {
 
                 </div>
 
-
             </div>
-
 
         </div>
 
 
-        <!-- SPEICHER -->
-
         <div class="card section">
-
 
             <div class="section-title">
                 Speicher
@@ -1214,7 +1193,6 @@ button {
 
 
             <div class="data-grid">
-
 
                 <div class="data-item">
 
@@ -1295,17 +1273,12 @@ button {
 
                 </div>
 
-
             </div>
-
 
         </div>
 
 
-        <!-- FBH -->
-
         <div class="card section">
-
 
             <div class="section-title">
                 Fussbodenheizung
@@ -1313,7 +1286,6 @@ button {
 
 
             <div class="data-grid">
-
 
                 <div class="data-item">
 
@@ -1362,17 +1334,12 @@ button {
 
                 </div>
 
-
             </div>
-
 
         </div>
 
 
-        <!-- PROGNOSE -->
-
         <div class="card section">
-
 
             <div class="section-title">
                 Prognose
@@ -1380,7 +1347,6 @@ button {
 
 
             <div class="data-grid">
-
 
                 <div class="data-item">
 
@@ -1509,7 +1475,6 @@ button {
 
                 </div>
 
-
             </div>
 
 
@@ -1528,9 +1493,7 @@ button {
 
             </div>
 
-
         </div>
-
 
     </div>
 
@@ -1542,9 +1505,7 @@ button {
         —
     </div>
 
-
 </div>
-
 
 </template>
 
@@ -1581,7 +1542,7 @@ let currentMode =
 
 
 /* ============================================================
-   DOM HELPERS
+   DOM
 ============================================================ */
 
 function allRole(role) {
@@ -1769,43 +1730,9 @@ function determineMode() {
 
 
     /*
-     * Wichtig:
+     * Geöffnete ca. 630 x 445 px Ansicht = DETAIL.
      *
-     * NICHT mehr:
-     *
-     *     height < 500
-     *
-     * Der Fehlversuch hat deine geöffnete
-     * ca. 630 x 445 px Ansicht fälschlich
-     * als Compact behandelt.
-     *
-     *
-     * Neue Logik:
-     *
-     * Detail wenn:
-     *
-     * - genügend tatsächliche Höhe vorhanden
-     * UND
-     * - genügend tatsächliche Fläche vorhanden
-     *
-     *
-     * 630 x 445:
-     *
-     * 280'350 px²
-     *
-     * => DETAIL
-     *
-     *
-     * Kleine / kurze Kacheln:
-     *
-     * => COMPACT
-     *
-     *
-     * Mobile Grossansicht:
-     *
-     * schmal, aber hoch und grosse Fläche
-     *
-     * => DETAIL
+     * Kleine Kachel = COMPACT.
      */
 
     if (
@@ -1821,10 +1748,6 @@ function determineMode() {
     return "compact";
 }
 
-
-/* ============================================================
-   MODUS RENDERN
-============================================================ */
 
 function renderMode() {
 
@@ -1886,7 +1809,7 @@ function renderMode() {
 
 
 /* ============================================================
-   SETTINGS BUTTON
+   EINSTELLUNGEN
 ============================================================ */
 
 function bindButtons() {
@@ -1903,11 +1826,6 @@ function bindButtons() {
                 "click",
 
                 function (event) {
-
-                    /*
-                     * Klick nicht gleichzeitig als
-                     * Kachel-Klick behandeln.
-                     */
 
                     event.preventDefault();
 
@@ -1937,7 +1855,33 @@ function bindButtons() {
 
 
                     /*
-                     * Symcon HTML-SDK.
+                     * PRIMÄR:
+                     *
+                     * HTML SDK -> PHP Modul.
+                     *
+                     * Dort öffnet VISU_OpenObject()
+                     * die Kategorie.
+                     */
+
+                    if (
+                        typeof requestAction
+                        ===
+                        "function"
+                    ) {
+
+                        requestAction(
+                            "OpenSettings",
+                            true
+                        );
+
+                        return;
+                    }
+
+
+                    /*
+                     * FALLBACK:
+                     *
+                     * Direkte HTML-SDK Funktion.
                      */
 
                     if (
@@ -1954,15 +1898,11 @@ function bindButtons() {
                     }
 
 
-                    /*
-                     * Niemals still nichts tun.
-                     */
-
                     button.disabled =
                         true;
 
                     button.title =
-                        "openObject() ist in dieser Ansicht nicht verfügbar";
+                        "Symcon-Navigation in dieser Ansicht nicht verfügbar";
                 }
             );
         }
@@ -2024,10 +1964,6 @@ function applyData() {
         {};
 
 
-    /*
-     * Betriebsart
-     */
-
     setRoleText(
         "mode",
         wp.mode
@@ -2054,10 +1990,6 @@ function applyData() {
         }
     );
 
-
-    /*
-     * Räume
-     */
 
     setRoleText(
         "roomAverage",
@@ -2105,10 +2037,6 @@ function applyData() {
     }
 
 
-    /*
-     * FBH
-     */
-
     if (
         isNumber(
             fbh.open
@@ -2154,10 +2082,6 @@ function applyData() {
         )
     );
 
-
-    /*
-     * Wärmepumpe
-     */
 
     setRoleText(
         "outsideTemp",
@@ -2224,10 +2148,6 @@ function applyData() {
     );
 
 
-    /*
-     * Speicher
-     */
-
     setRoleText(
         "dhwTop",
         formatTemperature(
@@ -2268,10 +2188,6 @@ function applyData() {
     );
 
 
-    /*
-     * MeteoSchweiz
-     */
-
     setRoleText(
         "meteoMaximum",
         formatTemperature(
@@ -2307,10 +2223,6 @@ function applyData() {
         )
     );
 
-
-    /*
-     * Solcast
-     */
 
     setRoleText(
 
@@ -2378,10 +2290,6 @@ function applyData() {
     }
 
 
-    /*
-     * Letztes Update
-     */
-
     setRoleText(
 
         "lastUpdate",
@@ -2394,22 +2302,20 @@ function applyData() {
     );
 
 
-    /*
-     * Settings prüfen.
-     */
-
-    const settingsOK =
-        (
-            Number(
-                data.settingsObjectID
-                ||
-                0
-            )
-            >
+    const settingsAvailable =
+        Number(
+            data.settingsObjectID
+            ||
             0
         )
+        >
+        0
         &&
         (
+            typeof requestAction
+            ===
+            "function"
+            ||
             typeof openObject
             ===
             "function"
@@ -2424,11 +2330,11 @@ function applyData() {
         function (button) {
 
             button.disabled =
-                !settingsOK;
+                !settingsAvailable;
 
 
             button.title =
-                settingsOK
+                settingsAvailable
 
                     ?
 
@@ -2443,7 +2349,314 @@ function applyData() {
 
 
 /* ============================================================
-   LIVE UPDATE
+   THEME
+============================================================ */
+
+/*
+ * Hintergrundfarbe in RGB zerlegen.
+ */
+
+function parseRgb(value) {
+
+    if (
+        !value
+        ||
+        value ===
+        "transparent"
+    ) {
+
+        return null;
+    }
+
+
+    const match =
+        value.match(
+            /rgba?\(\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)/i
+        );
+
+
+    if (!match) {
+
+        return null;
+    }
+
+
+    return [
+
+        Number(
+            match[1]
+        ),
+
+        Number(
+            match[2]
+        ),
+
+        Number(
+            match[3]
+        )
+
+    ];
+}
+
+
+function luminance(rgb) {
+
+    if (!rgb) {
+
+        return null;
+    }
+
+
+    const normalized =
+        rgb.map(
+
+            function (value) {
+
+                return
+                    value
+                    /
+                    255;
+            }
+        );
+
+
+    return
+        0.2126
+        *
+        normalized[0]
+        +
+        0.7152
+        *
+        normalized[1]
+        +
+        0.0722
+        *
+        normalized[2];
+}
+
+
+/*
+ * Tatsächliche Symcon-Kachel ausserhalb des HTML-SDK prüfen.
+ *
+ * Desktop hatte bisher:
+ *
+ * dunkle Symcon-Kachel
+ * aber HTML-SDK meldete Light-Farben.
+ *
+ * Deshalb ist die umgebende Kachel unsere erste Referenz.
+ */
+
+function getParentTileBackground() {
+
+    try {
+
+        let element =
+            window.frameElement;
+
+
+        let steps =
+            0;
+
+
+        while (
+            element
+            &&
+            steps < 10
+        ) {
+
+            const style =
+                window.parent
+                    .getComputedStyle(
+                        element
+                    );
+
+
+            const background =
+                parseRgb(
+                    style.backgroundColor
+                );
+
+
+            if (
+                background
+                &&
+                luminance(
+                    background
+                )
+                !==
+                null
+            ) {
+
+                return
+                    background;
+            }
+
+
+            element =
+                element.parentElement;
+
+
+            steps++;
+        }
+
+    } catch (error) {
+
+        /*
+         * App / WebView kann Parentzugriff blockieren.
+         * Dann benutzen wir unten den Fallback.
+         */
+    }
+
+
+    return null;
+}
+
+
+function detectSymconTheme() {
+
+    /*
+     * ---------------------------------------------------------
+     * 1. Tatsächlicher Hintergrund der Symcon-Kachel
+     * ---------------------------------------------------------
+     */
+
+    const parentBackground =
+        getParentTileBackground();
+
+
+    const parentLuminance =
+        luminance(
+            parentBackground
+        );
+
+
+    if (
+        parentLuminance
+        !==
+        null
+    ) {
+
+        return
+            parentLuminance
+            <
+            0.50
+
+                ?
+
+                "dark"
+
+                :
+
+                "light";
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * 2. Symcon content-color als Fallback
+     * ---------------------------------------------------------
+     */
+
+    const rootStyle =
+        getComputedStyle(
+            document.documentElement
+        );
+
+
+    const contentColor =
+        parseRgb(
+            rootStyle
+                .getPropertyValue(
+                    "--content-color"
+                )
+                .trim()
+        );
+
+
+    const contentLuminance =
+        luminance(
+            contentColor
+        );
+
+
+    if (
+        contentLuminance
+        !==
+        null
+    ) {
+
+        /*
+         * Helle Schrift => dunkles Theme.
+         */
+        return
+            contentLuminance
+            >
+            0.60
+
+                ?
+
+                "dark"
+
+                :
+
+                "light";
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * 3. Letzter Fallback
+     * ---------------------------------------------------------
+     *
+     * Nicht primär verwenden!
+     *
+     * OS/Browser kann ein anderes Theme haben als Symcon.
+     */
+
+    if (
+        window.matchMedia
+        &&
+        window
+            .matchMedia(
+                "(prefers-color-scheme: dark)"
+            )
+            .matches
+    ) {
+
+        return "dark";
+    }
+
+
+    return "light";
+}
+
+
+function syncTheme() {
+
+    const theme =
+        detectSymconTheme();
+
+
+    if (
+        document
+            .documentElement
+            .dataset
+            .sbTheme
+        !==
+        theme
+    ) {
+
+        document
+            .documentElement
+            .dataset
+            .sbTheme =
+                theme;
+    }
+}
+
+
+/* ============================================================
+   LIVE
 ============================================================ */
 
 function handleMessage(data) {
@@ -2484,12 +2697,6 @@ function handleMessage(data) {
         data;
 
 
-    /*
-     * Nur Werte im DOM ändern.
-     *
-     * Kein kompletter HTML-Neuaufbau.
-     */
-
     applyData();
 }
 
@@ -2502,6 +2709,8 @@ const resizeObserver =
     new ResizeObserver(
 
         function () {
+
+            syncTheme();
 
             renderMode();
         }
@@ -2523,24 +2732,12 @@ window.addEventListener(
 
     function () {
 
-        /*
-         * Compact oder Detail anhand
-         * tatsächlicher Kachelfläche.
-         */
+        syncTheme();
 
         renderMode();
 
-
-        /*
-         * Initialdaten sind bereits eingebettet.
-         */
-
         applyData();
 
-
-        /*
-         * Zusätzlich einmal Livewerte holen.
-         */
 
         if (
             typeof requestAction
@@ -2553,6 +2750,19 @@ window.addEventListener(
                 true
             );
         }
+
+
+        /*
+         * Falls Symcon das Theme live ändert,
+         * ziehen wir es nach.
+         *
+         * Keine HTML-Neuladung.
+         */
+
+        window.setInterval(
+            syncTheme,
+            1500
+        );
     }
 );
 
