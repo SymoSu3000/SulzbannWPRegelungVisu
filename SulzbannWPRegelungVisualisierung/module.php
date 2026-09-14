@@ -14,13 +14,12 @@ class SulzbannWPRegelungVisu extends IPSModule
      * - Compact = HTML-SDK
      * - VisualizationType 1
      * - Grossansicht = WebContent-Unterobjekt
-     * - Einstellungen und Grossansicht werden CLIENTSEITIG
-     *   mit openObject() geöffnet
+     * - Grossansicht und Einstellungen werden im aktuellen Client
+     *   direkt mit openObject() geöffnet.
      *
-     * WICHTIG:
-     * VISU_OpenObject() wird NICHT mehr für Benutzer-Navigation
-     * verwendet, da sonst andere gleichzeitig geöffnete Clients
-     * ebenfalls umgeschaltet werden.
+     * Legacy:
+     * - OpenGross / OpenSettings bleiben in RequestAction erhalten,
+     *   damit noch geladene alte Clients keinen Fatal Error erzeugen.
      *
      * Keine WP-/OZW-/KNX-Schreibzugriffe.
      * ============================================================
@@ -315,17 +314,6 @@ class SulzbannWPRegelungVisu extends IPSModule
      * ============================================================
      * ACTIONS
      * ============================================================
-     *
-     * Benutzer-Navigation läuft NICHT mehr hier.
-     *
-     * Grossansicht:
-     * module.html -> openObject(grossObjectID)
-     *
-     * Einstellungen:
-     * module.html -> openObject(settingsObjectID)
-     *
-     * Dadurch bleibt die Navigation lokal auf dem Client.
-     * ============================================================
      */
 
     public function RequestAction(
@@ -343,6 +331,59 @@ class SulzbannWPRegelungVisu extends IPSModule
                 return;
 
 
+            /*
+             * LEGACY-FALLBACK:
+             *
+             * Falls auf einem Client noch eine alte module.html
+             * geladen ist, kommt weiterhin OpenSettings hier an.
+             *
+             * Die neue module.html benutzt direkt openObject().
+             */
+            case 'OpenSettings':
+
+                $settingsObjectID =
+                    $this->FindSettingsObject();
+
+                if (
+                    $settingsObjectID > 0
+                    &&
+                    IPS_ObjectExists(
+                        $settingsObjectID
+                    )
+                ) {
+                    $this->OpenObjectLegacy(
+                        $settingsObjectID
+                    );
+                }
+
+                return;
+
+
+            /*
+             * LEGACY-FALLBACK für alte/gecachte Clients.
+             */
+            case 'OpenGross':
+
+                $grossObjectID =
+                    $this->GetIDForIdent(
+                        'WPRegelungGross'
+                    );
+
+                if (
+                    $grossObjectID > 0
+                    &&
+                    IPS_ObjectExists(
+                        $grossObjectID
+                    )
+                ) {
+                    $this->OpenObjectLegacy(
+                        $grossObjectID
+                    );
+                }
+
+                return;
+
+
             default:
 
                 throw new Exception(
@@ -350,6 +391,90 @@ class SulzbannWPRegelungVisu extends IPSModule
                     .
                     $Ident
                 );
+        }
+    }
+
+    /*
+     * ============================================================
+     * LEGACY NAVIGATION
+     * ============================================================
+     *
+     * Nur für bereits geladene alte Clients.
+     *
+     * Die aktuelle module.html soll diese Funktion NICHT benutzen.
+     * ============================================================
+     */
+
+    private function OpenObjectLegacy(
+        int $objectID
+    ): void {
+        if (
+            $objectID <= 0
+            ||
+            !IPS_ObjectExists(
+                $objectID
+            )
+        ) {
+            return;
+        }
+
+        foreach (
+            IPS_GetInstanceList()
+            as $instanceID
+        ) {
+            $instance =
+                IPS_GetInstance(
+                    $instanceID
+                );
+
+            $moduleName =
+                (string) (
+                    $instance['ModuleInfo']['ModuleName']
+                    ??
+                    ''
+                );
+
+            $isTileVisualization =
+                stripos(
+                    $moduleName,
+                    'Kachel Visualisierung'
+                )
+                !==
+                false
+                ||
+                stripos(
+                    $moduleName,
+                    'Tile Visualization'
+                )
+                !==
+                false;
+
+            if (!$isTileVisualization) {
+                continue;
+            }
+
+            try {
+
+                VISU_OpenObject(
+                    (int) $instanceID,
+                    $objectID,
+                    ''
+                );
+
+            } catch (Throwable $e) {
+
+                $this->SendDebug(
+                    'LegacyNavigation',
+                    'VISU #'
+                    .
+                    $instanceID
+                    .
+                    ': '
+                    .
+                    $e->getMessage(),
+                    0
+                );
+            }
         }
     }
 
@@ -1263,6 +1388,7 @@ HTML;
         /*
          * Räume
          */
+
         $roomTemperatures = [];
 
         foreach (
@@ -1316,6 +1442,7 @@ HTML;
         /*
          * Ventile
          */
+
         $openValves = 0;
 
         foreach (
@@ -1334,6 +1461,7 @@ HTML;
         /*
          * Stellwerte
          */
+
         $demands = [];
 
         foreach (
@@ -1373,8 +1501,9 @@ HTML;
         }
 
         /*
-         * IDs für lokale Client-Navigation.
+         * Objekt-IDs für clientseitiges openObject().
          */
+
         $settingsObjectID =
             $this->FindSettingsObject();
 
@@ -1387,9 +1516,6 @@ HTML;
             'timestamp' =>
                 time(),
 
-            /*
-             * Diese IDs verwendet module.html direkt mit openObject().
-             */
             'settingsObjectID' =>
                 (
                     $settingsObjectID > 0
@@ -1915,7 +2041,9 @@ HTML;
         if (
             $variableID <= 0
             ||
-            !IPS_VariableExists($variableID)
+            !IPS_VariableExists(
+                $variableID
+            )
         ) {
             return false;
         }
@@ -1933,7 +2061,9 @@ HTML;
         if (
             $variableID <= 0
             ||
-            !IPS_VariableExists($variableID)
+            !IPS_VariableExists(
+                $variableID
+            )
         ) {
             return null;
         }
