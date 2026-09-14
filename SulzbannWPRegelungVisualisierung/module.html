@@ -14,72 +14,108 @@
 
 <style>
 
+/* ============================================================
+   THEME
+============================================================ */
+
 :root {
+
     color-scheme: light dark;
 
-    --foreground:
+    --sb-bg: transparent;
+
+    --sb-text:
         var(
             --content-color,
             #202124
         );
 
-    --muted:
+    --sb-muted:
         color-mix(
             in srgb,
-            var(--foreground) 62%,
+            var(--sb-text) 62%,
             transparent
         );
 
-    --card:
+    --sb-card:
         color-mix(
             in srgb,
-            var(--foreground) 7%,
+            var(--sb-text) 7%,
             transparent
         );
 
-    --soft:
+    --sb-soft:
         color-mix(
             in srgb,
-            var(--foreground) 10%,
+            var(--sb-text) 10%,
             transparent
         );
 
-    --border:
+    --sb-border:
         color-mix(
             in srgb,
-            var(--foreground) 17%,
+            var(--sb-text) 17%,
             transparent
         );
 
-    --heating:#d97f2b;
-    --cooling:#2e8ec8;
-    --standby:#7e8b91;
-    --fault:#d84a4a;
+    --sb-accent:
+        var(
+            --accent-color,
+            #00cdab
+        );
+
+    --sb-heating:#d97f2b;
+    --sb-cooling:#2e8ec8;
+    --sb-standby:#78909c;
+    --sb-fault:#d84a4a;
 }
 
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme:dark) {
 
     :root {
 
-        --foreground:
+        --sb-text:
             var(
                 --content-color,
                 #f3f5f7
             );
-    }
-}
 
-
-@media (prefers-color-scheme: light) {
-
-    :root {
-
-        --foreground:
-            var(
-                --content-color,
-                #202124
+        --sb-muted:
+            color-mix(
+                in srgb,
+                var(--sb-text) 68%,
+                transparent
             );
+
+        --sb-card:
+            rgba(
+                255,
+                255,
+                255,
+                .055
+            );
+
+        --sb-soft:
+            rgba(
+                255,
+                255,
+                255,
+                .085
+            );
+
+        --sb-border:
+            rgba(
+                225,
+                240,
+                246,
+                .18
+            );
+
+        --sb-heating:#ff9c48;
+        --sb-cooling:#46a9e5;
+        --sb-standby:#91a0a8;
+        --sb-fault:#ef6262;
     }
 }
 
@@ -91,6 +127,7 @@
 
 html,
 body {
+
     margin:0;
     padding:0;
 
@@ -101,7 +138,7 @@ body {
 
     background:transparent;
 
-    color:var(--foreground);
+    color:var(--sb-text);
 
     font-family:
         -apple-system,
@@ -113,12 +150,15 @@ body {
 
 
 button {
+
     font:inherit;
+
     color:inherit;
 }
 
 
 #app {
+
     width:100%;
     height:100%;
 
@@ -126,10 +166,12 @@ button {
 }
 
 
-/*
- * Symcon zeichnet den eigentlichen Kacheltitel selbst.
- */
+/* ============================================================
+   SAFE AREA
+============================================================ */
+
 .view-shell {
+
     width:100%;
     height:100%;
 
@@ -141,41 +183,12 @@ button {
 }
 
 
-.compact {
-    display:flex;
-
-    flex-direction:column;
-
-    gap:10px;
-
-    min-height:0;
-}
-
-
-.compact-head {
-    display:flex;
-
-    align-items:center;
-    justify-content:space-between;
-
-    gap:12px;
-
-    min-height:40px;
-}
-
-
-.compact-mode {
-    display:flex;
-
-    align-items:center;
-
-    gap:9px;
-
-    min-width:0;
-}
-
+/* ============================================================
+   BASIS
+============================================================ */
 
 .status-dot {
+
     width:11px;
     height:11px;
 
@@ -183,62 +196,83 @@ button {
 
     border-radius:50%;
 
-    background:var(--standby);
+    background:var(--sb-standby);
 }
 
 
 .status-dot.heating {
-    background:var(--heating);
+    background:var(--sb-heating);
 }
 
 
 .status-dot.cooling {
-    background:var(--cooling);
+    background:var(--sb-cooling);
 }
 
 
 .status-dot.standby {
-    background:var(--standby);
+    background:var(--sb-standby);
 }
 
 
 .status-dot.fault {
-    background:var(--fault);
+    background:var(--sb-fault);
 }
 
 
 .label {
+
     font-size:13px;
     line-height:1.25;
 
-    color:var(--muted);
+    color:var(--sb-muted);
 }
 
 
-.compact-mode-value {
-    margin-top:2px;
+.value {
 
-    font-size:17px;
+    margin-top:4px;
+
+    font-size:18px;
     line-height:1.2;
 
     font-weight:700;
 
-    color:var(--foreground);
+    color:var(--sb-text);
 }
 
 
+.card {
+
+    background:var(--sb-card);
+
+    border:
+        1px
+        solid
+        var(--sb-border);
+
+    border-radius:11px;
+
+    min-width:0;
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
 .actions {
+
     display:flex;
 
     align-items:center;
 
     gap:7px;
-
-    flex-shrink:0;
 }
 
 
 .action-button {
+
     height:38px;
 
     padding:
@@ -248,13 +282,13 @@ button {
     border:
         1px
         solid
-        var(--border);
+        var(--sb-border);
 
     border-radius:9px;
 
-    background:var(--soft);
+    background:var(--sb-soft);
 
-    color:var(--foreground);
+    color:var(--sb-text);
 
     display:inline-flex;
 
@@ -268,7 +302,6 @@ button {
     white-space:nowrap;
 
     font-size:13px;
-
     font-weight:600;
 }
 
@@ -279,6 +312,7 @@ button {
 
 
 .action-button:disabled {
+
     opacity:.38;
 
     cursor:default;
@@ -286,6 +320,7 @@ button {
 
 
 .expand-button {
+
     width:38px;
     min-width:38px;
 
@@ -293,7 +328,61 @@ button {
 }
 
 
+/* ============================================================
+   COMPACT
+============================================================ */
+
+.compact {
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+    min-height:0;
+}
+
+
+.compact-head {
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:12px;
+
+    min-height:40px;
+}
+
+
+.compact-mode {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    min-width:0;
+}
+
+
+.compact-mode-value {
+
+    font-size:17px;
+
+    font-weight:700;
+
+    line-height:1.2;
+
+    color:var(--sb-text);
+}
+
+
 .compact-grid {
+
     display:grid;
 
     grid-template-columns:
@@ -308,21 +397,8 @@ button {
 }
 
 
-.card {
-    background:var(--card);
-
-    border:
-        1px
-        solid
-        var(--border);
-
-    border-radius:11px;
-
-    min-width:0;
-}
-
-
 .compact-card {
+
     padding:
         10px
         11px;
@@ -337,21 +413,174 @@ button {
 }
 
 
-.value {
-    margin-top:4px;
+/* ============================================================
+   DETAIL
+============================================================ */
 
-    font-size:18px;
-    line-height:1.2;
+.detail {
+
+    height:100%;
+
+    overflow:auto;
+
+    padding-right:2px;
+}
+
+
+.detail-head {
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:16px;
+
+    margin-bottom:12px;
+
+    min-height:42px;
+}
+
+
+.detail-mode {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    min-width:0;
+}
+
+
+.detail-mode-value {
+
+    font-size:21px;
 
     font-weight:700;
 
-    color:var(--foreground);
+    line-height:1.2;
 }
 
+
+.summary-grid {
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0,1fr)
+        );
+
+    gap:10px;
+
+    margin-bottom:10px;
+}
+
+
+.summary-card {
+
+    padding:
+        11px
+        12px;
+
+    min-height:76px;
+}
+
+
+.sections {
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap:10px;
+}
+
+
+.section {
+
+    padding:13px;
+}
+
+
+.section-title {
+
+    margin-bottom:12px;
+
+    font-size:15px;
+    line-height:1.25;
+
+    font-weight:700;
+
+    color:var(--sb-text);
+}
+
+
+.data-grid {
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap:
+        14px
+        24px;
+}
+
+
+.data-item {
+
+    min-width:0;
+
+    min-height:46px;
+}
+
+
+.peak-window {
+
+    margin-top:14px;
+
+    padding-top:12px;
+
+    border-top:
+        1px
+        solid
+        var(--sb-border);
+}
+
+
+.footer {
+
+    margin-top:10px;
+
+    text-align:right;
+
+    font-size:12px;
+    line-height:1.2;
+
+    color:var(--sb-muted);
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
 
 @media (max-width:700px) {
 
     .view-shell {
+
         padding:
             52px
             9px
@@ -365,12 +594,41 @@ button {
     }
 
 
+    .value {
+        font-size:18px;
+    }
+
+
+    .summary-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0,1fr)
+            );
+    }
+
+
+    .sections {
+        grid-template-columns:1fr;
+    }
+
+
+    .data-grid {
+
+        gap:
+            13px
+            16px;
+    }
+
+
     .settings-text {
         display:none;
     }
 
 
     .settings-button {
+
         min-width:40px;
 
         padding:
@@ -383,6 +641,7 @@ button {
 @media (max-width:420px) {
 
     .compact-grid {
+
         grid-template-columns:
             1fr
             1fr;
@@ -393,11 +652,16 @@ button {
 
     .compact-grid
     .compact-card:last-child {
-        grid-column:1/-1;
+
+        grid-column:
+            1
+            /
+            -1;
     }
 
 
     .compact-card {
+
         min-height:68px;
 
         padding:
@@ -406,19 +670,21 @@ button {
     }
 
 
-    .actions {
-        gap:5px;
+    .summary-grid {
+        gap:8px;
     }
 
 
-    .action-button {
-        height:36px;
+    .section {
+        padding:11px;
     }
+}
 
 
-    .expand-button {
-        width:36px;
-        min-width:36px;
+@media (max-width:340px) {
+
+    .data-grid {
+        grid-template-columns:1fr;
     }
 }
 
@@ -429,8 +695,16 @@ button {
 
 <body>
 
-<div id="app">
 
+<div id="app"></div>
+
+
+
+<!-- ============================================================
+     COMPACT TEMPLATE
+============================================================ -->
+
+<template id="compactTemplate">
 
     <div class="view-shell compact">
 
@@ -467,13 +741,12 @@ button {
 
             <div class="actions">
 
-
                 <button
                     data-role="grossButton"
                     class="action-button expand-button"
                     type="button"
+                    title="Grossansicht"
                     aria-label="Grossansicht"
-                    title="Grossansicht öffnen"
                 >
                     ↗
                 </button>
@@ -488,13 +761,11 @@ button {
 
                     <i class="fa-light fa-gear"></i>
 
-
                     <span class="settings-text">
                         Einstellungen
                     </span>
 
                 </button>
-
 
             </div>
 
@@ -509,7 +780,6 @@ button {
                 <div class="label">
                     Raumtemperatur
                 </div>
-
 
                 <div
                     class="value"
@@ -527,7 +797,6 @@ button {
                     FBH Ventile offen
                 </div>
 
-
                 <div
                     class="value"
                     data-role="valvesOpen"
@@ -544,7 +813,6 @@ button {
                     Stellwert max.
                 </div>
 
-
                 <div
                     class="value"
                     data-role="demandMaximum"
@@ -559,8 +827,298 @@ button {
 
     </div>
 
+</template>
 
-</div>
+
+
+<!-- ============================================================
+     DETAIL TEMPLATE
+============================================================ -->
+
+<template id="detailTemplate">
+
+    <div class="view-shell detail">
+
+
+        <div class="detail-head">
+
+
+            <div class="detail-mode">
+
+                <span
+                    data-role="modeDot"
+                    class="status-dot standby"
+                ></span>
+
+
+                <div>
+
+                    <div class="label">
+                        WP Master-Betriebsart
+                    </div>
+
+
+                    <div
+                        class="detail-mode-value"
+                        data-role="mode"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                data-role="settingsButton"
+                class="action-button settings-button"
+                type="button"
+                aria-label="Einstellungen"
+            >
+
+                <i class="fa-light fa-gear"></i>
+
+                <span class="settings-text">
+                    Einstellungen
+                </span>
+
+            </button>
+
+        </div>
+
+
+
+        <div class="summary-grid">
+
+            <div class="card summary-card">
+                <div class="label">Raumtemperatur Mittel</div>
+                <div class="value" data-role="roomAverage">—</div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="label">Raum Min. / Max.</div>
+                <div class="value" data-role="roomRange">—</div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="label">FBH Ventile offen</div>
+                <div class="value" data-role="valvesOpen">—</div>
+            </div>
+
+            <div class="card summary-card">
+                <div class="label">FBH Stellwert max.</div>
+                <div class="value" data-role="demandMaximum">—</div>
+            </div>
+
+        </div>
+
+
+
+        <div class="sections">
+
+
+            <div class="card section">
+
+                <div class="section-title">
+                    Wärmepumpe
+                </div>
+
+                <div class="data-grid">
+
+                    <div class="data-item">
+                        <div class="label">Aussentemperatur</div>
+                        <div class="value" data-role="outsideTemp">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Vorlauf</div>
+                        <div class="value" data-role="flowTemp">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Rücklauf</div>
+                        <div class="value" data-role="returnTemp">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Verdichtermodulation</div>
+                        <div class="value" data-role="modulation">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Leistungsaufnahme</div>
+                        <div class="value" data-role="wpPower">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Wärmeleistung</div>
+                        <div class="value" data-role="heatOutput">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">COP</div>
+                        <div class="value" data-role="cop">—</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="card section">
+
+                <div class="section-title">
+                    Speicher
+                </div>
+
+                <div class="data-grid">
+
+                    <div class="data-item">
+                        <div class="label">Boiler oben</div>
+                        <div class="value" data-role="dhwTop">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Boiler unten</div>
+                        <div class="value" data-role="dhwBottom">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Puffer oben</div>
+                        <div class="value" data-role="bufferTop">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Puffer Mitte</div>
+                        <div class="value" data-role="bufferMiddle">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Puffer unten</div>
+                        <div class="value" data-role="bufferBottom">—</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="card section">
+
+                <div class="section-title">
+                    Fussbodenheizung
+                </div>
+
+                <div class="data-grid">
+
+                    <div class="data-item">
+                        <div class="label">Ventile offen</div>
+                        <div class="value" data-role="valvesOpen">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Stellwert Mittel</div>
+                        <div class="value" data-role="demandAverage">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Stellwert Maximum</div>
+                        <div class="value" data-role="demandMaximum">—</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="card section">
+
+                <div class="section-title">
+                    Prognose
+                </div>
+
+                <div class="data-grid">
+
+                    <div class="data-item">
+                        <div class="label">Morgen Maximum</div>
+                        <div class="value" data-role="meteoMaximum">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Morgen Mittel</div>
+                        <div class="value" data-role="meteoMean">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Morgen Minimum</div>
+                        <div class="value" data-role="meteoMinimum">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Globalstrahlung</div>
+                        <div class="value" data-role="meteoSolar">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Solcast P50 0–24 h</div>
+                        <div class="value" data-role="solcastEnergy">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">PV Peak</div>
+                        <div class="value" data-role="solcastPeak">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Peak Zeitpunkt</div>
+                        <div class="value" data-role="solcastPeakTime">—</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Vertrauen</div>
+                        <div class="value" data-role="solcastConfidence">—</div>
+                    </div>
+
+                </div>
+
+
+                <div class="peak-window">
+
+                    <div class="label">
+                        Peakfenster
+                    </div>
+
+                    <div
+                        class="value"
+                        data-role="solcastPeakWindow"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <div
+            class="footer"
+            data-role="lastUpdate"
+        >
+            —
+        </div>
+
+
+    </div>
+
+</template>
+
 
 
 <script>
@@ -585,10 +1143,18 @@ let currentData =
 
 
 /*
- * ============================================================
- * DOM
- * ============================================================
+ * Wir zeigen im HTML-SDK selbst Compact.
+ *
+ * Die funktionierende Grossansicht dieses Rücksetzstandes
+ * wird über WPRegelungGross geöffnet.
  */
+const currentMode =
+    "compact";
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
 
 function allRole(role) {
 
@@ -626,18 +1192,10 @@ function setRoleText(
 }
 
 
-/*
- * ============================================================
- * FORMAT
- * ============================================================
- */
-
 function isNumber(value) {
 
     return (
-        typeof value
-        ===
-        "number"
+        typeof value === "number"
         &&
         Number.isFinite(value)
     );
@@ -670,6 +1228,16 @@ function fmtTemp(value) {
 }
 
 
+function fmtKW(value) {
+
+    return fmt(
+        value,
+        2,
+        " kW"
+    );
+}
+
+
 function fmtPercent(value) {
 
     return fmt(
@@ -680,11 +1248,82 @@ function fmtPercent(value) {
 }
 
 
-/*
- * ============================================================
- * BUTTONS
- * ============================================================
- */
+function fmtTime(timestamp) {
+
+    if (
+        !timestamp
+        ||
+        timestamp <= 0
+    ) {
+        return "—";
+    }
+
+
+    const d =
+        new Date(
+            timestamp
+            *
+            1000
+        );
+
+
+    if (
+        Number.isNaN(
+            d.getTime()
+        )
+    ) {
+        return "—";
+    }
+
+
+    return d.toLocaleTimeString(
+        "de-CH",
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+}
+
+
+/* ============================================================
+   RENDER COMPACT
+============================================================ */
+
+function renderCompact() {
+
+    const app =
+        document.getElementById(
+            "app"
+        );
+
+
+    const tpl =
+        document.getElementById(
+            "compactTemplate"
+        );
+
+
+    app.innerHTML =
+        "";
+
+
+    app.appendChild(
+        tpl.content.cloneNode(
+            true
+        )
+    );
+
+
+    bindButtons();
+
+    applyData();
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
 
 function bindButtons() {
 
@@ -703,6 +1342,31 @@ function bindButtons() {
                     event.stopPropagation();
 
 
+                    const target =
+                        Number(
+                            currentData.settingsObjectID
+                            ||
+                            0
+                        );
+
+
+                    if (
+                        target <= 0
+                    ) {
+
+                        button.disabled =
+                            true;
+
+                        button.title =
+                            "Einstellungen-Ziel wurde nicht gefunden";
+
+                        return;
+                    }
+
+
+                    /*
+                     * Bestätigter Primärweg.
+                     */
                     if (
                         typeof requestAction
                         ===
@@ -718,17 +1382,10 @@ function bindButtons() {
                     }
 
 
-                    const target =
-                        Number(
-                            currentData.settingsObjectID
-                            ||
-                            0
-                        );
-
-
+                    /*
+                     * Fallback.
+                     */
                     if (
-                        target > 0
-                        &&
                         typeof openObject
                         ===
                         "function"
@@ -737,7 +1394,13 @@ function bindButtons() {
                         openObject(
                             target
                         );
+
+                        return;
                     }
+
+
+                    button.disabled =
+                        true;
                 }
             );
         }
@@ -777,11 +1440,9 @@ function bindButtons() {
 }
 
 
-/*
- * ============================================================
- * LIVEWERTE
- * ============================================================
- */
+/* ============================================================
+   APPLY DATA
+============================================================ */
 
 function applyData() {
 
@@ -844,6 +1505,30 @@ function applyData() {
 
 
     setRoleText(
+        "roomRange",
+        (
+            isNumber(
+                rooms.minimum
+            )
+            &&
+            isNumber(
+                rooms.maximum
+            )
+        )
+            ?
+            rooms.minimum.toFixed(1)
+            +
+            " / "
+            +
+            rooms.maximum.toFixed(1)
+            +
+            " °C"
+            :
+            "—"
+    );
+
+
+    setRoleText(
         "valvesOpen",
         (
             isNumber(
@@ -862,6 +1547,14 @@ function applyData() {
             fbh.total
             :
             "—"
+    );
+
+
+    setRoleText(
+        "demandAverage",
+        fmtPercent(
+            fbh.demandAverage
+        )
     );
 
 
@@ -891,16 +1584,22 @@ function applyData() {
 
             button.disabled =
                 !settingsOK;
+
+
+            button.title =
+                settingsOK
+                    ?
+                    "WP Regelung Einstellungen öffnen"
+                    :
+                    "Einstellungen-Ziel nicht verfügbar";
         }
     );
 }
 
 
-/*
- * ============================================================
- * SYMCON LIVE MESSAGE
- * ============================================================
- */
+/* ============================================================
+   LIVE MESSAGE
+============================================================ */
 
 function handleMessage(data) {
 
@@ -943,19 +1642,15 @@ function handleMessage(data) {
 }
 
 
-/*
- * ============================================================
- * START
- * ============================================================
- */
+/* ============================================================
+   START
+============================================================ */
 
 window.addEventListener(
     "load",
     () => {
 
-        bindButtons();
-
-        applyData();
+        renderCompact();
 
 
         if (
