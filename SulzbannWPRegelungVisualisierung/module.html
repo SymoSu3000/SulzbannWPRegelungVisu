@@ -1,356 +1,893 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="de">
 
 <head>
 
-    <meta charset="utf-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, viewport-fit=cover"
-    >
+<meta charset="UTF-8">
 
-    <script src="/icons.js"></script>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
 
-    <style>
 
-        /*
-         * =====================================================================
-         * SULZBANN WP REGELUNG VISU
-         * HTML-SDK
-         * =====================================================================
-         *
-         * WICHTIG:
-         *
-         * Keine Hell-/Dunkel-Erkennung über prefers-color-scheme.
-         *
-         * Schriftfarbe wird von Symcon geerbt.
-         * Hintergrund bleibt transparent.
-         *
-         * =====================================================================
-         */
+<style>
 
+/* ============================================================
+   THEME
+============================================================ */
 
-        * {
-            box-sizing: border-box;
-        }
+:root {
 
+    --text: #17191c;
+    --muted: #5d6870;
 
-        html,
-        body {
-            width: 100%;
-            min-height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+    --background: transparent;
 
+    --card:
+        rgba(
+            0,
+            0,
+            0,
+            0.055
+        );
 
-        body {
-            background: transparent;
-            color: inherit;
-            font-family: inherit;
-            overflow-x: hidden;
-        }
+    --card-strong:
+        rgba(
+            0,
+            0,
+            0,
+            0.085
+        );
 
+    --border:
+        rgba(
+            80,
+            100,
+            112,
+            0.30
+        );
 
-        button {
-            font: inherit;
-            color: inherit;
-        }
-
+    --heating: #e58b35;
 
-        .page {
-            width: 100%;
-            padding: 10px;
-        }
+    --cooling: #3e9bd8;
 
+    --standby: #7e8c93;
 
-        /*
-         * ---------------------------------------------------------------------
-         * Kopf
-         * ---------------------------------------------------------------------
-         */
+    --fault: #d84a4a;
+}
 
-        .top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
 
+@media (prefers-color-scheme: dark) {
 
-        .mode {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 0;
-        }
+    :root {
 
+        --text: #ffffff;
 
-        .mode-dot {
-            width: 12px;
-            height: 12px;
-            flex: 0 0 12px;
-            border-radius: 50%;
-            background: #888;
-        }
+        --muted: #bac6cd;
 
+        --background: transparent;
 
-        .mode-dot.heating {
-            background: #e58b35;
-        }
+        --card:
+            rgba(
+                255,
+                255,
+                255,
+                0.075
+            );
 
+        --card-strong:
+            rgba(
+                255,
+                255,
+                255,
+                0.105
+            );
 
-        .mode-dot.cooling {
-            background: #3e9bd8;
-        }
+        --border:
+            rgba(
+                220,
+                235,
+                243,
+                0.18
+            );
 
+        --heating: #ff9c48;
 
-        .mode-dot.standby {
-            background: #888;
-        }
+        --cooling: #46a9e5;
 
+        --standby: #91a0a8;
 
-        .mode-dot.fault {
-            background: #d84a4a;
-        }
+        --fault: #ef6262;
+    }
+}
 
 
-        .mode-text {
-            min-width: 0;
-        }
-
-
-        .label {
-            font-size: 0.76rem;
-            opacity: 0.68;
-            line-height: 1.15;
-        }
+/* ============================================================
+   BASIS
+============================================================ */
 
-
-        .mode-value {
-            margin-top: 2px;
-            font-size: 1.18rem;
-            font-weight: 650;
-            line-height: 1.15;
-        }
+* {
+    box-sizing: border-box;
+}
 
 
-        /*
-         * ---------------------------------------------------------------------
-         * Einstellungen
-         * ---------------------------------------------------------------------
-         */
+html,
+body {
 
-        .settings-button {
-            appearance: none;
-            border: 1px solid rgba(127, 127, 127, 0.28);
-            background: rgba(127, 127, 127, 0.10);
-            border-radius: 10px;
-            min-width: 38px;
-            height: 38px;
-            padding: 0 11px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-        }
+    width: 100%;
+    height: 100%;
 
+    margin: 0;
+    padding: 0;
 
-        .settings-button:active {
-            background: rgba(127, 127, 127, 0.20);
-        }
+    overflow: hidden;
 
+    background:
+        transparent;
 
-        .settings-text {
-            font-size: 0.78rem;
-        }
+    color:
+        var(--text);
 
-
-        /*
-         * ---------------------------------------------------------------------
-         * Hauptwerte
-         * ---------------------------------------------------------------------
-         */
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
 
-        .hero-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
-            margin-bottom: 8px;
-        }
 
+button {
+    font: inherit;
+}
 
-        .hero {
-            min-width: 0;
-            padding: 10px;
-            border-radius: 11px;
-            background: rgba(127, 127, 127, 0.10);
-            border: 1px solid rgba(127, 127, 127, 0.16);
-        }
 
+#app {
 
-        .hero-value {
-            margin-top: 4px;
-            font-size: 1.22rem;
-            font-weight: 650;
-            line-height: 1.15;
-            white-space: nowrap;
-        }
+    width: 100%;
+    height: 100%;
 
+    overflow: hidden;
+}
 
-        /*
-         * ---------------------------------------------------------------------
-         * Sektionen
-         * ---------------------------------------------------------------------
-         */
 
-        .section {
-            margin-top: 8px;
-            padding: 10px;
-            border-radius: 11px;
-            background: rgba(127, 127, 127, 0.07);
-            border: 1px solid rgba(127, 127, 127, 0.14);
-        }
+/* ============================================================
+   GEMEINSAM
+============================================================ */
 
+.status-dot {
 
-        .section-title {
-            font-size: 0.78rem;
-            font-weight: 650;
-            opacity: 0.75;
-            margin-bottom: 8px;
-        }
+    width: 11px;
+    height: 11px;
 
+    min-width: 11px;
 
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 7px 12px;
-        }
+    border-radius: 50%;
 
+    background:
+        var(--standby);
+}
 
-        .item {
-            min-width: 0;
-        }
 
+.status-dot.heating {
+    background: var(--heating);
+}
 
-        .item-value {
-            margin-top: 2px;
-            font-size: 0.96rem;
-            font-weight: 550;
-            line-height: 1.2;
-        }
 
+.status-dot.cooling {
+    background: var(--cooling);
+}
 
-        /*
-         * ---------------------------------------------------------------------
-         * Solcast Peak
-         * ---------------------------------------------------------------------
-         */
 
-        .peak-row {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
-        }
+.status-dot.standby {
+    background: var(--standby);
+}
 
 
-        /*
-         * ---------------------------------------------------------------------
-         * Footer
-         * ---------------------------------------------------------------------
-         */
+.status-dot.fault {
+    background: var(--fault);
+}
 
-        .footer {
-            margin-top: 8px;
-            text-align: right;
-            font-size: 0.68rem;
-            opacity: 0.48;
-        }
 
+.settings-button {
 
-        /*
-         * ---------------------------------------------------------------------
-         * Mobile
-         * ---------------------------------------------------------------------
-         */
+    border:
+        1px solid
+        var(--border);
 
-        @media (max-width: 480px) {
+    background:
+        var(--card-strong);
 
-            .page {
-                padding: 8px;
-            }
+    color:
+        var(--text);
 
+    border-radius:
+        9px;
 
-            .hero-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+    min-height:
+        38px;
 
+    padding:
+        0 12px;
 
-            .hero-grid .hero:last-child {
-                grid-column: span 2;
-            }
+    cursor:
+        pointer;
 
+    font-size:
+        13px;
 
-            .peak-row {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+    font-weight:
+        600;
 
+    white-space:
+        nowrap;
+}
 
-            .peak-row .item:last-child {
-                grid-column: span 2;
-            }
 
+.settings-button:active {
+    opacity: 0.70;
+}
 
-            .settings-text {
-                display: none;
-            }
-        }
 
+.settings-button.disabled {
 
-        @media (max-width: 350px) {
+    opacity: 0.40;
 
-            .data-grid {
-                grid-template-columns: 1fr;
-            }
+    cursor: default;
+}
 
-        }
 
-    </style>
+.label {
+
+    color:
+        var(--muted);
+
+    font-size:
+        13px;
+
+    line-height:
+        1.30;
+}
+
+
+.value {
+
+    color:
+        var(--text);
+
+    font-size:
+        18px;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.25;
+
+    margin-top:
+        4px;
+}
+
+
+/* ============================================================
+   COMPACT
+============================================================ */
+
+.compact {
+
+    width: 100%;
+    height: 100%;
+
+    padding:
+        8px
+        10px
+        10px
+        10px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        9px;
+}
+
+
+.compact-head {
+
+    min-height:
+        42px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        12px;
+}
+
+
+.compact-mode {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        9px;
+
+    min-width:
+        0;
+}
+
+
+.compact-mode-text {
+
+    min-width:
+        0;
+}
+
+
+.compact-mode-label {
+
+    color:
+        var(--muted);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.20;
+}
+
+
+.compact-mode-value {
+
+    color:
+        var(--text);
+
+    font-size:
+        16px;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.25;
+
+    margin-top:
+        2px;
+}
+
+
+.compact-grid {
+
+    min-height:
+        0;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        8px;
+}
+
+
+.compact-card {
+
+    min-width:
+        0;
+
+    min-height:
+        72px;
+
+    background:
+        var(--card);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        11px;
+
+    padding:
+        9px 10px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+}
+
+
+.compact-card .label {
+
+    font-size:
+        12px;
+}
+
+
+.compact-card .value {
+
+    font-size:
+        18px;
+}
+
+
+/* ============================================================
+   DETAIL
+============================================================ */
+
+.detail {
+
+    display:
+        none;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    overflow:
+        auto;
+
+    padding:
+        14px;
+}
+
+
+.detail-inner {
+
+    width:
+        100%;
+
+    max-width:
+        1250px;
+
+    margin:
+        0 auto;
+}
+
+
+.detail-head {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        18px;
+
+    min-height:
+        50px;
+
+    margin-bottom:
+        12px;
+}
+
+
+.detail-mode {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        11px;
+}
+
+
+.detail-mode-title {
+
+    font-size:
+        13px;
+
+    color:
+        var(--muted);
+}
+
+
+.detail-mode-value {
+
+    margin-top:
+        3px;
+
+    font-size:
+        21px;
+
+    font-weight:
+        700;
+}
+
+
+.summary-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+    margin-bottom:
+        10px;
+}
+
+
+.summary-card {
+
+    min-width:
+        0;
+
+    min-height:
+        76px;
+
+    padding:
+        12px 13px;
+
+    background:
+        var(--card-strong);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        12px;
+}
+
+
+.sections {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+}
+
+
+.section {
+
+    min-width:
+        0;
+
+    padding:
+        14px;
+
+    background:
+        var(--card);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        12px;
+}
+
+
+.section-title {
+
+    color:
+        var(--text);
+
+    font-size:
+        15px;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.25;
+
+    margin-bottom:
+        13px;
+}
+
+
+.data-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        15px
+        28px;
+}
+
+
+.data-item {
+
+    min-width:
+        0;
+
+    min-height:
+        47px;
+}
+
+
+.data-item .label {
+
+    font-size:
+        13px;
+}
+
+
+.data-item .value {
+
+    font-size:
+        18px;
+}
+
+
+.peak-block {
+
+    margin-top:
+        14px;
+
+    padding-top:
+        14px;
+
+    border-top:
+        1px solid
+        var(--border);
+}
+
+
+.footer {
+
+    margin-top:
+        10px;
+
+    text-align:
+        right;
+
+    color:
+        var(--muted);
+
+    font-size:
+        11px;
+}
+
+
+/* ============================================================
+   AUTOMATISCH COMPACT / DETAIL
+============================================================ */
+
+/*
+ * Wichtig:
+ *
+ * Kleine Kachel:
+ * Compact
+ *
+ * Sobald Symcon die Kachel nach dem ersten Klick vergrössert,
+ * wird ihre tatsächliche Höhe gross genug.
+ *
+ * Dann blendet JS direkt die Detailansicht ein.
+ *
+ * Das ist derselbe Mechanismus wie bei der bestätigten
+ * WP-/Hydraulik-Visu.
+ */
+
+
+/* ============================================================
+   MOBILE DETAIL
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .detail {
+
+        padding:
+            10px;
+    }
+
+
+    .summary-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+
+    .sections {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .data-grid {
+
+        gap:
+            13px
+            16px;
+    }
+
+}
+
+
+@media (max-width: 430px) {
+
+    .settings-text {
+        display: none;
+    }
+
+
+    .settings-button {
+
+        min-width:
+            42px;
+
+        padding:
+            0 10px;
+    }
+
+
+    .compact {
+
+        padding:
+            7px;
+    }
+
+
+    .compact-grid {
+
+        gap:
+            6px;
+    }
+
+
+    .compact-card {
+
+        padding:
+            8px;
+    }
+
+
+    .compact-card .label {
+
+        font-size:
+            12px;
+    }
+
+
+    .compact-card .value {
+
+        font-size:
+            17px;
+    }
+
+
+    .data-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+}
+
+
+@media (max-width: 340px) {
+
+    .data-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+</style>
 
 </head>
 
 
 <body>
 
-<div class="page">
+<div id="app">
 
 
-    <!-- ================================================================ -->
-    <!-- WP MASTER -->
-    <!-- ================================================================ -->
+<!-- ============================================================
+     COMPACT
+============================================================ -->
 
-    <div class="top">
+<div
+    id="compactView"
+    class="compact"
+>
 
-        <div class="mode">
+    <div class="compact-head">
 
-            <div
-                id="modeDot"
-                class="mode-dot standby"
-            ></div>
+        <div class="compact-mode">
 
-            <div class="mode-text">
+            <span
+                id="compactModeDot"
+                class="status-dot standby"
+            ></span>
 
-                <div class="label">
+
+            <div class="compact-mode-text">
+
+                <div class="compact-mode-label">
                     WP Master-Betriebsart
                 </div>
 
                 <div
-                    id="wpMode"
-                    class="mode-value"
+                    id="compactMode"
+                    class="compact-mode-value"
                 >
                     —
                 </div>
@@ -361,38 +898,31 @@
 
 
         <button
+            id="compactSettingsButton"
             class="settings-button"
             type="button"
-            onclick="openSettings()"
-            title="WP Regelung Einstellungen"
+            onclick="openSettings(event)"
         >
-
-            <i class="fa-light fa-gear"></i>
-
+            ⚙
             <span class="settings-text">
                 Einstellungen
             </span>
-
         </button>
 
     </div>
 
 
-    <!-- ================================================================ -->
-    <!-- HAUPTWERTE -->
-    <!-- ================================================================ -->
+    <div class="compact-grid">
 
-    <div class="hero-grid">
-
-        <div class="hero">
+        <div class="compact-card">
 
             <div class="label">
                 Raumtemperatur
             </div>
 
             <div
-                id="roomAverage"
-                class="hero-value"
+                id="compactRoomAverage"
+                class="value"
             >
                 —
             </div>
@@ -400,7 +930,137 @@
         </div>
 
 
-        <div class="hero">
+        <div class="compact-card">
+
+            <div class="label">
+                FBH Ventile
+            </div>
+
+            <div
+                id="compactValves"
+                class="value"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="compact-card">
+
+            <div class="label">
+                Stellwert max.
+            </div>
+
+            <div
+                id="compactDemand"
+                class="value"
+            >
+                —
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ============================================================
+     DETAIL
+============================================================ -->
+
+<div
+    id="detailView"
+    class="detail"
+>
+
+<div class="detail-inner">
+
+
+    <div class="detail-head">
+
+        <div class="detail-mode">
+
+            <span
+                id="detailModeDot"
+                class="status-dot standby"
+            ></span>
+
+
+            <div>
+
+                <div class="detail-mode-title">
+                    WP Master-Betriebsart
+                </div>
+
+                <div
+                    id="detailMode"
+                    class="detail-mode-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button
+            id="detailSettingsButton"
+            class="settings-button"
+            type="button"
+            onclick="openSettings(event)"
+        >
+            ⚙
+            <span class="settings-text">
+                Einstellungen
+            </span>
+        </button>
+
+    </div>
+
+
+    <!-- ========================================================
+         ÜBERSICHT
+    ========================================================= -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="label">
+                Raumtemperatur Mittel
+            </div>
+
+            <div
+                id="roomAverage"
+                class="value"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="label">
+                Raum Min. / Max.
+            </div>
+
+            <div
+                id="roomRange"
+                class="value"
+            >
+                —
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
 
             <div class="label">
                 FBH Ventile offen
@@ -408,7 +1068,7 @@
 
             <div
                 id="valvesOpen"
-                class="hero-value"
+                class="value"
             >
                 —
             </div>
@@ -416,7 +1076,7 @@
         </div>
 
 
-        <div class="hero">
+        <div class="summary-card">
 
             <div class="label">
                 FBH Stellwert max.
@@ -424,7 +1084,7 @@
 
             <div
                 id="demandMaximum"
-                class="hero-value"
+                class="value"
             >
                 —
             </div>
@@ -434,148 +1094,460 @@
     </div>
 
 
-    <!-- ================================================================ -->
-    <!-- WÄRMEPUMPE -->
-    <!-- ================================================================ -->
+    <!-- ========================================================
+         SEKTIONEN
+    ========================================================= -->
 
-    <div class="section">
+    <div class="sections">
 
-        <div class="section-title">
-            Wärmepumpe
+
+        <!-- ====================================================
+             WÄRMEPUMPE
+        ===================================================== -->
+
+        <div class="section">
+
+            <div class="section-title">
+                Wärmepumpe
+            </div>
+
+
+            <div class="data-grid">
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Aussentemperatur
+                    </div>
+
+                    <div
+                        id="outsideTemp"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Vorlauf
+                    </div>
+
+                    <div
+                        id="flowTemp"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Rücklauf
+                    </div>
+
+                    <div
+                        id="returnTemp"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Verdichtermodulation
+                    </div>
+
+                    <div
+                        id="modulation"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Leistungsaufnahme
+                    </div>
+
+                    <div
+                        id="wpPower"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Wärmeleistung
+                    </div>
+
+                    <div
+                        id="heatOutput"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        COP
+                    </div>
+
+                    <div
+                        id="cop"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="data-grid">
 
-            <div class="item">
-                <div class="label">Außen</div>
-                <div id="outsideTemp" class="item-value">—</div>
+        <!-- ====================================================
+             SPEICHER
+        ===================================================== -->
+
+        <div class="section">
+
+            <div class="section-title">
+                Speicher
             </div>
 
-            <div class="item">
-                <div class="label">Vorlauf</div>
-                <div id="flowTemp" class="item-value">—</div>
-            </div>
 
-            <div class="item">
-                <div class="label">Rücklauf</div>
-                <div id="returnTemp" class="item-value">—</div>
-            </div>
+            <div class="data-grid">
 
-            <div class="item">
-                <div class="label">Leistungsaufnahme</div>
-                <div id="wpPower" class="item-value">—</div>
-            </div>
+                <div class="data-item">
 
-            <div class="item">
-                <div class="label">Wärmeleistung</div>
-                <div id="heatOutput" class="item-value">—</div>
-            </div>
+                    <div class="label">
+                        Boiler oben
+                    </div>
 
-            <div class="item">
-                <div class="label">COP</div>
-                <div id="cop" class="item-value">—</div>
-            </div>
+                    <div
+                        id="dhwTop"
+                        class="value"
+                    >
+                        —
+                    </div>
 
-        </div>
-
-    </div>
+                </div>
 
 
-    <!-- ================================================================ -->
-    <!-- SPEICHER -->
-    <!-- ================================================================ -->
+                <div class="data-item">
 
-    <div class="section">
+                    <div class="label">
+                        Boiler unten
+                    </div>
 
-        <div class="section-title">
-            Speicher
-        </div>
+                    <div
+                        id="dhwBottom"
+                        class="value"
+                    >
+                        —
+                    </div>
 
-        <div class="data-grid">
-
-            <div class="item">
-                <div class="label">Boiler oben</div>
-                <div id="dhwTop" class="item-value">—</div>
-            </div>
-
-            <div class="item">
-                <div class="label">Boiler unten</div>
-                <div id="dhwBottom" class="item-value">—</div>
-            </div>
-
-            <div class="item">
-                <div class="label">Puffer oben</div>
-                <div id="bufferTop" class="item-value">—</div>
-            </div>
-
-            <div class="item">
-                <div class="label">Puffer Mitte</div>
-                <div id="bufferMiddle" class="item-value">—</div>
-            </div>
-
-            <div class="item">
-                <div class="label">Puffer unten</div>
-                <div id="bufferBottom" class="item-value">—</div>
-            </div>
-
-        </div>
-
-    </div>
+                </div>
 
 
-    <!-- ================================================================ -->
-    <!-- PROGNOSE -->
-    <!-- ================================================================ -->
+                <div class="data-item">
 
-    <div class="section">
+                    <div class="label">
+                        Puffer oben
+                    </div>
 
-        <div class="section-title">
-            Prognose
-        </div>
+                    <div
+                        id="bufferTop"
+                        class="value"
+                    >
+                        —
+                    </div>
 
-        <div class="data-grid">
+                </div>
 
-            <div class="item">
-                <div class="label">Morgen Maximum</div>
-                <div id="meteoMaximum" class="item-value">—</div>
-            </div>
 
-            <div class="item">
-                <div class="label">Morgen Mittel</div>
-                <div id="meteoMean" class="item-value">—</div>
-            </div>
+                <div class="data-item">
 
-            <div class="item">
-                <div class="label">Globalstrahlung</div>
-                <div id="meteoSolar" class="item-value">—</div>
-            </div>
+                    <div class="label">
+                        Puffer Mitte
+                    </div>
 
-            <div class="item">
-                <div class="label">Solcast P50 0–24 h</div>
-                <div id="solcastEnergy" class="item-value">—</div>
+                    <div
+                        id="bufferMiddle"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Puffer unten
+                    </div>
+
+                    <div
+                        id="bufferBottom"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
 
 
-        <div
-            class="peak-row"
-            style="margin-top: 9px;"
-        >
+        <!-- ====================================================
+             FBH
+        ===================================================== -->
 
-            <div class="item">
-                <div class="label">PV Peak</div>
-                <div id="solcastPeak" class="item-value">—</div>
+        <div class="section">
+
+            <div class="section-title">
+                Fussbodenheizung
             </div>
 
-            <div class="item">
-                <div class="label">Peak Zeitpunkt</div>
-                <div id="solcastPeakTime" class="item-value">—</div>
+
+            <div class="data-grid">
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Ventile offen
+                    </div>
+
+                    <div
+                        id="fbhOpen"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Stellwert Mittel
+                    </div>
+
+                    <div
+                        id="fbhDemandAverage"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Stellwert Maximum
+                    </div>
+
+                    <div
+                        id="fbhDemandMaximum"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="item">
-                <div class="label">Vertrauen</div>
-                <div id="solcastConfidence" class="item-value">—</div>
+        </div>
+
+
+        <!-- ====================================================
+             PROGNOSE
+        ===================================================== -->
+
+        <div class="section">
+
+            <div class="section-title">
+                Prognose
+            </div>
+
+
+            <div class="data-grid">
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Morgen Maximum
+                    </div>
+
+                    <div
+                        id="meteoMaximum"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Morgen Mittel
+                    </div>
+
+                    <div
+                        id="meteoMean"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Morgen Minimum
+                    </div>
+
+                    <div
+                        id="meteoMinimum"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Globalstrahlung
+                    </div>
+
+                    <div
+                        id="meteoSolar"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Solcast P50 0–24 h
+                    </div>
+
+                    <div
+                        id="solcastEnergy"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        PV Peak
+                    </div>
+
+                    <div
+                        id="solcastPeak"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Peak Zeitpunkt
+                    </div>
+
+                    <div
+                        id="solcastPeakTime"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="data-item">
+
+                    <div class="label">
+                        Vertrauen
+                    </div>
+
+                    <div
+                        id="solcastConfidence"
+                        class="value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="peak-block">
+
+                <div class="label">
+                    Peakfenster
+                </div>
+
+                <div
+                    id="solcastPeakWindow"
+                    class="value"
+                >
+                    —
+                </div>
+
             </div>
 
         </div>
@@ -592,576 +1564,990 @@
 
 </div>
 
+</div>
+
+
+</div>
+
 
 <script>
 
-    /*
-     * =====================================================================
-     * INITIALDATEN
-     * =====================================================================
-     */
+/* ============================================================
+   DATEN
+============================================================ */
 
-    const INITIAL_DATA =
-        __SBWRV_INITIAL_DATA__;
+let currentData =
+    {};
 
 
-    const SETTINGS_OBJECT_ID =
-        __SBWRV_SETTINGS_OBJECT_ID__;
+let currentMode =
+    null;
 
 
-    /*
-     * =====================================================================
-     * FORMATIERUNG
-     * =====================================================================
-     */
+let settingsObjectID =
+    0;
 
-    function isNumber(value) {
 
-        return (
-            typeof value === 'number'
-            &&
-            Number.isFinite(value)
-        );
+/* ============================================================
+   HILFSFUNKTIONEN
+============================================================ */
+
+function isNumber(value) {
+
+    return (
+        typeof value === "number"
+        &&
+        Number.isFinite(
+            value
+        )
+    );
+}
+
+
+function formatNumber(
+    value,
+    digits,
+    suffix
+) {
+
+    if (
+        !isNumber(
+            value
+        )
+    ) {
+
+        return "—";
     }
 
 
-    function formatNumber(
-        value,
-        digits,
+    return (
+        value.toFixed(
+            digits
+        )
+        +
         suffix
+    );
+}
+
+
+function formatTemperature(value) {
+
+    return formatNumber(
+        value,
+        1,
+        " °C"
+    );
+}
+
+
+function formatKW(value) {
+
+    return formatNumber(
+        value,
+        2,
+        " kW"
+    );
+}
+
+
+function formatPercent(value) {
+
+    return formatNumber(
+        value,
+        0,
+        " %"
+    );
+}
+
+
+function formatTimestamp(
+    timestamp
+) {
+
+    if (
+        !timestamp
+        ||
+        timestamp <= 0
     ) {
 
-        if (!isNumber(value)) {
+        return "—";
+    }
 
-            return '—';
+
+    const date =
+        new Date(
+            timestamp * 1000
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "—";
+    }
+
+
+    return date.toLocaleTimeString(
+        "de-CH",
+        {
+            hour: "2-digit",
+            minute: "2-digit"
         }
+    );
+}
 
 
-        return (
-            value.toFixed(digits)
-            +
-            suffix
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            id
         );
-    }
 
 
-    function formatTemperature(value) {
-
-        return formatNumber(
-            value,
-            1,
-            ' °C'
-        );
-    }
-
-
-    function formatKW(value) {
-
-        return formatNumber(
-            value,
-            2,
-            ' kW'
-        );
-    }
-
-
-    function formatPercent(value) {
-
-        return formatNumber(
-            value,
-            0,
-            ' %'
-        );
-    }
-
-
-    function formatTimestamp(
-        timestamp,
-        withDate = false
+    if (
+        !element
     ) {
 
-        if (
-            !timestamp
+        return;
+    }
+
+
+    element.textContent =
+        value;
+}
+
+
+function setModeDot(
+    id,
+    modeCode
+) {
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if (
+        !element
+    ) {
+
+        return;
+    }
+
+
+    element.className =
+        "status-dot "
+        +
+        (
+            modeCode
             ||
-            timestamp <= 0
-        ) {
-
-            return '—';
-        }
-
-
-        const date =
-            new Date(
-                timestamp * 1000
-            );
-
-
-        if (
-            Number.isNaN(
-                date.getTime()
-            )
-        ) {
-
-            return '—';
-        }
-
-
-        if (withDate) {
-
-            return date.toLocaleString(
-                'de-CH',
-                {
-                    day: '2-digit',
-                    month: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }
-            );
-        }
-
-
-        return date.toLocaleTimeString(
-            'de-CH',
-            {
-                hour: '2-digit',
-                minute: '2-digit'
-            }
+            "standby"
         );
-    }
+}
 
 
-    function setText(
-        id,
-        value
-    ) {
+/* ============================================================
+   COMPACT / DETAIL
+============================================================ */
 
-        const element =
-            document.getElementById(
-                id
-            );
+function determineMode() {
 
-
-        if (!element) {
-
-            return;
-        }
+    const width =
+        document.documentElement
+            .clientWidth;
 
 
-        element.textContent =
-            value;
-    }
+    const height =
+        document.documentElement
+            .clientHeight;
 
 
     /*
-     * =====================================================================
-     * RENDER
-     * =====================================================================
-     */
-
-    function render(data) {
-
-        if (
-            !data
-            ||
-            typeof data !== 'object'
-        ) {
-
-            return;
-        }
-
-
-        /*
-         * -----------------------------------------------------------------
-         * WP Master
-         * -----------------------------------------------------------------
-         */
-
-        const wp =
-            data.wp || {};
-
-
-        setText(
-            'wpMode',
-            wp.mode || '—'
-        );
-
-
-        const modeDot =
-            document.getElementById(
-                'modeDot'
-            );
-
-
-        if (modeDot) {
-
-            modeDot.className =
-                'mode-dot '
-                +
-                (
-                    wp.modeCode
-                    ||
-                    'standby'
-                );
-        }
-
-
-        /*
-         * -----------------------------------------------------------------
-         * Räume
-         * -----------------------------------------------------------------
-         */
-
-        const rooms =
-            data.rooms || {};
-
-
-        setText(
-            'roomAverage',
-            formatTemperature(
-                rooms.average
-            )
-        );
-
-
-        /*
-         * -----------------------------------------------------------------
-         * FBH
-         * -----------------------------------------------------------------
-         */
-
-        const fbh =
-            data.fbh || {};
-
-
-        setText(
-            'valvesOpen',
-            (
-                isNumber(fbh.open)
-                &&
-                isNumber(fbh.total)
-            )
-                ?
-                (
-                    fbh.open
-                    +
-                    ' / '
-                    +
-                    fbh.total
-                )
-                :
-                '—'
-        );
-
-
-        setText(
-            'demandMaximum',
-            formatPercent(
-                fbh.demandMaximum
-            )
-        );
-
-
-        /*
-         * -----------------------------------------------------------------
-         * WP Werte
-         * -----------------------------------------------------------------
-         */
-
-        setText(
-            'outsideTemp',
-            formatTemperature(
-                wp.outside
-            )
-        );
-
-
-        setText(
-            'flowTemp',
-            formatTemperature(
-                wp.flow
-            )
-        );
-
-
-        setText(
-            'returnTemp',
-            formatTemperature(
-                wp.return
-            )
-        );
-
-
-        setText(
-            'wpPower',
-            formatKW(
-                wp.power
-            )
-        );
-
-
-        setText(
-            'heatOutput',
-            formatKW(
-                wp.heatOutput
-            )
-        );
-
-
-        setText(
-            'cop',
-            isNumber(wp.cop)
-                ?
-                wp.cop.toFixed(2)
-                :
-                '—'
-        );
-
-
-        /*
-         * -----------------------------------------------------------------
-         * Speicher
-         * -----------------------------------------------------------------
-         */
-
-        const dhw =
-            data.dhw || {};
-
-
-        const buffer =
-            data.buffer || {};
-
-
-        setText(
-            'dhwTop',
-            formatTemperature(
-                dhw.top
-            )
-        );
-
-
-        setText(
-            'dhwBottom',
-            formatTemperature(
-                dhw.bottom
-            )
-        );
-
-
-        setText(
-            'bufferTop',
-            formatTemperature(
-                buffer.top
-            )
-        );
-
-
-        setText(
-            'bufferMiddle',
-            formatTemperature(
-                buffer.middle
-            )
-        );
-
-
-        setText(
-            'bufferBottom',
-            formatTemperature(
-                buffer.bottom
-            )
-        );
-
-
-        /*
-         * -----------------------------------------------------------------
-         * Meteo
-         * -----------------------------------------------------------------
-         */
-
-        const meteo =
-            data.meteo || {};
-
-
-        setText(
-            'meteoMaximum',
-            formatTemperature(
-                meteo.maximum
-            )
-        );
-
-
-        setText(
-            'meteoMean',
-            formatTemperature(
-                meteo.mean
-            )
-        );
-
-
-        setText(
-            'meteoSolar',
-            formatNumber(
-                meteo.solar,
-                2,
-                ' kWh/m²'
-            )
-        );
-
-
-        /*
-         * -----------------------------------------------------------------
-         * Solcast
-         * -----------------------------------------------------------------
-         */
-
-        const solcast =
-            data.solcast || {};
-
-
-        setText(
-            'solcastEnergy',
-            formatNumber(
-                solcast.energyP50,
-                1,
-                ' kWh'
-            )
-        );
-
-
-        setText(
-            'solcastPeak',
-            formatKW(
-                solcast.peak
-            )
-        );
-
-
-        setText(
-            'solcastPeakTime',
-            formatTimestamp(
-                solcast.peakTime
-            )
-        );
-
-
-        setText(
-            'solcastConfidence',
-            formatPercent(
-                solcast.confidence
-            )
-        );
-
-
-        /*
-         * -----------------------------------------------------------------
-         * Aktualisierung
-         * -----------------------------------------------------------------
-         */
-
-        setText(
-            'lastUpdate',
-            'Aktualisiert '
-            +
-            formatTimestamp(
-                data.timestamp
-            )
-        );
-    }
-
-
-    /*
-     * =====================================================================
-     * LIVE-NACHRICHT VOM MODUL
-     * =====================================================================
+     * Bewährte Logik aus der WP-Visu:
      *
-     * Wird von UpdateVisualizationValue() ausgelöst.
+     * Kleine Kachel -> Compact
+     *
+     * Sobald Symcon die Kachel beim normalen Öffnen vergrössert,
+     * ist die Höhe gross genug -> sofort Detail.
+     *
+     * Kein zusätzlicher Vollbild-Klick nötig.
      */
 
-    function handleMessage(data) {
+    if (
+        height < 500
+        ||
+        (
+            width < 760
+            &&
+            height < 560
+        )
+    ) {
 
-        let payload =
-            data;
+        return "compact";
+    }
 
 
-        /*
-         * PHP sendet bewusst JSON.
-         */
-        if (
-            typeof payload === 'string'
-        ) {
+    return "detail";
+}
 
-            try {
 
-                payload =
-                    JSON.parse(
-                        payload
-                    );
+function renderMode() {
 
-            } catch (error) {
+    const newMode =
+        determineMode();
 
-                console.error(
-                    'Sulzbann WP Regelung Visu: JSON Fehler',
-                    error
+
+    if (
+        newMode === currentMode
+    ) {
+
+        return;
+    }
+
+
+    currentMode =
+        newMode;
+
+
+    const compact =
+        document.getElementById(
+            "compactView"
+        );
+
+
+    const detail =
+        document.getElementById(
+            "detailView"
+        );
+
+
+    if (
+        newMode === "compact"
+    ) {
+
+        compact.style.display =
+            "flex";
+
+        detail.style.display =
+            "none";
+
+    } else {
+
+        compact.style.display =
+            "none";
+
+        detail.style.display =
+            "block";
+    }
+
+
+    applyData();
+}
+
+
+/* ============================================================
+   DATEN DARSTELLEN
+============================================================ */
+
+function applyData() {
+
+    const data =
+        currentData
+        ||
+        {};
+
+
+    const wp =
+        data.wp
+        ||
+        {};
+
+
+    const rooms =
+        data.rooms
+        ||
+        {};
+
+
+    const fbh =
+        data.fbh
+        ||
+        {};
+
+
+    const dhw =
+        data.dhw
+        ||
+        {};
+
+
+    const buffer =
+        data.buffer
+        ||
+        {};
+
+
+    const meteo =
+        data.meteo
+        ||
+        {};
+
+
+    const solcast =
+        data.solcast
+        ||
+        {};
+
+
+    /*
+     * Einstellungen-ID
+     */
+
+    settingsObjectID =
+        Number(
+            data.settingsObjectID
+            ||
+            0
+        );
+
+
+    const settingsAvailable =
+        (
+            settingsObjectID > 0
+        );
+
+
+    [
+        "compactSettingsButton",
+        "detailSettingsButton"
+    ].forEach(
+
+        function (id) {
+
+            const button =
+                document.getElementById(
+                    id
                 );
+
+
+            if (
+                !button
+            ) {
 
                 return;
             }
+
+
+            button.classList.toggle(
+                "disabled",
+                !settingsAvailable
+            );
+
+
+            button.disabled =
+                !settingsAvailable;
         }
+    );
 
 
-        render(
-            payload
+    /*
+     * Mode
+     */
+
+    setText(
+        "compactMode",
+        wp.mode
+        ||
+        "—"
+    );
+
+
+    setText(
+        "detailMode",
+        wp.mode
+        ||
+        "—"
+    );
+
+
+    setModeDot(
+        "compactModeDot",
+        wp.modeCode
+    );
+
+
+    setModeDot(
+        "detailModeDot",
+        wp.modeCode
+    );
+
+
+    /*
+     * Compact
+     */
+
+    setText(
+        "compactRoomAverage",
+        formatTemperature(
+            rooms.average
+        )
+    );
+
+
+    setText(
+        "compactValves",
+        (
+            isNumber(
+                fbh.open
+            )
+            &&
+            isNumber(
+                fbh.total
+            )
+        )
+            ?
+            (
+                fbh.open
+                +
+                " / "
+                +
+                fbh.total
+            )
+            :
+            "—"
+    );
+
+
+    setText(
+        "compactDemand",
+        formatPercent(
+            fbh.demandMaximum
+        )
+    );
+
+
+    /*
+     * Räume
+     */
+
+    setText(
+        "roomAverage",
+        formatTemperature(
+            rooms.average
+        )
+    );
+
+
+    if (
+        isNumber(
+            rooms.minimum
+        )
+        &&
+        isNumber(
+            rooms.maximum
+        )
+    ) {
+
+        setText(
+            "roomRange",
+            rooms.minimum.toFixed(1)
+            +
+            " / "
+            +
+            rooms.maximum.toFixed(1)
+            +
+            " °C"
+        );
+
+    } else {
+
+        setText(
+            "roomRange",
+            "—"
         );
     }
 
 
     /*
-     * =====================================================================
-     * EINSTELLUNGEN
-     * =====================================================================
+     * FBH
      */
 
-    function openSettings() {
+    const valvesText =
+        (
+            isNumber(
+                fbh.open
+            )
+            &&
+            isNumber(
+                fbh.total
+            )
+        )
+            ?
+            (
+                fbh.open
+                +
+                " / "
+                +
+                fbh.total
+            )
+            :
+            "—";
 
-        if (
-            !SETTINGS_OBJECT_ID
-            ||
-            SETTINGS_OBJECT_ID <= 0
-        ) {
 
-            return;
-        }
+    setText(
+        "valvesOpen",
+        valvesText
+    );
 
 
-        if (
-            typeof openObject
-            ===
-            'function'
-        ) {
+    setText(
+        "fbhOpen",
+        valvesText
+    );
 
-            openObject(
-                SETTINGS_OBJECT_ID
-            );
 
-        } else {
+    setText(
+        "demandMaximum",
+        formatPercent(
+            fbh.demandMaximum
+        )
+    );
 
-            console.warn(
-                'openObject() wird von dieser Symcon-Version nicht unterstützt.'
-            );
-        }
+
+    setText(
+        "fbhDemandAverage",
+        formatPercent(
+            fbh.demandAverage
+        )
+    );
+
+
+    setText(
+        "fbhDemandMaximum",
+        formatPercent(
+            fbh.demandMaximum
+        )
+    );
+
+
+    /*
+     * WP
+     */
+
+    setText(
+        "outsideTemp",
+        formatTemperature(
+            wp.outside
+        )
+    );
+
+
+    setText(
+        "flowTemp",
+        formatTemperature(
+            wp.flow
+        )
+    );
+
+
+    setText(
+        "returnTemp",
+        formatTemperature(
+            wp.return
+        )
+    );
+
+
+    setText(
+        "modulation",
+        formatPercent(
+            wp.modulation
+        )
+    );
+
+
+    setText(
+        "wpPower",
+        formatKW(
+            wp.power
+        )
+    );
+
+
+    setText(
+        "heatOutput",
+        formatKW(
+            wp.heatOutput
+        )
+    );
+
+
+    setText(
+        "cop",
+        isNumber(
+            wp.cop
+        )
+            ?
+            wp.cop.toFixed(
+                2
+            )
+            :
+            "—"
+    );
+
+
+    /*
+     * Speicher
+     */
+
+    setText(
+        "dhwTop",
+        formatTemperature(
+            dhw.top
+        )
+    );
+
+
+    setText(
+        "dhwBottom",
+        formatTemperature(
+            dhw.bottom
+        )
+    );
+
+
+    setText(
+        "bufferTop",
+        formatTemperature(
+            buffer.top
+        )
+    );
+
+
+    setText(
+        "bufferMiddle",
+        formatTemperature(
+            buffer.middle
+        )
+    );
+
+
+    setText(
+        "bufferBottom",
+        formatTemperature(
+            buffer.bottom
+        )
+    );
+
+
+    /*
+     * Meteo
+     */
+
+    setText(
+        "meteoMaximum",
+        formatTemperature(
+            meteo.maximum
+        )
+    );
+
+
+    setText(
+        "meteoMean",
+        formatTemperature(
+            meteo.mean
+        )
+    );
+
+
+    setText(
+        "meteoMinimum",
+        formatTemperature(
+            meteo.minimum
+        )
+    );
+
+
+    setText(
+        "meteoSolar",
+        formatNumber(
+            meteo.solar,
+            2,
+            " kWh/m²"
+        )
+    );
+
+
+    /*
+     * Solcast
+     */
+
+    setText(
+        "solcastEnergy",
+        formatNumber(
+            solcast.energyP50,
+            1,
+            " kWh"
+        )
+    );
+
+
+    setText(
+        "solcastPeak",
+        formatKW(
+            solcast.peak
+        )
+    );
+
+
+    setText(
+        "solcastPeakTime",
+        formatTimestamp(
+            solcast.peakTime
+        )
+    );
+
+
+    setText(
+        "solcastConfidence",
+        formatPercent(
+            solcast.confidence
+        )
+    );
+
+
+    if (
+        solcast.peakWindowStart > 0
+        &&
+        solcast.peakWindowEnd > 0
+    ) {
+
+        setText(
+            "solcastPeakWindow",
+            formatTimestamp(
+                solcast.peakWindowStart
+            )
+            +
+            " – "
+            +
+            formatTimestamp(
+                solcast.peakWindowEnd
+            )
+        );
+
+    } else {
+
+        setText(
+            "solcastPeakWindow",
+            "—"
+        );
     }
 
 
     /*
-     * =====================================================================
-     * INITIAL RENDER
-     * =====================================================================
+     * Aktualisierung
      */
 
-    render(
-        INITIAL_DATA
+    setText(
+        "lastUpdate",
+        "Aktualisiert "
+        +
+        formatTimestamp(
+            data.timestamp
+        )
+    );
+}
+
+
+/* ============================================================
+   SYMCON LIVE MESSAGE
+============================================================ */
+
+function handleMessage(data) {
+
+    if (
+        typeof data ===
+        "string"
+    ) {
+
+        try {
+
+            data =
+                JSON.parse(
+                    data
+                );
+
+        } catch (error) {
+
+            console.error(
+                "Sulzbann WP Regelung Visu: JSON Fehler",
+                error
+            );
+
+            return;
+        }
+    }
+
+
+    if (
+        !data
+        ||
+        typeof data !==
+        "object"
+    ) {
+
+        return;
+    }
+
+
+    currentData =
+        data;
+
+
+    applyData();
+}
+
+
+/* ============================================================
+   EINSTELLUNGEN
+============================================================ */
+
+function openSettings(event) {
+
+    /*
+     * Verhindert, dass der Klick auf den Button
+     * gleichzeitig als Klick auf die Kachel interpretiert wird.
+     */
+
+    if (
+        event
+    ) {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+    }
+
+
+    if (
+        !settingsObjectID
+        ||
+        settingsObjectID <= 0
+    ) {
+
+        console.warn(
+            "WP Regelung: Einstellungen-Ziel nicht gefunden."
+        );
+
+        return;
+    }
+
+
+    /*
+     * HTML-SDK Funktion von IP-Symcon.
+     */
+
+    if (
+        typeof openObject ===
+        "function"
+    ) {
+
+        openObject(
+            settingsObjectID
+        );
+
+        return;
+    }
+
+
+    /*
+     * Zusätzlicher Browser-Scope-Fallback.
+     */
+
+    if (
+        typeof window.openObject ===
+        "function"
+    ) {
+
+        window.openObject(
+            settingsObjectID
+        );
+
+        return;
+    }
+
+
+    console.warn(
+        "IP-Symcon openObject() ist in dieser Ansicht nicht verfügbar."
+    );
+}
+
+
+/* ============================================================
+   RESIZE
+============================================================ */
+
+const resizeObserver =
+    new ResizeObserver(
+
+        function () {
+
+            renderMode();
+
+        }
     );
 
+
+resizeObserver.observe(
+    document.documentElement
+);
+
+
+/* ============================================================
+   START
+============================================================ */
+
+window.addEventListener(
+
+    "load",
+
+    function () {
+
+        /*
+         * Ansicht aufgrund tatsächlicher Kachelgrösse.
+         */
+
+        renderMode();
+
+
+        /*
+         * Werte einmal beim Modul anfordern.
+         */
+
+        if (
+            typeof requestAction ===
+            "function"
+        ) {
+
+            requestAction(
+                "Refresh",
+                true
+            );
+        }
+
+    }
+);
+
 </script>
+
 
 </body>
 
