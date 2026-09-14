@@ -9,17 +9,12 @@ class SulzbannWPRegelungVisu extends IPSModule
      * SULZBANN WP REGELUNG VISU
      * ============================================================
      *
-     * STABILER STAND 14.09.2026
-     *
+     * Stand:
      * - Compact = HTML-SDK
      * - VisualizationType 1
      * - Grossansicht = WebContent-Unterobjekt
-     * - Grossansicht und Einstellungen werden im aktuellen Client
-     *   direkt mit openObject() geöffnet.
-     *
-     * Legacy:
-     * - OpenGross / OpenSettings bleiben in RequestAction erhalten,
-     *   damit noch geladene alte Clients keinen Fatal Error erzeugen.
+     * - Desktop-Navigation clientlokal mit openObject()
+     * - Legacy-Fallback bleibt erhalten
      *
      * Keine WP-/OZW-/KNX-Schreibzugriffe.
      * ============================================================
@@ -164,14 +159,8 @@ class SulzbannWPRegelungVisu extends IPSModule
     {
         parent::Create();
 
-        /*
-         * Funktionierende Compact-Kachel.
-         */
         $this->SetVisualizationType(1);
 
-        /*
-         * Bestehende Grossansicht.
-         */
         $this->RegisterVariableString(
             'WPRegelungGross',
             'WP Regelung Gross',
@@ -196,10 +185,7 @@ class SulzbannWPRegelungVisu extends IPSModule
 
         $this->SetVisualizationType(1);
 
-        foreach (
-            $this->GetSourceVariableIDs()
-            as $variableID
-        ) {
+        foreach ($this->GetSourceVariableIDs() as $variableID) {
             if (
                 $variableID > 0
                 &&
@@ -217,16 +203,13 @@ class SulzbannWPRegelungVisu extends IPSModule
 
     /*
      * ============================================================
-     * COMPACT HTML-SDK
+     * HTML SDK COMPACT
      * ============================================================
      */
 
     public function GetVisualizationTile(): string
     {
-        $file =
-            __DIR__
-            .
-            '/module.html';
+        $file = __DIR__ . '/module.html';
 
         if (!file_exists($file)) {
             return '
@@ -239,10 +222,7 @@ class SulzbannWPRegelungVisu extends IPSModule
             ';
         }
 
-        $html =
-            file_get_contents(
-                $file
-            );
+        $html = file_get_contents($file);
 
         if ($html === false) {
             return '
@@ -255,21 +235,20 @@ class SulzbannWPRegelungVisu extends IPSModule
             ';
         }
 
-        $initialJson =
-            json_encode(
-                $this->BuildVisualizationData(),
-                JSON_UNESCAPED_UNICODE
-                |
-                JSON_UNESCAPED_SLASHES
-                |
-                JSON_HEX_TAG
-                |
-                JSON_HEX_AMP
-                |
-                JSON_HEX_APOS
-                |
-                JSON_HEX_QUOT
-            );
+        $initialJson = json_encode(
+            $this->BuildVisualizationData(),
+            JSON_UNESCAPED_UNICODE
+            |
+            JSON_UNESCAPED_SLASHES
+            |
+            JSON_HEX_TAG
+            |
+            JSON_HEX_AMP
+            |
+            JSON_HEX_APOS
+            |
+            JSON_HEX_QUOT
+        );
 
         if ($initialJson === false) {
             $initialJson = '{}';
@@ -306,7 +285,6 @@ class SulzbannWPRegelungVisu extends IPSModule
         }
 
         $this->SendLiveValues();
-
         $this->UpdateGrossVisualization();
     }
 
@@ -325,19 +303,14 @@ class SulzbannWPRegelungVisu extends IPSModule
             case 'Refresh':
 
                 $this->SendLiveValues();
-
                 $this->UpdateGrossVisualization();
 
                 return;
 
 
             /*
-             * LEGACY-FALLBACK:
-             *
-             * Falls auf einem Client noch eine alte module.html
-             * geladen ist, kommt weiterhin OpenSettings hier an.
-             *
-             * Die neue module.html benutzt direkt openObject().
+             * LEGACY-FALLBACK
+             * Nur damit alte/gecachte Clients nicht abstürzen.
              */
             case 'OpenSettings':
 
@@ -347,9 +320,7 @@ class SulzbannWPRegelungVisu extends IPSModule
                 if (
                     $settingsObjectID > 0
                     &&
-                    IPS_ObjectExists(
-                        $settingsObjectID
-                    )
+                    IPS_ObjectExists($settingsObjectID)
                 ) {
                     $this->OpenObjectLegacy(
                         $settingsObjectID
@@ -360,7 +331,7 @@ class SulzbannWPRegelungVisu extends IPSModule
 
 
             /*
-             * LEGACY-FALLBACK für alte/gecachte Clients.
+             * LEGACY-FALLBACK
              */
             case 'OpenGross':
 
@@ -372,9 +343,7 @@ class SulzbannWPRegelungVisu extends IPSModule
                 if (
                     $grossObjectID > 0
                     &&
-                    IPS_ObjectExists(
-                        $grossObjectID
-                    )
+                    IPS_ObjectExists($grossObjectID)
                 ) {
                     $this->OpenObjectLegacy(
                         $grossObjectID
@@ -398,11 +367,6 @@ class SulzbannWPRegelungVisu extends IPSModule
      * ============================================================
      * LEGACY NAVIGATION
      * ============================================================
-     *
-     * Nur für bereits geladene alte Clients.
-     *
-     * Die aktuelle module.html soll diese Funktion NICHT benutzen.
-     * ============================================================
      */
 
     private function OpenObjectLegacy(
@@ -411,9 +375,7 @@ class SulzbannWPRegelungVisu extends IPSModule
         if (
             $objectID <= 0
             ||
-            !IPS_ObjectExists(
-                $objectID
-            )
+            !IPS_ObjectExists($objectID)
         ) {
             return;
         }
@@ -439,15 +401,13 @@ class SulzbannWPRegelungVisu extends IPSModule
                     $moduleName,
                     'Kachel Visualisierung'
                 )
-                !==
-                false
+                !== false
                 ||
                 stripos(
                     $moduleName,
                     'Tile Visualization'
                 )
-                !==
-                false;
+                !== false;
 
             if (!$isTileVisualization) {
                 continue;
@@ -465,12 +425,6 @@ class SulzbannWPRegelungVisu extends IPSModule
 
                 $this->SendDebug(
                     'LegacyNavigation',
-                    'VISU #'
-                    .
-                    $instanceID
-                    .
-                    ': '
-                    .
                     $e->getMessage(),
                     0
                 );
@@ -548,29 +502,15 @@ class SulzbannWPRegelungVisu extends IPSModule
 
     private function BuildGrossVisualization(): string
     {
-        $d =
-            $this->BuildVisualizationData();
+        $d = $this->BuildVisualizationData();
 
-        $wp =
-            $d['wp'];
-
-        $rooms =
-            $d['rooms'];
-
-        $fbh =
-            $d['fbh'];
-
-        $dhw =
-            $d['dhw'];
-
-        $buffer =
-            $d['buffer'];
-
-        $meteo =
-            $d['meteo'];
-
-        $solcast =
-            $d['solcast'];
+        $wp = $d['wp'];
+        $rooms = $d['rooms'];
+        $fbh = $d['fbh'];
+        $dhw = $d['dhw'];
+        $buffer = $d['buffer'];
+        $meteo = $d['meteo'];
+        $solcast = $d['solcast'];
 
         $mode =
             htmlspecialchars(
@@ -809,10 +749,12 @@ class SulzbannWPRegelungVisu extends IPSModule
     color-scheme: light dark;
 
     --text:#202124;
-    --muted:#65727b;
+    --muted:#68747b;
 
-    --card:rgba(25,35,40,.055);
-    --border:rgba(35,55,65,.18);
+    --card:rgba(20,30,35,.055);
+    --card-strong:rgba(20,30,35,.085);
+
+    --border:rgba(40,60,70,.18);
 
     --heating:#d97f2b;
     --cooling:#2e8ec8;
@@ -826,9 +768,11 @@ class SulzbannWPRegelungVisu extends IPSModule
     :root {
 
         --text:#f3f5f7;
-        --muted:#b7c6cd;
+        --muted:#b8c6cd;
 
         --card:rgba(255,255,255,.055);
+        --card-strong:rgba(255,255,255,.085);
+
         --border:rgba(225,240,246,.18);
 
         --heating:#ff9c48;
@@ -870,24 +814,60 @@ body {
 
     width:100%;
 
-    padding:18px;
+    padding:16px;
 }
 
 
-.head {
+.hero {
 
-    display:flex;
+    display:grid;
 
-    align-items:center;
-    justify-content:space-between;
+    grid-template-columns:
+        minmax(240px,1.25fr)
+        repeat(
+            3,
+            minmax(150px,.75fr)
+        );
 
-    gap:16px;
+    gap:10px;
 
-    margin-bottom:14px;
+    margin-bottom:10px;
 }
 
 
-.mode-wrap {
+.hero-card,
+.section {
+
+    background:var(--card);
+
+    border:
+        1px
+        solid
+        var(--border);
+
+    border-radius:12px;
+}
+
+
+.hero-main {
+
+    padding:16px;
+
+    background:var(--card-strong);
+}
+
+
+.hero-value {
+
+    margin-top:4px;
+
+    font-size:24px;
+
+    font-weight:700;
+}
+
+
+.mode-line {
 
     display:flex;
 
@@ -928,41 +908,37 @@ body {
 }
 
 
+.hero-mini {
+
+    min-height:88px;
+
+    padding:13px;
+}
+
+
 .label {
 
     font-size:13px;
+
     line-height:1.25;
 
     color:var(--muted);
 }
 
 
-.mode {
+.value {
 
-    margin-top:3px;
+    margin-top:4px;
 
-    font-size:22px;
+    font-size:18px;
+
+    line-height:1.2;
+
     font-weight:700;
 }
 
 
-.summary-grid {
-
-    display:grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            minmax(0,1fr)
-        );
-
-    gap:10px;
-
-    margin-bottom:10px;
-}
-
-
-.sections {
+.layout {
 
     display:grid;
 
@@ -976,27 +952,6 @@ body {
 }
 
 
-.card {
-
-    background:var(--card);
-
-    border:
-        1px
-        solid
-        var(--border);
-
-    border-radius:11px;
-}
-
-
-.summary-card {
-
-    min-height:78px;
-
-    padding:12px;
-}
-
-
 .section {
 
     padding:14px;
@@ -1007,7 +962,8 @@ body {
 
     margin-bottom:13px;
 
-    font-size:15px;
+    font-size:16px;
+
     font-weight:700;
 }
 
@@ -1023,8 +979,8 @@ body {
         );
 
     gap:
-        15px
-        24px;
+        14px
+        22px;
 }
 
 
@@ -1034,14 +990,28 @@ body {
 }
 
 
-.value {
+.section-wide {
 
-    margin-top:4px;
+    grid-column:
+        1
+        /
+        -1;
+}
 
-    font-size:18px;
-    line-height:1.2;
 
-    font-weight:700;
+.forecast-grid {
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0,1fr)
+        );
+
+    gap:
+        14px
+        22px;
 }
 
 
@@ -1049,7 +1019,7 @@ body {
 
     margin-top:14px;
 
-    padding-top:13px;
+    padding-top:12px;
 
     border-top:
         1px
@@ -1060,7 +1030,7 @@ body {
 
 .footer {
 
-    margin-top:11px;
+    margin-top:10px;
 
     text-align:right;
 
@@ -1070,13 +1040,10 @@ body {
 }
 
 
-@media (max-width:800px) {
+@media (max-width:1000px) {
 
-    .page {
-        padding:12px;
-    }
+    .hero {
 
-    .summary-grid {
         grid-template-columns:
             repeat(
                 2,
@@ -1084,12 +1051,80 @@ body {
             );
     }
 
-    .sections {
+
+    .hero-main {
+
+        grid-column:
+            1
+            /
+            -1;
+    }
+
+
+    .forecast-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0,1fr)
+            );
+    }
+}
+
+
+@media (max-width:700px) {
+
+    .page {
+        padding:10px;
+    }
+
+
+    .hero,
+    .layout {
+
         grid-template-columns:1fr;
     }
 
+
+    .hero-main {
+
+        grid-column:auto;
+    }
+
+
+    .section-wide {
+
+        grid-column:auto;
+    }
+
+
+    .forecast-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0,1fr)
+            );
+    }
+
+
     .label {
         font-size:12px;
+    }
+
+
+    .value {
+        font-size:17px;
+    }
+}
+
+
+@media (max-width:420px) {
+
+    .data-grid,
+    .forecast-grid {
+
+        grid-template-columns:1fr;
     }
 }
 
@@ -1103,21 +1138,23 @@ body {
 <div class="page">
 
 
-    <div class="head">
+    <div class="hero">
 
-        <div class="mode-wrap">
 
-            <div
-                class="mode-dot {$modeCode}"
-            ></div>
+        <div class="hero-card hero-main">
 
-            <div>
+            <div class="label">
+                WP Master-Betriebsart
+            </div>
 
-                <div class="label">
-                    WP Master-Betriebsart
-                </div>
 
-                <div class="mode">
+            <div class="mode-line">
+
+                <div
+                    class="mode-dot {$modeCode}"
+                ></div>
+
+                <div class="hero-value">
                     {$mode}
                 </div>
 
@@ -1125,42 +1162,59 @@ body {
 
         </div>
 
+
+        <div class="hero-card hero-mini">
+
+            <div class="label">
+                Aussentemperatur
+            </div>
+
+            <div class="value">
+                {$outside}
+            </div>
+
+        </div>
+
+
+        <div class="hero-card hero-mini">
+
+            <div class="label">
+                Vorlauf / Rücklauf
+            </div>
+
+            <div class="value">
+                {$flow} / {$return}
+            </div>
+
+        </div>
+
+
+        <div class="hero-card hero-mini">
+
+            <div class="label">
+                Modulation / COP
+            </div>
+
+            <div class="value">
+                {$modulation} / {$cop}
+            </div>
+
+        </div>
+
+
     </div>
 
 
-    <div class="summary-grid">
 
-        <div class="card summary-card">
-            <div class="label">Raumtemperatur Mittel</div>
-            <div class="value">{$roomAverage}</div>
-        </div>
-
-        <div class="card summary-card">
-            <div class="label">Raum Min. / Max.</div>
-            <div class="value">{$roomRange}</div>
-        </div>
-
-        <div class="card summary-card">
-            <div class="label">FBH Ventile offen</div>
-            <div class="value">{$valves}</div>
-        </div>
-
-        <div class="card summary-card">
-            <div class="label">FBH Stellwert max.</div>
-            <div class="value">{$demandMaximum}</div>
-        </div>
-
-    </div>
+    <div class="layout">
 
 
-    <div class="sections">
-
-
-        <div class="card section">
+        <div class="section">
 
             <div class="section-title">
                 Wärmepumpe
             </div>
+
 
             <div class="data-grid">
 
@@ -1204,11 +1258,13 @@ body {
         </div>
 
 
-        <div class="card section">
+
+        <div class="section">
 
             <div class="section-title">
-                Speicher
+                Boiler / Puffer
             </div>
+
 
             <div class="data-grid">
 
@@ -1242,13 +1298,25 @@ body {
         </div>
 
 
-        <div class="card section">
+
+        <div class="section">
 
             <div class="section-title">
-                Fussbodenheizung
+                Räume / Fussbodenheizung
             </div>
 
+
             <div class="data-grid">
+
+                <div class="data-item">
+                    <div class="label">Raumtemperatur Mittel</div>
+                    <div class="value">{$roomAverage}</div>
+                </div>
+
+                <div class="data-item">
+                    <div class="label">Raum Min. / Max.</div>
+                    <div class="value">{$roomRange}</div>
+                </div>
 
                 <div class="data-item">
                     <div class="label">Ventile offen</div>
@@ -1270,13 +1338,15 @@ body {
         </div>
 
 
-        <div class="card section">
+
+        <div class="section section-wide">
 
             <div class="section-title">
-                Prognose
+                Wetter / PV Prognose
             </div>
 
-            <div class="data-grid">
+
+            <div class="forecast-grid">
 
                 <div class="data-item">
                     <div class="label">Morgen Maximum</div>
@@ -1335,12 +1405,14 @@ body {
 
         </div>
 
+
     </div>
 
 
     <div class="footer">
         Aktualisiert {$lastUpdate}
     </div>
+
 
 </div>
 
@@ -1352,7 +1424,7 @@ HTML;
 
     /*
      * ============================================================
-     * DATA
+     * DATEN
      * ============================================================
      */
 
@@ -1416,9 +1488,8 @@ HTML;
         $roomMinimum = null;
         $roomMaximum = null;
 
-        if (
-            count($roomTemperatures) > 0
-        ) {
+        if (count($roomTemperatures) > 0) {
+
             $roomAverage =
                 array_sum(
                     $roomTemperatures
@@ -1449,11 +1520,7 @@ HTML;
             self::VALVE_STATE_IDS
             as $variableID
         ) {
-            if (
-                $this->ReadBool(
-                    $variableID
-                )
-            ) {
+            if ($this->ReadBool($variableID)) {
                 $openValves++;
             }
         }
@@ -1482,9 +1549,8 @@ HTML;
         $demandAverage = null;
         $demandMaximum = null;
 
-        if (
-            count($demands) > 0
-        ) {
+        if (count($demands) > 0) {
+
             $demandAverage =
                 array_sum(
                     $demands
@@ -1499,10 +1565,6 @@ HTML;
                     $demands
                 );
         }
-
-        /*
-         * Objekt-IDs für clientseitiges openObject().
-         */
 
         $settingsObjectID =
             $this->FindSettingsObject();
@@ -1710,7 +1772,7 @@ HTML;
 
     /*
      * ============================================================
-     * SOURCES
+     * SOURCE IDS
      * ============================================================
      */
 
@@ -1780,7 +1842,8 @@ HTML;
                 );
 
             if ($id > 0) {
-                $ids[] = $id;
+                $ids[] =
+                    $id;
             }
         }
 
