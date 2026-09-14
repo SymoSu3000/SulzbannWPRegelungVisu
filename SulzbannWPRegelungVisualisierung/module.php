@@ -2,119 +2,38 @@
 
 declare(strict_types=1);
 
-
-/*
- * =============================================================================
- * SULZBANN WP REGELUNG VISU
- * HTML-SDK
- * VERSION 1.2
- * =============================================================================
- *
- * Änderungen V1.2:
- *
- * - Compact-/Detail-Ansicht wie bei der bewährten WP-Visu
- * - beim normalen Öffnen der Kachel wird automatisch Detail angezeigt
- * - kein zweiter Klick auf das Vollbild-Symbol nötig
- * - Einstellungen-Ziel wird rekursiv gesucht
- * - Einstellungen-ID wird zusammen mit den Live-Daten übertragen
- * - Livewerte weiterhin über UpdateVisualizationValue()
- * - keine HTMLBox-Rewrites
- * - keine Schreibzugriffe auf WP / KNX / OZW
- *
- * =============================================================================
- */
-
-
 class SulzbannWPRegelungVisu extends IPSModule
 {
-
-    /*
-     * =========================================================================
-     * SYSTEM
-     * =========================================================================
-     */
-
     private const OZW_ROOT_ID = 28320;
-
     private const SOLCAST_PARENT_ID = 16397;
 
-
-    /*
-     * =========================================================================
-     * WP
-     * =========================================================================
-     */
-
     private const WP_HEATING_ID = 44357;
-
     private const WP_COOLING_ID = 17689;
-
     private const OUTSIDE_TEMP_ID = 50237;
-
     private const WP_FLOW_TEMP_ID = 27923;
-
     private const WP_RETURN_TEMP_ID = 45419;
-
     private const WP_POWER_ID = 50450;
-
     private const WP_HEAT_OUTPUT_ID = 32403;
-
     private const WP_COP_ID = 37700;
-
     private const WP_MODULATION_ID = 20837;
 
-
-    /*
-     * =========================================================================
-     * SPEICHER
-     * =========================================================================
-     */
-
     private const BUFFER_TOP_ID = 27553;
-
     private const BUFFER_MIDDLE_ID = 52270;
-
     private const BUFFER_BOTTOM_ID = 18594;
-
     private const DHW_TOP_ID = 39112;
-
     private const DHW_BOTTOM_ID = 40096;
 
-
-    /*
-     * =========================================================================
-     * METEOSCHWEIZ MORGEN
-     * =========================================================================
-     */
-
     private const METEO_MAX_ID = 42622;
-
     private const METEO_MEAN_ID = 11157;
-
     private const METEO_MIN_ID = 28499;
-
     private const METEO_SOLAR_ID = 36980;
 
-
-    /*
-     * =========================================================================
-     * RAUMTEMPERATUREN
-     * =========================================================================
-     */
-
     private const ROOM_TEMP_IDS = [
-
-        /*
-         * EG
-         */
         47619,
         43486,
         20056,
         59980,
 
-        /*
-         * OG
-         */
         52271,
         51361,
         43453,
@@ -122,36 +41,18 @@ class SulzbannWPRegelungVisu extends IPSModule
         26539,
         12860,
 
-        /*
-         * Einliegerwohnung
-         */
         32416,
         25829,
         45373,
         29653
-
     ];
 
-
-    /*
-     * =========================================================================
-     * FBH VENTILZUSTÄNDE
-     * =========================================================================
-     */
-
     private const VALVE_STATE_IDS = [
-
-        /*
-         * EG
-         */
         18344,
         50892,
         37309,
         57721,
 
-        /*
-         * OG
-         */
         52749,
         46861,
         49967,
@@ -159,36 +60,18 @@ class SulzbannWPRegelungVisu extends IPSModule
         27850,
         10375,
 
-        /*
-         * Einliegerwohnung
-         */
         33924,
         19131,
         58629,
         12822
-
     ];
 
-
-    /*
-     * =========================================================================
-     * FBH STELLWERTE
-     * =========================================================================
-     */
-
     private const VALVE_DEMAND_IDS = [
-
-        /*
-         * EG
-         */
         39391,
         22281,
         49588,
         51260,
 
-        /*
-         * OG
-         */
         26389,
         43578,
         36459,
@@ -196,57 +79,35 @@ class SulzbannWPRegelungVisu extends IPSModule
         39276,
         16937,
 
-        /*
-         * Einliegerwohnung
-         */
         19263,
         17140,
         14321,
         20806
-
     ];
 
 
-    /*
-     * =========================================================================
-     * CREATE
-     * =========================================================================
-     */
-
-    public function Create(): void
+    public function Create()
     {
-
         parent::Create();
 
-
         /*
-         * Echte HTML-SDK-Kachel.
+         * IP-Symcon 9.0
+         *
+         * Typ 2:
+         * HTML-SDK in normaler Kachel UND Vollbild.
          */
-        $this->SetVisualizationType(
-            1
-        );
+        $this->SetVisualizationType(2);
     }
 
 
-    /*
-     * =========================================================================
-     * APPLY CHANGES
-     * =========================================================================
-     */
-
-    public function ApplyChanges(): void
+    public function ApplyChanges()
     {
-
         parent::ApplyChanges();
 
-
-        $this->SetVisualizationType(
-            1
-        );
-
+        $this->SetVisualizationType(2);
 
         /*
-         * Relevante Variablen beobachten.
+         * Relevante Messwerte abonnieren.
          */
         foreach (
             $this->GetSourceVariableIDs()
@@ -270,15 +131,8 @@ class SulzbannWPRegelungVisu extends IPSModule
     }
 
 
-    /*
-     * =========================================================================
-     * HTML
-     * =========================================================================
-     */
-
-    public function GetVisualizationTile(): string
+    public function GetVisualizationTile()
     {
-
         $file =
             __DIR__
             .
@@ -292,7 +146,11 @@ class SulzbannWPRegelungVisu extends IPSModule
         ) {
 
             return
-                '<div>module.html fehlt.</div>';
+                '<div style="padding:60px 12px;color:var(--content-color)">'
+                .
+                'module.html fehlt.'
+                .
+                '</div>';
         }
 
 
@@ -307,27 +165,76 @@ class SulzbannWPRegelungVisu extends IPSModule
         ) {
 
             return
-                '<div>module.html konnte nicht geladen werden.</div>';
+                '<div style="padding:60px 12px;color:var(--content-color)">'
+                .
+                'module.html konnte nicht geladen werden.'
+                .
+                '</div>';
+        }
+
+
+        /*
+         * Ganz wichtig:
+         *
+         * Die Kachel bekommt sofort Initialdaten.
+         *
+         * Dadurch sind:
+         *
+         * - Werte
+         * - Betriebsart
+         * - Einstellungen-Ziel
+         *
+         * schon beim ersten Render vorhanden.
+         *
+         * Der Settings-Button muss nicht erst auf
+         * einen späteren Refresh warten.
+         */
+
+        $initialData =
+            $this->BuildVisualizationData();
+
+
+        $initialJson =
+            json_encode(
+                $initialData,
+                JSON_UNESCAPED_UNICODE
+                |
+                JSON_UNESCAPED_SLASHES
+                |
+                JSON_HEX_TAG
+                |
+                JSON_HEX_AMP
+                |
+                JSON_HEX_APOS
+                |
+                JSON_HEX_QUOT
+            );
+
+
+        if (
+            $initialJson === false
+        ) {
+
+            $initialJson =
+                '{}';
         }
 
 
         return
-            $html;
+            str_replace(
+                '__SBWRV_INITIAL_DATA__',
+                $initialJson,
+                $html
+            );
     }
 
-
-    /*
-     * =========================================================================
-     * LIVE UPDATE
-     * =========================================================================
-     */
 
     public function MessageSink(
         $TimeStamp,
         $SenderID,
         $Message,
         $Data
-    ): void {
+    ) {
 
         parent::MessageSink(
             $TimeStamp,
@@ -338,27 +245,20 @@ class SulzbannWPRegelungVisu extends IPSModule
 
 
         if (
-            $Message !== VM_UPDATE
+            $Message
+            ===
+            VM_UPDATE
         ) {
 
-            return;
+            $this->SendLiveValues();
         }
-
-
-        $this->SendLiveValues();
     }
 
-
-    /*
-     * =========================================================================
-     * REQUEST ACTION
-     * =========================================================================
-     */
 
     public function RequestAction(
         $Ident,
         $Value
-    ): void {
+    ) {
 
         switch (
             $Ident
@@ -374,28 +274,19 @@ class SulzbannWPRegelungVisu extends IPSModule
             default:
 
                 throw new Exception(
-                    'Invalid Ident'
+                    'Invalid Ident: '
+                    .
+                    $Ident
                 );
         }
     }
 
 
-    /*
-     * =========================================================================
-     * LIVE DATEN SENDEN
-     * =========================================================================
-     */
-
     private function SendLiveValues(): void
     {
-
-        $payload =
-            $this->BuildVisualizationData();
-
-
         $json =
             json_encode(
-                $payload,
+                $this->BuildVisualizationData(),
                 JSON_UNESCAPED_UNICODE
                 |
                 JSON_UNESCAPED_SLASHES
@@ -403,32 +294,24 @@ class SulzbannWPRegelungVisu extends IPSModule
 
 
         if (
-            $json === false
+            $json
+            !==
+            false
         ) {
 
-            return;
+            $this->UpdateVisualizationValue(
+                $json
+            );
         }
-
-
-        $this->UpdateVisualizationValue(
-            $json
-        );
     }
 
 
-    /*
-     * =========================================================================
-     * DATEN AUFBAUEN
-     * =========================================================================
-     */
-
     private function BuildVisualizationData(): array
     {
-
         /*
-         * ---------------------------------------------------------------------
-         * WP MASTER
-         * ---------------------------------------------------------------------
+         * ==============================================================
+         * WP MASTER-BETRIEBSART
+         * ==============================================================
          */
 
         $heating =
@@ -490,9 +373,9 @@ class SulzbannWPRegelungVisu extends IPSModule
 
 
         /*
-         * ---------------------------------------------------------------------
+         * ==============================================================
          * RAUMTEMPERATUREN
-         * ---------------------------------------------------------------------
+         * ==============================================================
          */
 
         $roomTemperatures =
@@ -564,9 +447,9 @@ class SulzbannWPRegelungVisu extends IPSModule
 
 
         /*
-         * ---------------------------------------------------------------------
+         * ==============================================================
          * FBH VENTILE
-         * ---------------------------------------------------------------------
+         * ==============================================================
          */
 
         $openValves =
@@ -590,9 +473,9 @@ class SulzbannWPRegelungVisu extends IPSModule
 
 
         /*
-         * ---------------------------------------------------------------------
+         * ==============================================================
          * FBH STELLWERTE
-         * ---------------------------------------------------------------------
+         * ==============================================================
          */
 
         $demands =
@@ -651,61 +534,9 @@ class SulzbannWPRegelungVisu extends IPSModule
 
 
         /*
-         * ---------------------------------------------------------------------
-         * SOLCAST
-         * ---------------------------------------------------------------------
-         */
-
-        $solcastP50 =
-            $this->ReadSolcastFloat(
-                'SolcastEnergy024P50'
-            );
-
-
-        $solcastPeak =
-            $this->ReadSolcastFloat(
-                'SolcastPeak024'
-            );
-
-
-        $solcastConfidence =
-            $this->ReadSolcastFloat(
-                'SolcastConfidence024'
-            );
-
-
-        $solcastPeakTime =
-            $this->ReadSolcastInteger(
-                'SolcastPeakTime024'
-            );
-
-
-        $solcastPeakWindowStart =
-            $this->ReadSolcastInteger(
-                'SolcastPeakWindowStart024'
-            );
-
-
-        $solcastPeakWindowEnd =
-            $this->ReadSolcastInteger(
-                'SolcastPeakWindowEnd024'
-            );
-
-
-        /*
-         * ---------------------------------------------------------------------
-         * EINSTELLUNGEN
-         * ---------------------------------------------------------------------
-         */
-
-        $settingsObjectID =
-            $this->FindSettingsObject();
-
-
-        /*
-         * ---------------------------------------------------------------------
+         * ==============================================================
          * RÜCKGABE
-         * ---------------------------------------------------------------------
+         * ==============================================================
          */
 
         return [
@@ -713,8 +544,13 @@ class SulzbannWPRegelungVisu extends IPSModule
             'timestamp' =>
                 time(),
 
+
+            /*
+             * Settings-Ziel wird bereits mit Initialdaten gesendet.
+             */
             'settingsObjectID' =>
-                $settingsObjectID,
+                $this->FindSettingsObject(),
+
 
             'wp' => [
 
@@ -764,8 +600,8 @@ class SulzbannWPRegelungVisu extends IPSModule
                     $this->ReadFloatNullable(
                         self::WP_MODULATION_ID
                     )
-
             ],
+
 
             'rooms' => [
 
@@ -782,8 +618,8 @@ class SulzbannWPRegelungVisu extends IPSModule
 
                 'maximum' =>
                     $roomMaximum
-
             ],
+
 
             'fbh' => [
 
@@ -800,8 +636,8 @@ class SulzbannWPRegelungVisu extends IPSModule
 
                 'demandMaximum' =>
                     $demandMaximum
-
             ],
+
 
             'buffer' => [
 
@@ -819,8 +655,8 @@ class SulzbannWPRegelungVisu extends IPSModule
                     $this->ReadFloatNullable(
                         self::BUFFER_BOTTOM_ID
                     )
-
             ],
+
 
             'dhw' => [
 
@@ -833,8 +669,8 @@ class SulzbannWPRegelungVisu extends IPSModule
                     $this->ReadFloatNullable(
                         self::DHW_BOTTOM_ID
                     )
-
             ],
+
 
             'meteo' => [
 
@@ -857,44 +693,47 @@ class SulzbannWPRegelungVisu extends IPSModule
                     $this->ReadFloatNullable(
                         self::METEO_SOLAR_ID
                     )
-
             ],
+
 
             'solcast' => [
 
                 'energyP50' =>
-                    $solcastP50,
+                    $this->ReadSolcastFloat(
+                        'SolcastEnergy024P50'
+                    ),
 
                 'peak' =>
-                    $solcastPeak,
+                    $this->ReadSolcastFloat(
+                        'SolcastPeak024'
+                    ),
 
                 'confidence' =>
-                    $solcastConfidence,
+                    $this->ReadSolcastFloat(
+                        'SolcastConfidence024'
+                    ),
 
                 'peakTime' =>
-                    $solcastPeakTime,
+                    $this->ReadSolcastInteger(
+                        'SolcastPeakTime024'
+                    ),
 
                 'peakWindowStart' =>
-                    $solcastPeakWindowStart,
+                    $this->ReadSolcastInteger(
+                        'SolcastPeakWindowStart024'
+                    ),
 
                 'peakWindowEnd' =>
-                    $solcastPeakWindowEnd
-
+                    $this->ReadSolcastInteger(
+                        'SolcastPeakWindowEnd024'
+                    )
             ]
-
         ];
     }
 
 
-    /*
-     * =========================================================================
-     * QUELLVARIABLEN
-     * =========================================================================
-     */
-
     private function GetSourceVariableIDs(): array
     {
-
         $ids = [
 
             self::WP_HEATING_ID,
@@ -921,7 +760,6 @@ class SulzbannWPRegelungVisu extends IPSModule
             self::METEO_MEAN_ID,
             self::METEO_MIN_ID,
             self::METEO_SOLAR_ID
-
         ];
 
 
@@ -954,10 +792,6 @@ class SulzbannWPRegelungVisu extends IPSModule
                 $id;
         }
 
-
-        /*
-         * Solcast Variablen per Ident.
-         */
 
         foreach (
             [
@@ -995,12 +829,6 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
     }
 
-
-    /*
-     * =========================================================================
-     * SOLCAST
-     * =========================================================================
-     */
 
     private function GetSolcastVariableID(
         string $ident
@@ -1050,18 +878,16 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
 
 
-        if (
-            $id <= 0
-        ) {
-
-            return null;
-        }
-
-
         return
-            $this->ReadFloatNullable(
-                $id
-            );
+            (
+                $id > 0
+            )
+                ?
+                $this->ReadFloatNullable(
+                    $id
+                )
+                :
+                null;
     }
 
 
@@ -1075,38 +901,33 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
 
 
-        if (
-            $id <= 0
-        ) {
-
-            return 0;
-        }
-
-
         return
-            (int) GetValue(
-                $id
-            );
+            (
+                $id > 0
+            )
+                ?
+                (int) GetValue(
+                    $id
+                )
+                :
+                0;
     }
 
 
     /*
-     * =========================================================================
-     * EINSTELLUNGEN SUCHEN
-     * =========================================================================
+     * ==============================================================
+     * SETTINGS-ZIEL
+     * ==============================================================
      *
-     * Gesuchte Struktur:
+     * Gesucht wird:
      *
      * Siemens OWZ
-     * └── WP Regelung
-     *     └── Parameter
-     *
-     * Im Gegensatz zur alten Version wird jetzt rekursiv gesucht.
+     *   > WP Regelung
+     *       > Parameter
      */
 
     private function FindSettingsObject(): int
     {
-
         if (
             !IPS_ObjectExists(
                 self::OZW_ROOT_ID
@@ -1117,9 +938,6 @@ class SulzbannWPRegelungVisu extends IPSModule
         }
 
 
-        /*
-         * Zuerst WP Regelung irgendwo unter Siemens OWZ suchen.
-         */
         $wpRegulation =
             $this->FindRecursiveByName(
                 self::OZW_ROOT_ID,
@@ -1131,18 +949,10 @@ class SulzbannWPRegelungVisu extends IPSModule
             $wpRegulation <= 0
         ) {
 
-            /*
-             * Falls Struktur später anders benannt wird:
-             * wenigstens Siemens OWZ öffnen.
-             */
-            return
-                self::OZW_ROOT_ID;
+            return 0;
         }
 
 
-        /*
-         * Parameter innerhalb WP Regelung suchen.
-         */
         $parameters =
             $this->FindRecursiveByName(
                 $wpRegulation,
@@ -1150,28 +960,16 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
 
 
-        if (
-            $parameters > 0
-        ) {
-
-            return
-                $parameters;
-        }
-
-
-        /*
-         * WP Regelung selbst als Fallback.
-         */
         return
-            $wpRegulation;
+            (
+                $parameters > 0
+            )
+                ?
+                $parameters
+                :
+                $wpRegulation;
     }
 
-
-    /*
-     * =========================================================================
-     * REKURSIVE OBJEKTSUCHE
-     * =========================================================================
-     */
 
     private function FindRecursiveByName(
         int $parentID,
@@ -1190,9 +988,10 @@ class SulzbannWPRegelungVisu extends IPSModule
         }
 
 
-        $queue = [
-            $parentID
-        ];
+        $queue =
+            [
+                $parentID
+            ];
 
 
         while (
@@ -1227,37 +1026,8 @@ class SulzbannWPRegelungVisu extends IPSModule
                 }
 
 
-                $object =
-                    IPS_GetObject(
-                        $childID
-                    );
-
-
-                /*
-                 * Nur Objekte mit potentiellen Kindern weitersuchen.
-                 */
-                if (
-                    isset(
-                        $object['ObjectType']
-                    )
-                    &&
-                    in_array(
-                        (int) $object['ObjectType'],
-                        [
-                            0,
-                            1,
-                            2,
-                            3,
-                            5,
-                            6
-                        ],
-                        true
-                    )
-                ) {
-
-                    $queue[] =
-                        (int) $childID;
-                }
+                $queue[] =
+                    (int) $childID;
             }
         }
 
@@ -1265,12 +1035,6 @@ class SulzbannWPRegelungVisu extends IPSModule
         return 0;
     }
 
-
-    /*
-     * =========================================================================
-     * SICHERE LESEFUNKTIONEN
-     * =========================================================================
-     */
 
     private function ReadBool(
         int $variableID
@@ -1317,18 +1081,13 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
 
 
-        if (
-            !is_numeric(
+        return
+            is_numeric(
                 $value
             )
-        ) {
-
-            return null;
-        }
-
-
-        return
-            (float) $value;
+                ?
+                (float) $value
+                :
+                null;
     }
-
 }
