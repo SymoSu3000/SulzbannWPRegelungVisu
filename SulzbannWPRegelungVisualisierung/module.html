@@ -7,68 +7,101 @@
 
 <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
 >
 
-<style>
+<script src="/icons.js"></script>
 
-/* ============================================================
-   THEME
-============================================================ */
+<style>
 
 :root {
     color-scheme: light dark;
 
-    --text: #202124;
-    --muted: #64727a;
+    --foreground:
+        var(
+            --content-color,
+            #202124
+        );
 
-    --surface: rgba(255,255,255,.72);
-    --surface-soft: rgba(229,235,238,.80);
+    --muted:
+        color-mix(
+            in srgb,
+            var(--foreground) 62%,
+            transparent
+        );
 
-    --border: rgba(70,85,95,.25);
+    --card:
+        color-mix(
+            in srgb,
+            var(--foreground) 7%,
+            transparent
+        );
 
-    --heating: #d97f2b;
-    --cooling: #2e8ec8;
-    --standby: #7e8b91;
-    --fault: #d84a4a;
+    --soft:
+        color-mix(
+            in srgb,
+            var(--foreground) 10%,
+            transparent
+        );
+
+    --border:
+        color-mix(
+            in srgb,
+            var(--foreground) 17%,
+            transparent
+        );
+
+    --heating:#d97f2b;
+    --cooling:#2e8ec8;
+    --standby:#7e8b91;
+    --fault:#d84a4a;
 }
 
 
 @media (prefers-color-scheme: dark) {
 
     :root {
-        --text: #f3f5f7;
-        --muted: #a9bac4;
 
-        --surface: rgba(15,34,45,.72);
-        --surface-soft: rgba(18,44,57,.76);
-
-        --border: rgba(170,195,208,.20);
+        --foreground:
+            var(
+                --content-color,
+                #f3f5f7
+            );
     }
 }
 
 
-/* ============================================================
-   BASIS
-============================================================ */
+@media (prefers-color-scheme: light) {
+
+    :root {
+
+        --foreground:
+            var(
+                --content-color,
+                #202124
+            );
+    }
+}
+
 
 * {
-    box-sizing: border-box;
+    box-sizing:border-box;
 }
+
 
 html,
 body {
-    width: 100%;
-    height: 100%;
+    margin:0;
+    padding:0;
 
-    margin: 0;
-    padding: 0;
+    width:100%;
+    height:100%;
 
-    overflow: hidden;
+    overflow:hidden;
 
-    background: transparent;
+    background:transparent;
 
-    color: var(--text);
+    color:var(--foreground);
 
     font-family:
         -apple-system,
@@ -78,343 +111,314 @@ body {
         sans-serif;
 }
 
-#app {
-    width: 100%;
-    height: 100%;
+
+button {
+    font:inherit;
+    color:inherit;
 }
 
 
-/* ============================================================
-   GEMEINSAM
-============================================================ */
+#app {
+    width:100%;
+    height:100%;
+
+    overflow:hidden;
+}
+
+
+/*
+ * Symcon zeichnet den eigentlichen Kacheltitel selbst.
+ */
+.view-shell {
+    width:100%;
+    height:100%;
+
+    padding:
+        54px
+        12px
+        12px
+        12px;
+}
+
+
+.compact {
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+    min-height:0;
+}
+
+
+.compact-head {
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:12px;
+
+    min-height:40px;
+}
+
+
+.compact-mode {
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    min-width:0;
+}
+
 
 .status-dot {
-    width: 11px;
-    height: 11px;
+    width:11px;
+    height:11px;
 
-    flex: 0 0 11px;
+    min-width:11px;
 
-    border-radius: 50%;
+    border-radius:50%;
 
-    background: var(--standby);
+    background:var(--standby);
 }
+
 
 .status-dot.heating {
-    background: var(--heating);
+    background:var(--heating);
 }
+
 
 .status-dot.cooling {
-    background: var(--cooling);
+    background:var(--cooling);
 }
+
 
 .status-dot.standby {
-    background: var(--standby);
+    background:var(--standby);
 }
+
 
 .status-dot.fault {
-    background: var(--fault);
+    background:var(--fault);
 }
+
 
 .label {
-    font-size: 13px;
-    line-height: 1.25;
+    font-size:13px;
+    line-height:1.25;
 
-    color: var(--muted);
+    color:var(--muted);
 }
 
-.value {
-    margin-top: 4px;
 
-    font-size: 18px;
-    line-height: 1.2;
+.compact-mode-value {
+    margin-top:2px;
 
-    font-weight: 700;
+    font-size:17px;
+    line-height:1.2;
+
+    font-weight:700;
+
+    color:var(--foreground);
 }
 
-.card {
-    background: var(--surface);
+
+.actions {
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    flex-shrink:0;
+}
+
+
+.action-button {
+    height:38px;
+
+    padding:
+        0
+        12px;
 
     border:
         1px
         solid
         var(--border);
 
-    border-radius: 11px;
+    border-radius:9px;
+
+    background:var(--soft);
+
+    color:var(--foreground);
+
+    display:inline-flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:7px;
+
+    cursor:pointer;
+
+    white-space:nowrap;
+
+    font-size:13px;
+
+    font-weight:600;
 }
 
 
-/* ============================================================
-   COMPACT
-============================================================ */
-
-.compact {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 10px;
-
-    padding:
-        8px
-        10px
-        10px
-        10px;
+.action-button:active {
+    opacity:.72;
 }
 
-.compact-head {
-    display: flex;
 
-    align-items: center;
-    justify-content: space-between;
+.action-button:disabled {
+    opacity:.38;
 
-    gap: 12px;
-
-    min-height: 42px;
+    cursor:default;
 }
 
-.compact-mode {
-    display: flex;
 
-    align-items: center;
+.expand-button {
+    width:38px;
+    min-width:38px;
 
-    gap: 9px;
+    padding:0;
 }
 
-.compact-mode-value {
-    margin-top: 2px;
-
-    font-size: 18px;
-    line-height: 1.2;
-
-    font-weight: 700;
-}
-
-.compact-note {
-    text-align: right;
-
-    font-size: 12px;
-
-    color: var(--muted);
-}
 
 .compact-grid {
-    display: grid;
+    display:grid;
 
     grid-template-columns:
         repeat(
             3,
-            minmax(0, 1fr)
+            minmax(0,1fr)
         );
 
-    gap: 9px;
-}
+    gap:9px;
 
-.compact-card {
-    min-height: 84px;
-
-    padding:
-        11px
-        12px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
+    min-height:0;
 }
 
 
-/* ============================================================
-   DETAIL
-============================================================ */
+.card {
+    background:var(--card);
 
-.detail {
-    display: none;
-
-    width: 100%;
-    height: 100%;
-
-    padding: 12px;
-
-    overflow: hidden;
-}
-
-.detail-layout {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 10px;
-}
-
-.detail-head {
-    display: flex;
-
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 15px;
-
-    min-height: 48px;
-}
-
-.detail-mode {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-}
-
-.detail-mode-value {
-    margin-top: 2px;
-
-    font-size: 22px;
-    line-height: 1.2;
-
-    font-weight: 700;
-}
-
-.detail-update {
-    font-size: 12px;
-
-    color: var(--muted);
-}
-
-.summary-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            minmax(0, 1fr)
-        );
-
-    gap: 10px;
-}
-
-.summary-card {
-    min-height: 78px;
-
-    padding:
-        11px
-        12px;
-}
-
-.sections {
-    flex: 1;
-
-    min-height: 0;
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
-
-    gap: 10px;
-}
-
-.section {
-    min-height: 0;
-
-    padding: 13px;
-}
-
-.section-title {
-    margin-bottom: 12px;
-
-    font-size: 15px;
-    line-height: 1.2;
-
-    font-weight: 700;
-}
-
-.data-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
-
-    gap:
-        13px
-        20px;
-}
-
-.data-item {
-    min-height: 44px;
-}
-
-.section-note {
-    margin-top: 12px;
-
-    padding-top: 10px;
-
-    border-top:
+    border:
         1px
         solid
         var(--border);
+
+    border-radius:11px;
+
+    min-width:0;
 }
 
 
-/* ============================================================
-   RESPONSIVE
-============================================================ */
+.compact-card {
+    padding:
+        10px
+        11px;
 
-@media (max-width: 520px) {
+    min-height:82px;
 
-    .compact {
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+}
+
+
+.value {
+    margin-top:4px;
+
+    font-size:18px;
+    line-height:1.2;
+
+    font-weight:700;
+
+    color:var(--foreground);
+}
+
+
+@media (max-width:700px) {
+
+    .view-shell {
         padding:
-            7px
-            8px
-            8px
-            8px;
+            52px
+            9px
+            9px
+            9px;
     }
 
-    .compact-grid {
-        gap: 7px;
-    }
 
     .label {
-        font-size: 12px;
+        font-size:12px;
     }
 
-    .value {
-        font-size: 17px;
+
+    .settings-text {
+        display:none;
+    }
+
+
+    .settings-button {
+        min-width:40px;
+
+        padding:
+            0
+            10px;
     }
 }
 
 
-/*
- * ============================================================
- * ENTSCHEIDENDER MECHANISMUS
- *
- * GENAU DAS PRINZIP DER FUNKTIONIERENDEN HEIZUNGSVISU:
- *
- * kleine / normale Kachel -> Compact
- * hohe / geöffnete Kachel -> Detail
- * ============================================================
- */
+@media (max-width:420px) {
 
-@media (min-height: 520px) {
+    .compact-grid {
+        grid-template-columns:
+            1fr
+            1fr;
 
-    .compact {
-        display: none;
+        gap:7px;
     }
 
-    .detail {
-        display: block;
+
+    .compact-grid
+    .compact-card:last-child {
+        grid-column:1/-1;
+    }
+
+
+    .compact-card {
+        min-height:68px;
+
+        padding:
+            8px
+            9px;
+    }
+
+
+    .actions {
+        gap:5px;
+    }
+
+
+    .action-button {
+        height:36px;
+    }
+
+
+    .expand-button {
+        width:36px;
+        min-width:36px;
     }
 }
 
@@ -428,622 +432,547 @@ body {
 <div id="app">
 
 
-<!-- ============================================================
-     COMPACT
-============================================================ -->
+    <div class="view-shell compact">
 
-<div class="compact">
 
-    <div class="compact-head">
+        <div class="compact-head">
 
-        <div class="compact-mode">
 
-            <span
-                class="status-dot {{MODE_CLASS}}"
-            ></span>
+            <div class="compact-mode">
 
-            <div>
+                <span
+                    data-role="modeDot"
+                    class="status-dot standby"
+                ></span>
+
+
+                <div>
+
+                    <div class="label">
+                        WP Master-Betriebsart
+                    </div>
+
+
+                    <div
+                        class="compact-mode-value"
+                        data-role="mode"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="actions">
+
+
+                <button
+                    data-role="grossButton"
+                    class="action-button expand-button"
+                    type="button"
+                    aria-label="Grossansicht"
+                    title="Grossansicht öffnen"
+                >
+                    ↗
+                </button>
+
+
+                <button
+                    data-role="settingsButton"
+                    class="action-button settings-button"
+                    type="button"
+                    aria-label="Einstellungen"
+                >
+
+                    <i class="fa-light fa-gear"></i>
+
+
+                    <span class="settings-text">
+                        Einstellungen
+                    </span>
+
+                </button>
+
+
+            </div>
+
+        </div>
+
+
+        <div class="compact-grid">
+
+
+            <div class="card compact-card">
 
                 <div class="label">
-                    WP Master-Betriebsart
+                    Raumtemperatur
                 </div>
 
-                <div class="compact-mode-value">
-                    {{MODE}}
+
+                <div
+                    class="value"
+                    data-role="roomAverage"
+                >
+                    —
                 </div>
 
             </div>
 
-        </div>
 
-
-        <div class="compact-note">
-            WP entscheidet Heizen / Kühlen
-        </div>
-
-    </div>
-
-
-    <div class="compact-grid">
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Raumtemperatur
-            </div>
-
-            <div class="value">
-                {{ROOM_AVERAGE}}
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                FBH Ventile offen
-            </div>
-
-            <div class="value">
-                {{VALVES}}
-            </div>
-
-        </div>
-
-
-        <div class="card compact-card">
-
-            <div class="label">
-                Stellwert max.
-            </div>
-
-            <div class="value">
-                {{DEMAND_MAXIMUM}}
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
-<!-- ============================================================
-     DETAIL / GROSS
-============================================================ -->
-
-<div class="detail">
-
-<div class="detail-layout">
-
-
-    <div class="detail-head">
-
-        <div class="detail-mode">
-
-            <span
-                class="status-dot {{MODE_CLASS}}"
-            ></span>
-
-            <div>
+            <div class="card compact-card">
 
                 <div class="label">
-                    WP Master-Betriebsart
-                </div>
-
-                <div class="detail-mode-value">
-                    {{MODE}}
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="detail-update">
-            Aktualisiert {{UPDATED}}
-        </div>
-
-    </div>
-
-
-
-    <!-- ========================================================
-         SUMMARY
-    ========================================================= -->
-
-    <div class="summary-grid">
-
-        <div class="card summary-card">
-
-            <div class="label">
-                Raumtemperatur Mittel
-            </div>
-
-            <div class="value">
-                {{ROOM_AVERAGE}}
-            </div>
-
-        </div>
-
-
-        <div class="card summary-card">
-
-            <div class="label">
-                Raum Min. / Max.
-            </div>
-
-            <div class="value">
-                {{ROOM_RANGE}}
-            </div>
-
-        </div>
-
-
-        <div class="card summary-card">
-
-            <div class="label">
-                FBH Ventile offen
-            </div>
-
-            <div class="value">
-                {{VALVES}}
-            </div>
-
-        </div>
-
-
-        <div class="card summary-card">
-
-            <div class="label">
-                FBH Stellwert max.
-            </div>
-
-            <div class="value">
-                {{DEMAND_MAXIMUM}}
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ========================================================
-         SEKTIONEN
-    ========================================================= -->
-
-    <div class="sections">
-
-
-        <!-- ====================================================
-             WÄRMEPUMPE
-        ===================================================== -->
-
-        <div class="card section">
-
-            <div class="section-title">
-                Wärmepumpe
-            </div>
-
-            <div class="data-grid">
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Aussentemperatur
-                    </div>
-
-                    <div class="value">
-                        {{OUTSIDE}}
-                    </div>
-
+                    FBH Ventile offen
                 </div>
 
 
-                <div class="data-item">
-
-                    <div class="label">
-                        Vorlauf
-                    </div>
-
-                    <div class="value">
-                        {{FLOW}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Rücklauf
-                    </div>
-
-                    <div class="value">
-                        {{RETURN}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Verdichtermodulation
-                    </div>
-
-                    <div class="value">
-                        {{MODULATION}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Leistungsaufnahme
-                    </div>
-
-                    <div class="value">
-                        {{POWER}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Wärmeleistung
-                    </div>
-
-                    <div class="value">
-                        {{HEAT_OUTPUT}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        COP
-                    </div>
-
-                    <div class="value">
-                        {{COP}}
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ====================================================
-             RÄUME / FBH
-        ===================================================== -->
-
-        <div class="card section">
-
-            <div class="section-title">
-                Räume / Fussbodenheizung
-            </div>
-
-            <div class="data-grid">
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Ausgewertete Räume
-                    </div>
-
-                    <div class="value">
-                        {{ROOM_COUNT}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Raum Mittel
-                    </div>
-
-                    <div class="value">
-                        {{ROOM_AVERAGE}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Raum Min. / Max.
-                    </div>
-
-                    <div class="value">
-                        {{ROOM_RANGE}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Ventile offen
-                    </div>
-
-                    <div class="value">
-                        {{VALVES}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Stellwert Mittel
-                    </div>
-
-                    <div class="value">
-                        {{DEMAND_AVERAGE}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Stellwert Maximum
-                    </div>
-
-                    <div class="value">
-                        {{DEMAND_MAXIMUM}}
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ====================================================
-             SPEICHER
-        ===================================================== -->
-
-        <div class="card section">
-
-            <div class="section-title">
-                Speicher
-            </div>
-
-            <div class="data-grid">
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Boiler oben
-                    </div>
-
-                    <div class="value">
-                        {{DHW_TOP}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Boiler unten
-                    </div>
-
-                    <div class="value">
-                        {{DHW_BOTTOM}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Puffer oben
-                    </div>
-
-                    <div class="value">
-                        {{BUFFER_TOP}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Puffer Mitte
-                    </div>
-
-                    <div class="value">
-                        {{BUFFER_MIDDLE}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Puffer unten
-                    </div>
-
-                    <div class="value">
-                        {{BUFFER_BOTTOM}}
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ====================================================
-             PROGNOSE
-        ===================================================== -->
-
-        <div class="card section">
-
-            <div class="section-title">
-                Wetter / PV Prognose
-            </div>
-
-            <div class="data-grid">
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Morgen Maximum
-                    </div>
-
-                    <div class="value">
-                        {{METEO_MAX}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Morgen Mittel
-                    </div>
-
-                    <div class="value">
-                        {{METEO_MEAN}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Morgen Minimum
-                    </div>
-
-                    <div class="value">
-                        {{METEO_MIN}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Globalstrahlung
-                    </div>
-
-                    <div class="value">
-                        {{METEO_SOLAR}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Solcast P50 0–24 h
-                    </div>
-
-                    <div class="value">
-                        {{SOLCAST_ENERGY}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        PV Peak
-                    </div>
-
-                    <div class="value">
-                        {{SOLCAST_PEAK}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Peak Zeitpunkt
-                    </div>
-
-                    <div class="value">
-                        {{SOLCAST_PEAK_TIME}}
-                    </div>
-
-                </div>
-
-
-                <div class="data-item">
-
-                    <div class="label">
-                        Vertrauen
-                    </div>
-
-                    <div class="value">
-                        {{SOLCAST_CONFIDENCE}}
-                    </div>
-
+                <div
+                    class="value"
+                    data-role="valvesOpen"
+                >
+                    —
                 </div>
 
             </div>
 
 
-            <div class="section-note">
+            <div class="card compact-card">
 
                 <div class="label">
-                    Peakfenster
+                    Stellwert max.
                 </div>
 
-                <div class="value">
-                    {{SOLCAST_PEAK_WINDOW}}
+
+                <div
+                    class="value"
+                    data-role="demandMaximum"
+                >
+                    —
                 </div>
 
             </div>
 
-        </div>
 
+        </div>
 
     </div>
 
-</div>
 
 </div>
 
 
-</div>
+<script>
+
+"use strict";
+
+
+const INITIAL_DATA =
+    __SBWRV_INITIAL_DATA__;
+
+
+let currentData =
+    (
+        INITIAL_DATA
+        &&
+        typeof INITIAL_DATA === "object"
+    )
+        ?
+        INITIAL_DATA
+        :
+        {};
+
+
+/*
+ * ============================================================
+ * DOM
+ * ============================================================
+ */
+
+function allRole(role) {
+
+    return document.querySelectorAll(
+        '[data-role="'
+        +
+        role
+        +
+        '"]'
+    );
+}
+
+
+function setRoleText(
+    role,
+    value
+) {
+
+    allRole(
+        role
+    )
+    .forEach(
+        element => {
+
+            if (
+                element.textContent
+                !==
+                value
+            ) {
+                element.textContent =
+                    value;
+            }
+        }
+    );
+}
+
+
+/*
+ * ============================================================
+ * FORMAT
+ * ============================================================
+ */
+
+function isNumber(value) {
+
+    return (
+        typeof value
+        ===
+        "number"
+        &&
+        Number.isFinite(value)
+    );
+}
+
+
+function fmt(
+    value,
+    digits,
+    suffix
+) {
+
+    return isNumber(value)
+        ?
+        value.toFixed(digits)
+        +
+        suffix
+        :
+        "—";
+}
+
+
+function fmtTemp(value) {
+
+    return fmt(
+        value,
+        1,
+        " °C"
+    );
+}
+
+
+function fmtPercent(value) {
+
+    return fmt(
+        value,
+        0,
+        " %"
+    );
+}
+
+
+/*
+ * ============================================================
+ * BUTTONS
+ * ============================================================
+ */
+
+function bindButtons() {
+
+    allRole(
+        "settingsButton"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    if (
+                        typeof requestAction
+                        ===
+                        "function"
+                    ) {
+
+                        requestAction(
+                            "OpenSettings",
+                            true
+                        );
+
+                        return;
+                    }
+
+
+                    const target =
+                        Number(
+                            currentData.settingsObjectID
+                            ||
+                            0
+                        );
+
+
+                    if (
+                        target > 0
+                        &&
+                        typeof openObject
+                        ===
+                        "function"
+                    ) {
+
+                        openObject(
+                            target
+                        );
+                    }
+                }
+            );
+        }
+    );
+
+
+    allRole(
+        "grossButton"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    if (
+                        typeof requestAction
+                        ===
+                        "function"
+                    ) {
+
+                        requestAction(
+                            "OpenGross",
+                            true
+                        );
+                    }
+                }
+            );
+        }
+    );
+}
+
+
+/*
+ * ============================================================
+ * LIVEWERTE
+ * ============================================================
+ */
+
+function applyData() {
+
+    const d =
+        currentData
+        ||
+        {};
+
+
+    const wp =
+        d.wp
+        ||
+        {};
+
+
+    const rooms =
+        d.rooms
+        ||
+        {};
+
+
+    const fbh =
+        d.fbh
+        ||
+        {};
+
+
+    setRoleText(
+        "mode",
+        wp.mode
+        ||
+        "—"
+    );
+
+
+    allRole(
+        "modeDot"
+    )
+    .forEach(
+        element => {
+
+            element.className =
+                "status-dot "
+                +
+                (
+                    wp.modeCode
+                    ||
+                    "standby"
+                );
+        }
+    );
+
+
+    setRoleText(
+        "roomAverage",
+        fmtTemp(
+            rooms.average
+        )
+    );
+
+
+    setRoleText(
+        "valvesOpen",
+        (
+            isNumber(
+                fbh.open
+            )
+            &&
+            isNumber(
+                fbh.total
+            )
+        )
+            ?
+            fbh.open
+            +
+            " / "
+            +
+            fbh.total
+            :
+            "—"
+    );
+
+
+    setRoleText(
+        "demandMaximum",
+        fmtPercent(
+            fbh.demandMaximum
+        )
+    );
+
+
+    const settingsOK =
+        Number(
+            d.settingsObjectID
+            ||
+            0
+        )
+        >
+        0;
+
+
+    allRole(
+        "settingsButton"
+    )
+    .forEach(
+        button => {
+
+            button.disabled =
+                !settingsOK;
+        }
+    );
+}
+
+
+/*
+ * ============================================================
+ * SYMCON LIVE MESSAGE
+ * ============================================================
+ */
+
+function handleMessage(data) {
+
+    if (
+        typeof data
+        ===
+        "string"
+    ) {
+
+        try {
+
+            data =
+                JSON.parse(
+                    data
+                );
+
+        } catch (error) {
+
+            return;
+        }
+    }
+
+
+    if (
+        !data
+        ||
+        typeof data
+        !==
+        "object"
+    ) {
+        return;
+    }
+
+
+    currentData =
+        data;
+
+
+    applyData();
+}
+
+
+/*
+ * ============================================================
+ * START
+ * ============================================================
+ */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        bindButtons();
+
+        applyData();
+
+
+        if (
+            typeof requestAction
+            ===
+            "function"
+        ) {
+
+            requestAction(
+                "Refresh",
+                true
+            );
+        }
+    }
+);
+
+</script>
 
 </body>
 
