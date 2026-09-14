@@ -4,9 +4,41 @@ declare(strict_types=1);
 
 class SulzbannWPRegelungVisu extends IPSModule
 {
-    private const OZW_ROOT_ID = 28320;
+    /*
+     * =========================================================================
+     * SULZBANN WP REGELUNG VISU
+     * =========================================================================
+     *
+     * IP-Symcon 9.0
+     *
+     * Bewährte Architektur analog zur funktionierenden Energy-Visu:
+     *
+     * - SetVisualizationType(1)
+     * - GetVisualizationTile() lädt module.html
+     * - MessageSink() reagiert auf Variablenänderungen
+     * - UpdateVisualizationValue() überträgt Live-Daten
+     * - Compact / Detail wird in module.html geregelt
+     *
+     * Keine HTMLBox.
+     * Keine Steuerbefehle an WP / OZW / KNX.
+     *
+     * =========================================================================
+     */
+
+    /*
+     * -------------------------------------------------------------------------
+     * FESTE OBJEKTE
+     * -------------------------------------------------------------------------
+     */
+
     private const SETTINGS_OBJECT_ID = 26699;
     private const SOLCAST_PARENT_ID = 16397;
+
+    /*
+     * -------------------------------------------------------------------------
+     * WP / OZW
+     * -------------------------------------------------------------------------
+     */
 
     private const WP_HEATING_ID = 44357;
     private const WP_COOLING_ID = 17689;
@@ -20,63 +52,170 @@ class SulzbannWPRegelungVisu extends IPSModule
     private const WP_COP_ID = 37700;
     private const WP_MODULATION_ID = 20837;
 
+    /*
+     * -------------------------------------------------------------------------
+     * PUFFER
+     * -------------------------------------------------------------------------
+     */
+
     private const BUFFER_TOP_ID = 27553;
     private const BUFFER_MIDDLE_ID = 52270;
     private const BUFFER_BOTTOM_ID = 18594;
 
+    /*
+     * -------------------------------------------------------------------------
+     * WARMWASSER
+     * -------------------------------------------------------------------------
+     */
+
     private const DHW_TOP_ID = 39112;
     private const DHW_BOTTOM_ID = 40096;
+
+    /*
+     * -------------------------------------------------------------------------
+     * METEO TAG 2 / MORGEN
+     * -------------------------------------------------------------------------
+     */
 
     private const METEO_MAX_ID = 42622;
     private const METEO_MEAN_ID = 11157;
     private const METEO_MIN_ID = 28499;
     private const METEO_SOLAR_ID = 36980;
 
+    /*
+     * -------------------------------------------------------------------------
+     * RAUMTEMPERATUREN
+     * -------------------------------------------------------------------------
+     */
+
     private const ROOM_TEMP_IDS = [
-        47619, 43486, 20056, 59980,
-        52271, 51361, 43453, 16944, 26539, 12860,
-        32416, 25829, 45373, 29653
+        // EG
+        47619, // Haupteingang
+        43486, // Küche
+        20056, // WC
+        59980, // Wohnen / Essen
+
+        // OG
+        52271, // Bad
+        51361, // Büro
+        43453, // Dusche
+        16944, // Eltern
+        26539, // Jan
+        12860, // Lea
+
+        // ELW
+        32416, // Bad
+        25829, // Küche / Essen
+        45373, // Wohnen
+        29653  // Zimmer
     ];
+
+    /*
+     * -------------------------------------------------------------------------
+     * FBH VENTILSTATUS
+     *
+     * false = geschlossen
+     * true  = offen
+     * -------------------------------------------------------------------------
+     */
 
     private const VALVE_STATE_IDS = [
-        18344, 50892, 37309, 57721,
-        52749, 46861, 49967, 15602, 27850, 10375,
-        33924, 19131, 58629, 12822
+        // EG
+        18344,
+        50892,
+        37309,
+        57721,
+
+        // OG
+        52749,
+        46861,
+        49967,
+        15602,
+        27850,
+        10375,
+
+        // ELW
+        33924,
+        19131,
+        58629,
+        12822
     ];
 
+    /*
+     * -------------------------------------------------------------------------
+     * FBH STELLWERTE
+     *
+     * MDT PWM-Stellwert 0 ... 100 %
+     * -------------------------------------------------------------------------
+     */
+
     private const VALVE_DEMAND_IDS = [
-        39391, 22281, 49588, 51260,
-        26389, 43578, 36459, 26819, 39276, 16937,
-        19263, 17140, 14321, 20806
+        // EG
+        39391,
+        22281,
+        49588,
+        51260,
+
+        // OG
+        26389,
+        43578,
+        36459,
+        26819,
+        39276,
+        16937,
+
+        // ELW
+        19263,
+        17140,
+        14321,
+        20806
     ];
+
+    /*
+     * =========================================================================
+     * CREATE
+     * =========================================================================
+     */
 
     public function Create(): void
     {
         parent::Create();
 
-        $this->SetVisualizationType(2);
-
-        $this->SendDebug(
-            'Create',
-            'Create() wurde ausgeführt',
-            0
-        );
+        /*
+         * Bewährter HTML-SDK-Typ analog Energy-Visu.
+         *
+         * Die Gross-/Detailansicht wird NICHT über Typ 2 gelöst.
+         * Compact / Detail entscheidet module.html anhand der verfügbaren
+         * Kachelgrösse.
+         */
+        $this->SetVisualizationType(1);
     }
+
+    /*
+     * =========================================================================
+     * APPLY CHANGES
+     * =========================================================================
+     */
 
     public function ApplyChanges(): void
     {
         parent::ApplyChanges();
 
-        $this->SetVisualizationType(2);
+        /*
+         * Wichtig:
+         * funktionierender Referenzaufbau = Type 1.
+         */
+        $this->SetVisualizationType(1);
 
-        $this->SendDebug(
-            'ApplyChanges',
-            'ApplyChanges() wurde ausgeführt',
-            0
-        );
-
+        /*
+         * Alle relevanten Variablen für Live-Updates registrieren.
+         */
         foreach ($this->GetSourceVariableIDs() as $variableID) {
-            if ($variableID > 0 && IPS_VariableExists($variableID)) {
+            if (
+                $variableID > 0
+                &&
+                IPS_VariableExists($variableID)
+            ) {
                 $this->RegisterMessage(
                     $variableID,
                     VM_UPDATE
@@ -85,36 +224,24 @@ class SulzbannWPRegelungVisu extends IPSModule
         }
     }
 
+    /*
+     * =========================================================================
+     * INITIALER HTML-INHALT
+     * =========================================================================
+     */
+
     public function GetVisualizationTile(): string
     {
-        $this->SendDebug(
-            'GetVisualizationTile',
-            'GetVisualizationTile() wurde aufgerufen',
-            0
-        );
-
         $htmlFile = __DIR__ . '/module.html';
 
-        $this->SendDebug(
-            'GetVisualizationTile',
-            'HTML-Datei: ' . $htmlFile,
-            0
-        );
-
         if (!file_exists($htmlFile)) {
-            $this->SendDebug(
-                'GetVisualizationTile',
-                'FEHLER: module.html nicht gefunden',
-                0
-            );
-
             return '
                 <div style="
                     padding:20px;
-                    font-size:16px;
-                    color:red;
+                    font-family:sans-serif;
+                    font-size:14px;
                 ">
-                    FEHLER: module.html nicht gefunden
+                    module.html nicht gefunden
                 </div>
             ';
         }
@@ -122,85 +249,77 @@ class SulzbannWPRegelungVisu extends IPSModule
         $html = file_get_contents($htmlFile);
 
         if ($html === false) {
-            $this->SendDebug(
-                'GetVisualizationTile',
-                'FEHLER: module.html konnte nicht gelesen werden',
-                0
-            );
-
             return '
                 <div style="
                     padding:20px;
-                    font-size:16px;
-                    color:red;
+                    font-family:sans-serif;
+                    font-size:14px;
                 ">
-                    FEHLER: module.html konnte nicht gelesen werden
+                    module.html konnte nicht gelesen werden
                 </div>
             ';
         }
 
-        $this->SendDebug(
-            'GetVisualizationTile',
-            'module.html gelesen, Länge: ' . strlen($html) . ' Byte',
-            0
-        );
-
+        /*
+         * Initialdaten direkt in module.html einsetzen.
+         *
+         * Dadurch stehen bereits beim ersten Rendern Daten zur Verfügung.
+         */
         $payload = $this->BuildPayload();
 
         $json = json_encode(
             $payload,
-            JSON_UNESCAPED_UNICODE |
-            JSON_UNESCAPED_SLASHES |
-            JSON_HEX_TAG |
-            JSON_HEX_AMP |
-            JSON_HEX_APOS |
+            JSON_UNESCAPED_UNICODE
+            |
+            JSON_UNESCAPED_SLASHES
+            |
+            JSON_HEX_TAG
+            |
+            JSON_HEX_AMP
+            |
+            JSON_HEX_APOS
+            |
             JSON_HEX_QUOT
         );
 
         if ($json === false) {
             $json = '{}';
-
-            $this->SendDebug(
-                'GetVisualizationTile',
-                'WARNUNG: JSON-Erstellung fehlgeschlagen',
-                0
-            );
         }
 
-        $result = str_replace(
+        return str_replace(
             '__SBWRV_INITIAL_DATA__',
             $json,
             $html
         );
-
-        $this->SendDebug(
-            'GetVisualizationTile',
-            'HTML Rückgabe, Länge: ' . strlen($result) . ' Byte',
-            0
-        );
-
-        return $result;
     }
+
+    /*
+     * =========================================================================
+     * ACTIONS AUS DER VISUALISIERUNG
+     * =========================================================================
+     */
 
     public function RequestAction(
         $Ident,
         $Value
     ): void {
-        $this->SendDebug(
-            'RequestAction',
-            'Ident=' . $Ident . ' Value=' . json_encode($Value),
-            0
-        );
+        switch ($Ident) {
+            case 'Refresh':
+                $this->SendLiveValues();
+                return;
 
-        if ($Ident === 'Refresh') {
-            $this->SendLiveValues();
-            return;
+            default:
+                throw new Exception(
+                    'Ungültige Aktion: ' . $Ident
+                );
         }
-
-        throw new Exception(
-            'Ungültige Aktion: ' . $Ident
-        );
     }
+
+    /*
+     * =========================================================================
+     * LIVE-UPDATES
+     * =========================================================================
+     */
 
     public function MessageSink(
         $TimeStamp,
@@ -226,33 +345,34 @@ class SulzbannWPRegelungVisu extends IPSModule
 
         $json = json_encode(
             $payload,
-            JSON_UNESCAPED_UNICODE |
+            JSON_UNESCAPED_UNICODE
+            |
             JSON_UNESCAPED_SLASHES
         );
 
         if ($json === false) {
-            $this->SendDebug(
-                'SendLiveValues',
-                'JSON-Erstellung fehlgeschlagen',
-                0
-            );
-
             return;
         }
-
-        $this->SendDebug(
-            'SendLiveValues',
-            'UpdateVisualizationValue: ' . strlen($json) . ' Byte',
-            0
-        );
 
         $this->UpdateVisualizationValue(
             $json
         );
     }
 
+    /*
+     * =========================================================================
+     * DATENPAKET
+     * =========================================================================
+     */
+
     private function BuildPayload(): array
     {
+        /*
+         * ---------------------------------------------------------------------
+         * WP IST MASTER
+         * ---------------------------------------------------------------------
+         */
+
         $heating = $this->ReadBool(
             self::WP_HEATING_ID
         );
@@ -274,9 +394,18 @@ class SulzbannWPRegelungVisu extends IPSModule
             $wpModeCode = 'standby';
 
         } else {
+            /*
+             * Heizen UND Kühlen gleichzeitig wäre unplausibel.
+             */
             $wpMode = 'Unplausibel';
             $wpModeCode = 'fault';
         }
+
+        /*
+         * ---------------------------------------------------------------------
+         * RAUMTEMPERATUREN
+         * ---------------------------------------------------------------------
+         */
 
         $roomTemperatures = [];
 
@@ -286,8 +415,10 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
 
             if (
-                $value !== null &&
-                $value > -30.0 &&
+                $value !== null
+                &&
+                $value > -30.0
+                &&
                 $value < 60.0
             ) {
                 $roomTemperatures[] = $value;
@@ -313,6 +444,12 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
         }
 
+        /*
+         * ---------------------------------------------------------------------
+         * OFFENE FBH-VENTILE
+         * ---------------------------------------------------------------------
+         */
+
         $openValves = 0;
 
         foreach (self::VALVE_STATE_IDS as $variableID) {
@@ -320,6 +457,12 @@ class SulzbannWPRegelungVisu extends IPSModule
                 $openValves++;
             }
         }
+
+        /*
+         * ---------------------------------------------------------------------
+         * FBH-STELLWERTE
+         * ---------------------------------------------------------------------
+         */
 
         $demands = [];
 
@@ -347,19 +490,47 @@ class SulzbannWPRegelungVisu extends IPSModule
             );
         }
 
+        /*
+         * ---------------------------------------------------------------------
+         * PAYLOAD
+         * ---------------------------------------------------------------------
+         */
+
         return [
             'type' => 'wp-regelung',
 
             'timestamp' => time(),
 
+            /*
+             * Direkt bekannte Kategorie:
+             *
+             * Technik
+             * > Heizung
+             * > Siemens OWZ
+             * > WP Regelung
+             * > Parameter
+             */
             'settingsObjectID' =>
                 self::SETTINGS_OBJECT_ID,
 
+            /*
+             * -----------------------------------------------------------------
+             * WP
+             * -----------------------------------------------------------------
+             */
+
             'wp' => [
-                'mode' => $wpMode,
-                'modeCode' => $wpModeCode,
-                'heating' => $heating,
-                'cooling' => $cooling,
+                'mode' =>
+                    $wpMode,
+
+                'modeCode' =>
+                    $wpModeCode,
+
+                'heating' =>
+                    $heating,
+
+                'cooling' =>
+                    $cooling,
 
                 'outside' =>
                     $this->ReadFloatNullable(
@@ -397,6 +568,12 @@ class SulzbannWPRegelungVisu extends IPSModule
                     )
             ],
 
+            /*
+             * -----------------------------------------------------------------
+             * RÄUME
+             * -----------------------------------------------------------------
+             */
+
             'rooms' => [
                 'count' =>
                     count($roomTemperatures),
@@ -411,12 +588,20 @@ class SulzbannWPRegelungVisu extends IPSModule
                     $roomMaximum
             ],
 
+            /*
+             * -----------------------------------------------------------------
+             * FBH
+             * -----------------------------------------------------------------
+             */
+
             'fbh' => [
                 'open' =>
                     $openValves,
 
                 'total' =>
-                    count(self::VALVE_STATE_IDS),
+                    count(
+                        self::VALVE_STATE_IDS
+                    ),
 
                 'demandAverage' =>
                     $demandAverage,
@@ -424,6 +609,12 @@ class SulzbannWPRegelungVisu extends IPSModule
                 'demandMaximum' =>
                     $demandMaximum
             ],
+
+            /*
+             * -----------------------------------------------------------------
+             * PUFFER
+             * -----------------------------------------------------------------
+             */
 
             'buffer' => [
                 'top' =>
@@ -442,6 +633,12 @@ class SulzbannWPRegelungVisu extends IPSModule
                     )
             ],
 
+            /*
+             * -----------------------------------------------------------------
+             * WARMWASSER
+             * -----------------------------------------------------------------
+             */
+
             'dhw' => [
                 'top' =>
                     $this->ReadFloatNullable(
@@ -453,6 +650,12 @@ class SulzbannWPRegelungVisu extends IPSModule
                         self::DHW_BOTTOM_ID
                     )
             ],
+
+            /*
+             * -----------------------------------------------------------------
+             * METEO MORGEN
+             * -----------------------------------------------------------------
+             */
 
             'meteo' => [
                 'maximum' =>
@@ -475,6 +678,12 @@ class SulzbannWPRegelungVisu extends IPSModule
                         self::METEO_SOLAR_ID
                     )
             ],
+
+            /*
+             * -----------------------------------------------------------------
+             * SOLCAST
+             * -----------------------------------------------------------------
+             */
 
             'solcast' => [
                 'energyP50' =>
@@ -510,9 +719,18 @@ class SulzbannWPRegelungVisu extends IPSModule
         ];
     }
 
+    /*
+     * =========================================================================
+     * QUELLVARIABLEN FÜR VM_UPDATE
+     * =========================================================================
+     */
+
     private function GetSourceVariableIDs(): array
     {
         $ids = [
+            /*
+             * WP
+             */
             self::WP_HEATING_ID,
             self::WP_COOLING_ID,
 
@@ -525,46 +743,65 @@ class SulzbannWPRegelungVisu extends IPSModule
             self::WP_COP_ID,
             self::WP_MODULATION_ID,
 
+            /*
+             * Puffer
+             */
             self::BUFFER_TOP_ID,
             self::BUFFER_MIDDLE_ID,
             self::BUFFER_BOTTOM_ID,
 
+            /*
+             * Warmwasser
+             */
             self::DHW_TOP_ID,
             self::DHW_BOTTOM_ID,
 
+            /*
+             * Meteo
+             */
             self::METEO_MAX_ID,
             self::METEO_MEAN_ID,
             self::METEO_MIN_ID,
             self::METEO_SOLAR_ID
         ];
 
+        /*
+         * Räume
+         */
         foreach (self::ROOM_TEMP_IDS as $id) {
             $ids[] = $id;
         }
 
+        /*
+         * Ventilstatus
+         */
         foreach (self::VALVE_STATE_IDS as $id) {
             $ids[] = $id;
         }
 
+        /*
+         * Stellwerte
+         */
         foreach (self::VALVE_DEMAND_IDS as $id) {
             $ids[] = $id;
         }
 
-        foreach (
-            [
-                'SolcastEnergy024P50',
-                'SolcastPeak024',
-                'SolcastConfidence024',
-                'SolcastPeakTime024',
-                'SolcastPeakWindowStart024',
-                'SolcastPeakWindowEnd024'
-            ]
-            as $ident
-        ) {
-            $id =
-                $this->GetSolcastVariableID(
-                    $ident
-                );
+        /*
+         * Solcast dynamisch über Ident.
+         */
+        $solcastIdents = [
+            'SolcastEnergy024P50',
+            'SolcastPeak024',
+            'SolcastConfidence024',
+            'SolcastPeakTime024',
+            'SolcastPeakWindowStart024',
+            'SolcastPeakWindowEnd024'
+        ];
+
+        foreach ($solcastIdents as $ident) {
+            $id = $this->GetSolcastVariableID(
+                $ident
+            );
 
             if ($id > 0) {
                 $ids[] = $id;
@@ -572,11 +809,15 @@ class SulzbannWPRegelungVisu extends IPSModule
         }
 
         return array_values(
-            array_unique(
-                $ids
-            )
+            array_unique($ids)
         );
     }
+
+    /*
+     * =========================================================================
+     * SOLCAST
+     * =========================================================================
+     */
 
     private function GetSolcastVariableID(
         string $ident
@@ -589,14 +830,14 @@ class SulzbannWPRegelungVisu extends IPSModule
             return 0;
         }
 
-        $id =
-            @IPS_GetObjectIDByIdent(
-                $ident,
-                self::SOLCAST_PARENT_ID
-            );
+        $id = @IPS_GetObjectIDByIdent(
+            $ident,
+            self::SOLCAST_PARENT_ID
+        );
 
         if (
-            $id === false ||
+            $id === false
+            ||
             !IPS_VariableExists(
                 (int) $id
             )
@@ -610,44 +851,47 @@ class SulzbannWPRegelungVisu extends IPSModule
     private function ReadSolcastFloat(
         string $ident
     ): ?float {
-        $id =
-            $this->GetSolcastVariableID(
-                $ident
-            );
+        $id = $this->GetSolcastVariableID(
+            $ident
+        );
 
         if ($id <= 0) {
             return null;
         }
 
-        return
-            $this->ReadFloatNullable(
-                $id
-            );
+        return $this->ReadFloatNullable(
+            $id
+        );
     }
 
     private function ReadSolcastInteger(
         string $ident
     ): int {
-        $id =
-            $this->GetSolcastVariableID(
-                $ident
-            );
+        $id = $this->GetSolcastVariableID(
+            $ident
+        );
 
         if ($id <= 0) {
             return 0;
         }
 
-        return
-            (int) GetValue(
-                $id
-            );
+        return (int) GetValue(
+            $id
+        );
     }
+
+    /*
+     * =========================================================================
+     * SICHERE LESEFUNKTIONEN
+     * =========================================================================
+     */
 
     private function ReadBool(
         int $variableID
     ): bool {
         if (
-            $variableID <= 0 ||
+            $variableID <= 0
+            ||
             !IPS_VariableExists(
                 $variableID
             )
@@ -655,17 +899,17 @@ class SulzbannWPRegelungVisu extends IPSModule
             return false;
         }
 
-        return
-            (bool) GetValue(
-                $variableID
-            );
+        return (bool) GetValue(
+            $variableID
+        );
     }
 
     private function ReadFloatNullable(
         int $variableID
     ): ?float {
         if (
-            $variableID <= 0 ||
+            $variableID <= 0
+            ||
             !IPS_VariableExists(
                 $variableID
             )
@@ -673,16 +917,14 @@ class SulzbannWPRegelungVisu extends IPSModule
             return null;
         }
 
-        $value =
-            GetValue(
-                $variableID
-            );
+        $value = GetValue(
+            $variableID
+        );
 
         if (!is_numeric($value)) {
             return null;
         }
 
-        return
-            (float) $value;
+        return (float) $value;
     }
 }
