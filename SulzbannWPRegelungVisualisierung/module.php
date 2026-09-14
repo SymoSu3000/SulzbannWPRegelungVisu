@@ -7,53 +7,150 @@ class SulzbannWPRegelungVisu extends IPSModule
     private const OZW_ROOT_ID = 28320;
     private const SOLCAST_PARENT_ID = 16397;
 
+    /*
+     * ============================================================
+     * WP / OZW
+     * ============================================================
+     */
+
     private const WP_HEATING_ID = 44357;
     private const WP_COOLING_ID = 17689;
+
     private const OUTSIDE_TEMP_ID = 50237;
     private const WP_FLOW_TEMP_ID = 27923;
     private const WP_RETURN_TEMP_ID = 45419;
+
     private const WP_POWER_ID = 50450;
     private const WP_HEAT_OUTPUT_ID = 32403;
     private const WP_COP_ID = 37700;
     private const WP_MODULATION_ID = 20837;
 
+    /*
+     * ============================================================
+     * SPEICHER
+     * ============================================================
+     */
+
     private const BUFFER_TOP_ID = 27553;
     private const BUFFER_MIDDLE_ID = 52270;
     private const BUFFER_BOTTOM_ID = 18594;
+
     private const DHW_TOP_ID = 39112;
     private const DHW_BOTTOM_ID = 40096;
+
+    /*
+     * ============================================================
+     * METEO
+     * ============================================================
+     */
 
     private const METEO_MAX_ID = 42622;
     private const METEO_MEAN_ID = 11157;
     private const METEO_MIN_ID = 28499;
     private const METEO_SOLAR_ID = 36980;
 
+    /*
+     * ============================================================
+     * RAUMTEMPERATUREN
+     * ============================================================
+     */
+
     private const ROOM_TEMP_IDS = [
-        47619, 43486, 20056, 59980,
-        52271, 51361, 43453, 16944, 26539, 12860,
-        32416, 25829, 45373, 29653
+        // EG
+        47619,
+        43486,
+        20056,
+        59980,
+
+        // OG
+        52271,
+        51361,
+        43453,
+        16944,
+        26539,
+        12860,
+
+        // ELW
+        32416,
+        25829,
+        45373,
+        29653
     ];
+
+    /*
+     * ============================================================
+     * FBH VENTILSTATUS
+     * ============================================================
+     */
 
     private const VALVE_STATE_IDS = [
-        18344, 50892, 37309, 57721,
-        52749, 46861, 49967, 15602, 27850, 10375,
-        33924, 19131, 58629, 12822
+        // EG
+        18344,
+        50892,
+        37309,
+        57721,
+
+        // OG
+        52749,
+        46861,
+        49967,
+        15602,
+        27850,
+        10375,
+
+        // ELW
+        33924,
+        19131,
+        58629,
+        12822
     ];
 
+    /*
+     * ============================================================
+     * FBH STELLWERTE
+     * ============================================================
+     */
+
     private const VALVE_DEMAND_IDS = [
-        39391, 22281, 49588, 51260,
-        26389, 43578, 36459, 26819, 39276, 16937,
-        19263, 17140, 14321, 20806
+        // EG
+        39391,
+        22281,
+        49588,
+        51260,
+
+        // OG
+        26389,
+        43578,
+        36459,
+        26819,
+        39276,
+        16937,
+
+        // ELW
+        19263,
+        17140,
+        14321,
+        20806
     ];
+
+    /*
+     * ============================================================
+     * CREATE
+     * ============================================================
+     */
 
     public function Create(): void
     {
         parent::Create();
 
-        // Offiziell für HTML-SDK: 1. Type 2 wird nicht verwendet.
+        /*
+         * Offizieller HTML-SDK Typ.
+         */
         $this->SetVisualizationType(1);
 
-        // Bestehende Grossansicht bleibt erhalten.
+        /*
+         * Bestehende Grossansicht.
+         */
         $this->RegisterVariableString(
             'WPRegelungGross',
             'WP Regelung Gross',
@@ -66,43 +163,92 @@ class SulzbannWPRegelungVisu extends IPSModule
         );
     }
 
+    /*
+     * ============================================================
+     * APPLY CHANGES
+     * ============================================================
+     */
+
     public function ApplyChanges(): void
     {
         parent::ApplyChanges();
+
         $this->SetVisualizationType(1);
 
-        foreach ($this->GetSourceVariableIDs() as $variableID) {
-            if ($variableID > 0 && IPS_VariableExists($variableID)) {
-                $this->RegisterMessage($variableID, VM_UPDATE);
+        foreach (
+            $this->GetSourceVariableIDs()
+            as $variableID
+        ) {
+            if (
+                $variableID > 0
+                &&
+                IPS_VariableExists($variableID)
+            ) {
+                $this->RegisterMessage(
+                    $variableID,
+                    VM_UPDATE
+                );
             }
         }
 
         $this->UpdateGrossVisualization();
     }
 
+    /*
+     * ============================================================
+     * HTML SDK
+     * ============================================================
+     */
+
     public function GetVisualizationTile(): string
     {
-        $file = __DIR__ . '/module.html';
+        $file =
+            __DIR__
+            .
+            '/module.html';
 
         if (!is_file($file)) {
-            return '<div style="padding:60px 12px;color:var(--content-color)">module.html fehlt.</div>';
+            return '
+                <div style="
+                    padding:60px 12px;
+                    color:var(--content-color)
+                ">
+                    module.html fehlt.
+                </div>
+            ';
         }
 
-        $html = file_get_contents($file);
+        $html =
+            file_get_contents(
+                $file
+            );
 
         if ($html === false) {
-            return '<div style="padding:60px 12px;color:var(--content-color)">module.html konnte nicht geladen werden.</div>';
+            return '
+                <div style="
+                    padding:60px 12px;
+                    color:var(--content-color)
+                ">
+                    module.html konnte nicht geladen werden.
+                </div>
+            ';
         }
 
-        $initialJson = json_encode(
-            $this->BuildVisualizationData(),
-            JSON_UNESCAPED_UNICODE |
-            JSON_UNESCAPED_SLASHES |
-            JSON_HEX_TAG |
-            JSON_HEX_AMP |
-            JSON_HEX_APOS |
-            JSON_HEX_QUOT
-        );
+        $initialJson =
+            json_encode(
+                $this->BuildVisualizationData(),
+                JSON_UNESCAPED_UNICODE
+                |
+                JSON_UNESCAPED_SLASHES
+                |
+                JSON_HEX_TAG
+                |
+                JSON_HEX_AMP
+                |
+                JSON_HEX_APOS
+                |
+                JSON_HEX_QUOT
+            );
 
         if ($initialJson === false) {
             $initialJson = '{}';
@@ -114,6 +260,12 @@ class SulzbannWPRegelungVisu extends IPSModule
             $html
         );
     }
+
+    /*
+     * ============================================================
+     * LIVE
+     * ============================================================
+     */
 
     public function MessageSink(
         $TimeStamp,
@@ -133,26 +285,48 @@ class SulzbannWPRegelungVisu extends IPSModule
         }
 
         $this->SendLiveValues();
+
         $this->UpdateGrossVisualization();
     }
+
+    /*
+     * ============================================================
+     * ACTIONS
+     * ============================================================
+     */
 
     public function RequestAction(
         $Ident,
         $Value
     ): void {
         switch ($Ident) {
+
             case 'Refresh':
+
                 $this->SendLiveValues();
+
                 $this->UpdateGrossVisualization();
+
                 return;
 
-            // Nur Legacy-/Cache-Fallback.
+
+            /*
+             * LEGACY-/CACHE-FALLBACK.
+             *
+             * Aktuelle Kacheln öffnen Einstellungen direkt
+             * clientlokal über openObject().
+             */
             case 'OpenSettings':
-                $settingsObjectID = $this->FindSettingsObject();
+
+                $settingsObjectID =
+                    $this->FindSettingsObject();
 
                 if (
-                    $settingsObjectID > 0 &&
-                    IPS_ObjectExists($settingsObjectID)
+                    $settingsObjectID > 0
+                    &&
+                    IPS_ObjectExists(
+                        $settingsObjectID
+                    )
                 ) {
                     $this->OpenObjectLegacy(
                         $settingsObjectID
@@ -161,15 +335,23 @@ class SulzbannWPRegelungVisu extends IPSModule
 
                 return;
 
-            // Nur Legacy-/Cache-Fallback.
+
+            /*
+             * LEGACY-/CACHE-FALLBACK.
+             */
             case 'OpenGross':
-                $grossObjectID = $this->GetIDForIdent(
-                    'WPRegelungGross'
-                );
+
+                $grossObjectID =
+                    $this->GetIDForIdent(
+                        'WPRegelungGross'
+                    );
 
                 if (
-                    $grossObjectID > 0 &&
-                    IPS_ObjectExists($grossObjectID)
+                    $grossObjectID > 0
+                    &&
+                    IPS_ObjectExists(
+                        $grossObjectID
+                    )
                 ) {
                     $this->OpenObjectLegacy(
                         $grossObjectID
@@ -178,20 +360,32 @@ class SulzbannWPRegelungVisu extends IPSModule
 
                 return;
 
+
             default:
+
                 throw new Exception(
-                    'Invalid Ident: ' .
+                    'Invalid Ident: '
+                    .
                     $Ident
                 );
         }
     }
 
+    /*
+     * ============================================================
+     * LEGACY NAVIGATION
+     * ============================================================
+     */
+
     private function OpenObjectLegacy(
         int $objectID
     ): void {
         if (
-            $objectID <= 0 ||
-            !IPS_ObjectExists($objectID)
+            $objectID <= 0
+            ||
+            !IPS_ObjectExists(
+                $objectID
+            )
         ) {
             return;
         }
@@ -200,32 +394,39 @@ class SulzbannWPRegelungVisu extends IPSModule
             IPS_GetInstanceList()
             as $instanceID
         ) {
-            $instance = IPS_GetInstance(
-                $instanceID
-            );
+            $instance =
+                IPS_GetInstance(
+                    $instanceID
+                );
 
-            $moduleName = (string) (
-                $instance['ModuleInfo']['ModuleName']
-                ??
-                ''
-            );
+            $moduleName =
+                (string) (
+                    $instance['ModuleInfo']['ModuleName']
+                    ??
+                    ''
+                );
 
             $isTileVisualization =
                 stripos(
                     $moduleName,
                     'Kachel Visualisierung'
-                ) !== false
+                )
+                !==
+                false
                 ||
                 stripos(
                     $moduleName,
                     'Tile Visualization'
-                ) !== false;
+                )
+                !==
+                false;
 
             if (!$isTileVisualization) {
                 continue;
             }
 
             try {
+
                 VISU_OpenObject(
                     (int) $instanceID,
                     $objectID,
@@ -233,6 +434,7 @@ class SulzbannWPRegelungVisu extends IPSModule
                 );
 
             } catch (Throwable $e) {
+
                 $this->SendDebug(
                     'LegacyNavigation',
                     $e->getMessage(),
@@ -242,13 +444,21 @@ class SulzbannWPRegelungVisu extends IPSModule
         }
     }
 
+    /*
+     * ============================================================
+     * LIVE JSON
+     * ============================================================
+     */
+
     private function SendLiveValues(): void
     {
-        $json = json_encode(
-            $this->BuildVisualizationData(),
-            JSON_UNESCAPED_UNICODE |
-            JSON_UNESCAPED_SLASHES
-        );
+        $json =
+            json_encode(
+                $this->BuildVisualizationData(),
+                JSON_UNESCAPED_UNICODE
+                |
+                JSON_UNESCAPED_SLASHES
+            );
 
         if ($json === false) {
             return;
@@ -259,20 +469,29 @@ class SulzbannWPRegelungVisu extends IPSModule
         );
     }
 
+    /*
+     * ============================================================
+     * GROSSANSICHT
+     * ============================================================
+     */
+
     private function UpdateGrossVisualization(): void
     {
-        $grossID = $this->GetIDForIdent(
-            'WPRegelungGross'
-        );
+        $grossID =
+            $this->GetIDForIdent(
+                'WPRegelungGross'
+            );
 
         if (
-            $grossID <= 0 ||
+            $grossID <= 0
+            ||
             !IPS_VariableExists($grossID)
         ) {
             return;
         }
 
-        $html = $this->BuildGrossVisualization();
+        $html =
+            $this->BuildGrossVisualization();
 
         if (
             GetValueString($grossID)
@@ -286,84 +505,115 @@ class SulzbannWPRegelungVisu extends IPSModule
         }
     }
 
+    /*
+     * ============================================================
+     * GROSSANSICHT HTML
+     * ============================================================
+     */
+
     private function BuildGrossVisualization(): string
     {
-        $d = $this->BuildVisualizationData();
+        $d =
+            $this->BuildVisualizationData();
 
-        $wp = $d['wp'];
-        $rooms = $d['rooms'];
-        $fbh = $d['fbh'];
-        $dhw = $d['dhw'];
-        $buffer = $d['buffer'];
-        $meteo = $d['meteo'];
-        $solcast = $d['solcast'];
+        $wp =
+            $d['wp'];
 
-        $mode = $this->H(
-            (string) $wp['mode']
-        );
+        $rooms =
+            $d['rooms'];
 
-        $modeCode = $this->H(
-            (string) $wp['modeCode']
-        );
+        $fbh =
+            $d['fbh'];
 
-        $outside = $this->H(
-            $this->FormatTemperature(
-                $wp['outside']
-            )
-        );
+        $dhw =
+            $d['dhw'];
 
-        $flow = $this->H(
-            $this->FormatTemperature(
-                $wp['flow']
-            )
-        );
+        $buffer =
+            $d['buffer'];
 
-        $return = $this->H(
-            $this->FormatTemperature(
-                $wp['return']
-            )
-        );
+        $meteo =
+            $d['meteo'];
 
-        $modulation = $this->H(
-            $this->FormatPercent(
-                $wp['modulation']
-            )
-        );
+        $solcast =
+            $d['solcast'];
 
-        $wpPower = $this->H(
-            $this->FormatPower(
-                $wp['power']
-            )
-        );
+        $mode =
+            $this->H(
+                (string) $wp['mode']
+            );
 
-        $heatOutput = $this->H(
-            $this->FormatPower(
-                $wp['heatOutput']
-            )
-        );
+        $modeCode =
+            $this->H(
+                (string) $wp['modeCode']
+            );
 
-        $cop = $this->H(
-            $wp['cop'] !== null
-                ?
-                number_format(
-                    (float) $wp['cop'],
-                    2,
-                    '.',
-                    ''
+        $outside =
+            $this->H(
+                $this->FormatTemperature(
+                    $wp['outside']
                 )
-                :
-                '—'
-        );
+            );
 
-        $roomAverage = $this->H(
-            $this->FormatTemperature(
-                $rooms['average']
-            )
-        );
+        $flow =
+            $this->H(
+                $this->FormatTemperature(
+                    $wp['flow']
+                )
+            );
+
+        $return =
+            $this->H(
+                $this->FormatTemperature(
+                    $wp['return']
+                )
+            );
+
+        $modulation =
+            $this->H(
+                $this->FormatPercent(
+                    $wp['modulation']
+                )
+            );
+
+        $wpPower =
+            $this->H(
+                $this->FormatPower(
+                    $wp['power']
+                )
+            );
+
+        $heatOutput =
+            $this->H(
+                $this->FormatPower(
+                    $wp['heatOutput']
+                )
+            );
+
+        $cop =
+            $this->H(
+                $wp['cop'] !== null
+                    ?
+                    number_format(
+                        (float) $wp['cop'],
+                        2,
+                        '.',
+                        ''
+                    )
+                    :
+                    '—'
+            );
+
+        $roomAverage =
+            $this->H(
+                $this->FormatTemperature(
+                    $rooms['average']
+                )
+            );
 
         $roomRange =
             (
-                $rooms['minimum'] !== null &&
+                $rooms['minimum'] !== null
+                &&
                 $rooms['maximum'] !== null
             )
                 ?
@@ -387,129 +637,147 @@ class SulzbannWPRegelungVisu extends IPSModule
                 :
                 '—';
 
-        $roomRange = $this->H(
-            $roomRange
-        );
+        $roomRange =
+            $this->H(
+                $roomRange
+            );
 
-        $valves = $this->H(
-            (int) $fbh['open']
-            .
-            ' / '
-            .
-            (int) $fbh['total']
-        );
-
-        $demandAverage = $this->H(
-            $this->FormatPercent(
-                $fbh['demandAverage']
-            )
-        );
-
-        $demandMaximum = $this->H(
-            $this->FormatPercent(
-                $fbh['demandMaximum']
-            )
-        );
-
-        $dhwTop = $this->H(
-            $this->FormatTemperature(
-                $dhw['top']
-            )
-        );
-
-        $dhwBottom = $this->H(
-            $this->FormatTemperature(
-                $dhw['bottom']
-            )
-        );
-
-        $bufferTop = $this->H(
-            $this->FormatTemperature(
-                $buffer['top']
-            )
-        );
-
-        $bufferMiddle = $this->H(
-            $this->FormatTemperature(
-                $buffer['middle']
-            )
-        );
-
-        $bufferBottom = $this->H(
-            $this->FormatTemperature(
-                $buffer['bottom']
-            )
-        );
-
-        $meteoMaximum = $this->H(
-            $this->FormatTemperature(
-                $meteo['maximum']
-            )
-        );
-
-        $meteoMean = $this->H(
-            $this->FormatTemperature(
-                $meteo['mean']
-            )
-        );
-
-        $meteoMinimum = $this->H(
-            $this->FormatTemperature(
-                $meteo['minimum']
-            )
-        );
-
-        $meteoSolar = $this->H(
-            $meteo['solar'] !== null
-                ?
-                number_format(
-                    (float) $meteo['solar'],
-                    2,
-                    '.',
-                    ''
-                )
+        $valves =
+            $this->H(
+                (int) $fbh['open']
                 .
-                ' kWh/m²'
-                :
-                '—'
-        );
-
-        $solcastEnergy = $this->H(
-            $solcast['energyP50'] !== null
-                ?
-                number_format(
-                    (float) $solcast['energyP50'],
-                    1,
-                    '.',
-                    ''
-                )
+                ' / '
                 .
-                ' kWh'
-                :
-                '—'
-        );
+                (int) $fbh['total']
+            );
 
-        $solcastPeak = $this->H(
-            $this->FormatPower(
-                $solcast['peak']
-            )
-        );
+        $demandAverage =
+            $this->H(
+                $this->FormatPercent(
+                    $fbh['demandAverage']
+                )
+            );
 
-        $solcastConfidence = $this->H(
-            $this->FormatPercent(
-                $solcast['confidence']
-            )
-        );
+        $demandMaximum =
+            $this->H(
+                $this->FormatPercent(
+                    $fbh['demandMaximum']
+                )
+            );
 
-        $peakTime = $this->H(
-            $this->FormatTimestamp(
-                $solcast['peakTime']
-            )
-        );
+        $dhwTop =
+            $this->H(
+                $this->FormatTemperature(
+                    $dhw['top']
+                )
+            );
+
+        $dhwBottom =
+            $this->H(
+                $this->FormatTemperature(
+                    $dhw['bottom']
+                )
+            );
+
+        $bufferTop =
+            $this->H(
+                $this->FormatTemperature(
+                    $buffer['top']
+                )
+            );
+
+        $bufferMiddle =
+            $this->H(
+                $this->FormatTemperature(
+                    $buffer['middle']
+                )
+            );
+
+        $bufferBottom =
+            $this->H(
+                $this->FormatTemperature(
+                    $buffer['bottom']
+                )
+            );
+
+        $meteoMaximum =
+            $this->H(
+                $this->FormatTemperature(
+                    $meteo['maximum']
+                )
+            );
+
+        $meteoMean =
+            $this->H(
+                $this->FormatTemperature(
+                    $meteo['mean']
+                )
+            );
+
+        $meteoMinimum =
+            $this->H(
+                $this->FormatTemperature(
+                    $meteo['minimum']
+                )
+            );
+
+        $meteoSolar =
+            $this->H(
+                $meteo['solar'] !== null
+                    ?
+                    number_format(
+                        (float) $meteo['solar'],
+                        2,
+                        '.',
+                        ''
+                    )
+                    .
+                    ' kWh/m²'
+                    :
+                    '—'
+            );
+
+        $solcastEnergy =
+            $this->H(
+                $solcast['energyP50'] !== null
+                    ?
+                    number_format(
+                        (float) $solcast['energyP50'],
+                        1,
+                        '.',
+                        ''
+                    )
+                    .
+                    ' kWh'
+                    :
+                    '—'
+            );
+
+        $solcastPeak =
+            $this->H(
+                $this->FormatPower(
+                    $solcast['peak']
+                )
+            );
+
+        $solcastConfidence =
+            $this->H(
+                $this->FormatPercent(
+                    $solcast['confidence']
+                )
+            );
+
+        $peakTime =
+            $this->H(
+                $this->FormatTimestamp(
+                    $solcast['peakTime']
+                )
+            );
 
         $peakWindow =
             (
-                $solcast['peakWindowStart'] > 0 &&
+                $solcast['peakWindowStart'] > 0
+                &&
                 $solcast['peakWindowEnd'] > 0
             )
                 ?
@@ -525,14 +793,16 @@ class SulzbannWPRegelungVisu extends IPSModule
                 :
                 '—';
 
-        $peakWindow = $this->H(
-            $peakWindow
-        );
+        $peakWindow =
+            $this->H(
+                $peakWindow
+            );
 
-        $lastUpdate = date(
-            'H:i',
-            (int) $d['timestamp']
-        );
+        $lastUpdate =
+            date(
+                'H:i',
+                (int) $d['timestamp']
+            );
 
         return <<<HTML
 <!doctype html>
@@ -614,6 +884,7 @@ body {
 
 .page {
     width:100%;
+
     padding:16px;
 }
 
@@ -649,19 +920,23 @@ body {
 
 .hero-main {
     padding:16px;
+
     background:var(--card-strong);
 }
 
 
 .hero-mini {
     min-height:88px;
+
     padding:13px;
 }
 
 
 .mode-line {
     display:flex;
+
     align-items:center;
+
     gap:10px;
 }
 
@@ -746,6 +1021,7 @@ body {
     margin-bottom:13px;
 
     font-size:16px;
+
     font-weight:700;
 }
 
@@ -826,12 +1102,14 @@ body {
             );
     }
 
+
     .hero-main {
         grid-column:
             1
             /
             -1;
     }
+
 
     .forecast-grid {
         grid-template-columns:
@@ -849,15 +1127,18 @@ body {
         padding:10px;
     }
 
+
     .hero,
     .layout {
         grid-template-columns:1fr;
     }
 
+
     .hero-main,
     .section-wide {
         grid-column:auto;
     }
+
 
     .forecast-grid {
         grid-template-columns:
@@ -867,9 +1148,11 @@ body {
             );
     }
 
+
     .label {
         font-size:12px;
     }
+
 
     .value {
         font-size:17px;
@@ -1178,41 +1461,68 @@ body {
 HTML;
     }
 
+    /*
+     * ============================================================
+     * DATEN
+     * ============================================================
+     */
+
     private function BuildVisualizationData(): array
     {
-        $heating = $this->ReadBool(
-            self::WP_HEATING_ID
-        );
+        $heating =
+            $this->ReadBool(
+                self::WP_HEATING_ID
+            );
 
-        $cooling = $this->ReadBool(
-            self::WP_COOLING_ID
-        );
+        $cooling =
+            $this->ReadBool(
+                self::WP_COOLING_ID
+            );
 
         if (
-            $heating &&
+            $heating
+            &&
             !$cooling
         ) {
-            $wpMode = 'Heizen';
-            $wpModeCode = 'heating';
+            $wpMode =
+                'Heizen';
+
+            $wpModeCode =
+                'heating';
 
         } elseif (
-            $cooling &&
+            $cooling
+            &&
             !$heating
         ) {
-            $wpMode = 'Kühlen';
-            $wpModeCode = 'cooling';
+            $wpMode =
+                'Kühlen';
+
+            $wpModeCode =
+                'cooling';
 
         } elseif (
-            !$heating &&
+            !$heating
+            &&
             !$cooling
         ) {
-            $wpMode = 'Standby';
-            $wpModeCode = 'standby';
+            $wpMode =
+                'Standby';
+
+            $wpModeCode =
+                'standby';
 
         } else {
-            $wpMode = 'Unplausibel';
-            $wpModeCode = 'fault';
+            $wpMode =
+                'Unplausibel';
+
+            $wpModeCode =
+                'fault';
         }
+
+        /*
+         * Räume
+         */
 
         $roomTemperatures = [];
 
@@ -1220,13 +1530,16 @@ HTML;
             self::ROOM_TEMP_IDS
             as $variableID
         ) {
-            $value = $this->ReadFloatNullable(
-                $variableID
-            );
+            $value =
+                $this->ReadFloatNullable(
+                    $variableID
+                );
 
             if (
-                $value !== null &&
-                $value > -30.0 &&
+                $value !== null
+                &&
+                $value > -30.0
+                &&
                 $value < 60.0
             ) {
                 $roomTemperatures[] =
@@ -1263,6 +1576,10 @@ HTML;
                 );
         }
 
+        /*
+         * Ventile
+         */
+
         $openValves = 0;
 
         foreach (
@@ -1278,15 +1595,20 @@ HTML;
             }
         }
 
+        /*
+         * Stellwerte
+         */
+
         $demands = [];
 
         foreach (
             self::VALVE_DEMAND_IDS
             as $variableID
         ) {
-            $value = $this->ReadFloatNullable(
-                $variableID
-            );
+            $value =
+                $this->ReadFloatNullable(
+                    $variableID
+                );
 
             if ($value !== null) {
                 $demands[] =
@@ -1303,13 +1625,23 @@ HTML;
             0
         ) {
             $demandAverage =
-                array_sum($demands)
+                array_sum(
+                    $demands
+                )
                 /
-                count($demands);
+                count(
+                    $demands
+                );
 
             $demandMaximum =
-                max($demands);
+                max(
+                    $demands
+                );
         }
+
+        /*
+         * Clientlokale Navigation
+         */
 
         $settingsObjectID =
             $this->FindSettingsObject();
@@ -1325,7 +1657,8 @@ HTML;
 
             'settingsObjectID' =>
                 (
-                    $settingsObjectID > 0 &&
+                    $settingsObjectID > 0
+                    &&
                     IPS_ObjectExists(
                         $settingsObjectID
                     )
@@ -1337,7 +1670,8 @@ HTML;
 
             'grossObjectID' =>
                 (
-                    $grossObjectID > 0 &&
+                    $grossObjectID > 0
+                    &&
                     IPS_ObjectExists(
                         $grossObjectID
                     )
@@ -1513,6 +1847,12 @@ HTML;
         ];
     }
 
+    /*
+     * ============================================================
+     * SOURCE IDS
+     * ============================================================
+     */
+
     private function GetSourceVariableIDs(): array
     {
         $ids = [
@@ -1541,12 +1881,13 @@ HTML;
             self::METEO_SOLAR_ID
         ];
 
-        $ids = array_merge(
-            $ids,
-            self::ROOM_TEMP_IDS,
-            self::VALVE_STATE_IDS,
-            self::VALVE_DEMAND_IDS
-        );
+        $ids =
+            array_merge(
+                $ids,
+                self::ROOM_TEMP_IDS,
+                self::VALVE_STATE_IDS,
+                self::VALVE_DEMAND_IDS
+            );
 
         foreach (
             [
@@ -1559,9 +1900,10 @@ HTML;
             ]
             as $ident
         ) {
-            $id = $this->GetSolcastVariableID(
-                $ident
-            );
+            $id =
+                $this->GetSolcastVariableID(
+                    $ident
+                );
 
             if ($id > 0) {
                 $ids[] =
@@ -1576,6 +1918,12 @@ HTML;
         );
     }
 
+    /*
+     * ============================================================
+     * SOLCAST
+     * ============================================================
+     */
+
     private function GetSolcastVariableID(
         string $ident
     ): int {
@@ -1587,13 +1935,15 @@ HTML;
             return 0;
         }
 
-        $id = @IPS_GetObjectIDByIdent(
-            $ident,
-            self::SOLCAST_PARENT_ID
-        );
+        $id =
+            @IPS_GetObjectIDByIdent(
+                $ident,
+                self::SOLCAST_PARENT_ID
+            );
 
         if (
-            $id === false ||
+            $id === false
+            ||
             !IPS_VariableExists(
                 (int) $id
             )
@@ -1604,6 +1954,7 @@ HTML;
         return
             (int) $id;
     }
+
 
     private function ReadSolcastFloat(
         string $ident
@@ -1623,6 +1974,7 @@ HTML;
                 null;
     }
 
+
     private function ReadSolcastInteger(
         string $ident
     ): int {
@@ -1634,10 +1986,18 @@ HTML;
         return
             $id > 0
                 ?
-                (int) GetValue($id)
+                (int) GetValue(
+                    $id
+                )
                 :
                 0;
     }
+
+    /*
+     * ============================================================
+     * SETTINGS
+     * ============================================================
+     */
 
     private function FindSettingsObject(): int
     {
@@ -1673,13 +2033,17 @@ HTML;
                 $wpRegulation;
     }
 
+
     private function FindRecursiveByName(
         int $parentID,
         string $name
     ): int {
         if (
-            $parentID <= 0 ||
-            !IPS_ObjectExists($parentID)
+            $parentID <= 0
+            ||
+            !IPS_ObjectExists(
+                $parentID
+            )
         ) {
             return 0;
         }
@@ -1705,7 +2069,9 @@ HTML;
                 as $childID
             ) {
                 if (
-                    IPS_GetName($childID)
+                    IPS_GetName(
+                        $childID
+                    )
                     ===
                     $name
                 ) {
@@ -1720,6 +2086,12 @@ HTML;
 
         return 0;
     }
+
+    /*
+     * ============================================================
+     * FORMAT
+     * ============================================================
+     */
 
     private function FormatTemperature(
         ?float $value
@@ -1739,6 +2111,7 @@ HTML;
                 ' °C';
     }
 
+
     private function FormatPower(
         ?float $value
     ): string {
@@ -1756,6 +2129,7 @@ HTML;
                 .
                 ' kW';
     }
+
 
     private function FormatPercent(
         ?float $value
@@ -1775,6 +2149,7 @@ HTML;
                 ' %';
     }
 
+
     private function FormatTimestamp(
         int $timestamp
     ): string {
@@ -1789,23 +2164,32 @@ HTML;
                 );
     }
 
+
     private function H(
         string $value
     ): string {
         return
             htmlspecialchars(
                 $value,
-                ENT_QUOTES |
+                ENT_QUOTES
+                |
                 ENT_SUBSTITUTE,
                 'UTF-8'
             );
     }
 
+    /*
+     * ============================================================
+     * SAFE READ
+     * ============================================================
+     */
+
     private function ReadBool(
         int $variableID
     ): bool {
         if (
-            $variableID <= 0 ||
+            $variableID <= 0
+            ||
             !IPS_VariableExists(
                 $variableID
             )
@@ -1819,11 +2203,13 @@ HTML;
             );
     }
 
+
     private function ReadFloatNullable(
         int $variableID
     ): ?float {
         if (
-            $variableID <= 0 ||
+            $variableID <= 0
+            ||
             !IPS_VariableExists(
                 $variableID
             )
