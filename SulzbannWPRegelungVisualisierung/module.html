@@ -1,520 +1,2129 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        :root {
-            color-scheme: light dark;
-            --ems-background: #ffffff;
-            --ems-text: #111111;
-            --ems-muted: #55585d;
-            --ems-line: #d8dade;
-            --ems-panel: transparent;
-            --ems-panel-strong: #f5f6f7;
-            --ems-purple: #a855f7;
-            --ems-yellow: #f4b400;
-            --ems-blue: #31a8e0;
-            --ems-green: #18b88a;
-            --ems-orange: #ff7a45;
-        }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --ems-background: transparent;
-                --ems-text: var(--content-color, #f3f5f7);
-                --ems-muted: rgba(235, 240, 244, 0.66);
-                --ems-line: rgba(225, 240, 246, 0.18);
-                --ems-panel: rgba(255, 255, 255, 0.055);
-                --ems-panel-strong: rgba(255, 255, 255, 0.085);
-                --ems-purple: #b967ff;
-                --ems-yellow: #ffc21a;
-                --ems-blue: #43b8ef;
-                --ems-green: #25d3a1;
-                --ems-orange: #ff9468;
-            }
-        }
+<meta charset="utf-8">
 
-        * {
-            box-sizing: border-box;
-        }
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+>
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            overflow: hidden;
-            background: var(--ems-background);
-            color: var(--ems-text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-        }
+<script src="/icons.js"></script>
 
-        .view-shell {
-            width: 100%;
-            height: 100%;
-            padding: 54px 10px 10px;
-            display: grid;
-            grid-template-rows: minmax(118px, 1fr) 40px minmax(136px, 1fr);
-            min-height: 0;
-        }
+<style>
 
-        .top-grid,
-        .bottom-grid {
-            display: grid;
-            min-height: 0;
-        }
+/* ============================================================
+   THEME
+============================================================ */
 
-        .top-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+:root {
+    color-scheme: light dark;
 
-        .bottom-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-        }
+    --sb-text:
+        var(
+            --content-color,
+            #202124
+        );
 
-        .panel,
-        .metric,
-        .strategy {
-            min-width: 0;
-            border-color: var(--ems-line);
-        }
+    --sb-muted:
+        color-mix(
+            in srgb,
+            var(--sb-text) 62%,
+            transparent
+        );
 
-        .panel {
-            display: grid;
-            grid-template-columns: 34px minmax(0, 1fr);
-            align-content: center;
-            gap: 10px;
-            padding: 14px 18px;
-            background: var(--ems-panel);
-        }
+    --sb-card:
+        color-mix(
+            in srgb,
+            var(--sb-text) 7%,
+            transparent
+        );
 
-        .panel:first-child {
-            border-right: 1px solid var(--ems-line);
-        }
+    --sb-soft:
+        color-mix(
+            in srgb,
+            var(--sb-text) 10%,
+            transparent
+        );
 
-        .strategy {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            border-top: 1px solid var(--ems-line);
-            border-bottom: 1px solid var(--ems-line);
-            background: var(--ems-panel-strong);
-            font-size: 14px;
-            font-weight: 700;
-        }
+    --sb-border:
+        color-mix(
+            in srgb,
+            var(--sb-text) 17%,
+            transparent
+        );
 
-        .bottom-grid {
-            background: var(--ems-panel);
-        }
+    --sb-heating:#d97f2b;
+    --sb-cooling:#2e8ec8;
+    --sb-standby:#78909c;
+    --sb-fault:#d84a4a;
+}
 
-        .metric {
-            display: grid;
-            grid-template-columns: 28px minmax(0, 1fr);
-            align-content: center;
-            gap: 8px;
-            padding: 12px 14px;
-            border-right: 1px solid var(--ems-line);
-        }
 
-        .metric:last-child {
-            border-right: 0;
-        }
+@media (prefers-color-scheme:dark) {
 
-        .icon {
-            align-self: center;
-            justify-self: center;
-            width: 32px;
-            height: 32px;
-            line-height: 1;
-        }
+    :root {
+        --sb-text:
+            var(
+                --content-color,
+                #f3f5f7
+            );
 
-        .icon svg {
-            display: block;
-            width: 100%;
-            height: 100%;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+        --sb-muted:
+            color-mix(
+                in srgb,
+                var(--sb-text) 68%,
+                transparent
+            );
 
-        .icon.target { color: var(--ems-purple); }
-        .icon.forecast { color: var(--ems-yellow); }
-        .icon.pv { color: var(--ems-yellow); }
-        .icon.grid { color: var(--ems-blue); }
-        .icon.soc { color: var(--ems-green); }
-        .icon.limit { color: var(--ems-orange); }
+        --sb-card:
+            rgba(
+                255,
+                255,
+                255,
+                .055
+            );
 
-        .copy {
-            min-width: 0;
-        }
+        --sb-soft:
+            rgba(
+                255,
+                255,
+                255,
+                .085
+            );
 
-        .label {
-            margin-bottom: 3px;
-            color: var(--ems-muted);
-            font-size: 13px;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        --sb-border:
+            rgba(
+                225,
+                240,
+                246,
+                .18
+            );
 
-        .value {
-            font-size: 18px;
-            font-weight: 750;
-            line-height: 1.2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        --sb-heating:#ff9c48;
+        --sb-cooling:#46a9e5;
+        --sb-standby:#91a0a8;
+        --sb-fault:#ef6262;
+    }
+}
 
-        .subvalue {
-            margin-top: 4px;
-            color: var(--ems-muted);
-            font-size: 13px;
-            line-height: 1.25;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
 
-        .metric .value {
-            font-size: 18px;
-        }
+/* ============================================================
+   BASIS
+============================================================ */
 
-        @media (max-width: 540px) {
-            .view-shell {
-                padding: 50px 6px 5px;
-                grid-template-rows: minmax(0, 1fr) 32px minmax(0, 0.78fr);
-            }
+* {
+    box-sizing:border-box;
+}
 
-            .panel {
-                grid-template-columns: 30px minmax(0, 1fr);
-                gap: 6px;
-                padding: 6px 8px;
-            }
 
-            .metric {
-                grid-template-columns: 26px minmax(0, 1fr);
-                gap: 4px;
-                padding: 5px 6px;
-            }
+html,
+body {
+    margin:0;
+    padding:0;
 
-            .label,
-            .subvalue {
-                font-size: 12px;
-            }
+    width:100%;
+    height:100%;
 
-            .value,
-            .metric .value {
-                font-size: 16px;
-            }
+    overflow:hidden;
 
-            .strategy {
-                font-size: 13px;
-            }
+    background:transparent;
 
-            .icon {
-                width: 28px;
-                height: 28px;
-            }
-        }
-    </style>
+    color:var(--sb-text);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+
+button {
+    font:inherit;
+    color:inherit;
+}
+
+
+#app {
+    width:100%;
+    height:100%;
+
+    overflow:hidden;
+}
+
+
+/* ============================================================
+   KACHEL
+============================================================ */
+
+.view-shell {
+    width:100%;
+    height:100%;
+
+    min-height:0;
+
+    padding:
+        50px
+        10px
+        10px
+        10px;
+}
+
+
+.compact {
+    display:flex;
+
+    flex-direction:column;
+
+    gap:7px;
+
+    min-height:0;
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.compact-head {
+    flex:
+        0
+        0
+        auto;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:10px;
+
+    min-height:34px;
+}
+
+
+.compact-mode {
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    min-width:0;
+}
+
+
+.status-dot {
+    width:10px;
+    height:10px;
+
+    min-width:10px;
+
+    border-radius:50%;
+
+    background:var(--sb-standby);
+}
+
+
+.status-dot.heating {
+    background:var(--sb-heating);
+}
+
+
+.status-dot.cooling {
+    background:var(--sb-cooling);
+}
+
+
+.status-dot.standby {
+    background:var(--sb-standby);
+}
+
+
+.status-dot.fault {
+    background:var(--sb-fault);
+}
+
+
+.label {
+    font-size:13px;
+    line-height:1.18;
+
+    color:var(--sb-muted);
+}
+
+
+.compact-mode-value {
+    margin-top:2px;
+
+    font-size:17px;
+    line-height:1.15;
+
+    font-weight:700;
+}
+
+
+/* ============================================================
+   HAUPT-AKTIONEN
+============================================================ */
+
+.actions {
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    flex:
+        0
+        0
+        auto;
+}
+
+
+.action-button {
+    width:36px;
+    height:36px;
+
+    padding:0;
+
+    border:
+        1px
+        solid
+        var(--sb-border);
+
+    border-radius:8px;
+
+    background:var(--sb-soft);
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    font-size:14px;
+    font-weight:600;
+}
+
+
+.action-button:active {
+    opacity:.72;
+}
+
+
+.action-button:disabled {
+    opacity:.38;
+
+    cursor:default;
+}
+
+
+/* ============================================================
+   SEITENWAHL
+============================================================ */
+
+.page-selector {
+    flex:
+        0
+        0
+        auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap:5px;
+
+    padding:2px;
+
+    border:
+        1px
+        solid
+        var(--sb-border);
+
+    border-radius:8px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--sb-text) 4%,
+            transparent
+        );
+}
+
+
+.page-button {
+    min-height:30px;
+
+    padding:
+        4px
+        10px;
+
+    border:0;
+
+    border-radius:6px;
+
+    background:transparent;
+
+    color:var(--sb-muted);
+
+    cursor:pointer;
+
+    font-size:13px;
+    line-height:1.1;
+
+    font-weight:600;
+}
+
+
+.page-button.active {
+    background:var(--sb-soft);
+
+    color:var(--sb-text);
+}
+
+
+.page-button:active {
+    opacity:.72;
+}
+
+
+/* ============================================================
+   SEITENBEREICH
+============================================================ */
+
+/*
+ * KEIN vertikales internes Scrollen.
+ *
+ * Stattdessen immer genau eine Datenseite darstellen.
+ */
+
+.compact-pages {
+    flex:
+        1
+        1
+        auto;
+
+    min-height:0;
+
+    overflow:hidden;
+}
+
+
+.page-panel {
+    width:100%;
+    height:100%;
+
+    min-height:0;
+
+    display:none;
+}
+
+
+.page-panel.active {
+    display:block;
+}
+
+
+/* ============================================================
+   DATENKARTEN
+============================================================ */
+
+.compact-grid {
+    width:100%;
+    height:100%;
+
+    min-height:0;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0,1fr)
+        );
+
+    grid-template-rows:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap:6px;
+}
+
+
+.card {
+    background:var(--sb-card);
+
+    border:
+        1px
+        solid
+        var(--sb-border);
+
+    border-radius:9px;
+
+    min-width:0;
+    min-height:0;
+}
+
+
+.compact-card {
+    padding:
+        6px
+        9px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    overflow:hidden;
+}
+
+
+.value {
+    margin-top:3px;
+
+    font-size:17px;
+    line-height:1.15;
+
+    font-weight:700;
+
+    white-space:nowrap;
+}
+
+
+/* ============================================================
+   MOBILE / TABLET
+============================================================ */
+
+@media (max-width:700px) {
+
+    .view-shell {
+        padding:
+            48px
+            7px
+            7px
+            7px;
+    }
+
+
+    .compact-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0,1fr)
+            );
+
+        grid-template-rows:
+            repeat(
+                3,
+                minmax(0,1fr)
+            );
+
+        gap:5px;
+    }
+
+
+    .compact-card {
+        padding:
+            5px
+            8px;
+    }
+
+
+    .label {
+        font-size:12px;
+    }
+
+
+    .value {
+        font-size:16px;
+    }
+
+
+    .compact-mode-value {
+        font-size:16px;
+    }
+
+
+    .page-button {
+        min-height:29px;
+
+        font-size:12px;
+    }
+}
+
+
+@media (max-width:380px) {
+
+    .compact-card {
+        padding:
+            4px
+            7px;
+    }
+
+
+    .value {
+        font-size:15px;
+    }
+}
+
+
+/* ============================================================
+   SEHR NIEDRIGE KACHEL
+============================================================ */
+
+@media (max-height:330px) {
+
+    .view-shell {
+        padding-top:46px;
+    }
+
+
+    .compact {
+        gap:5px;
+    }
+
+
+    .compact-head {
+        min-height:30px;
+    }
+
+
+    .action-button {
+        width:32px;
+        height:32px;
+    }
+
+
+    .page-button {
+        min-height:26px;
+
+        padding-top:2px;
+        padding-bottom:2px;
+    }
+
+
+    .compact-card {
+        padding-top:3px;
+        padding-bottom:3px;
+    }
+}
+
+</style>
+
 </head>
+
+
 <body>
-    <main class="view-shell">
-        <section class="top-grid">
-            <article class="panel">
-                <div class="icon target" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="7"></circle>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                </div>
-                <div class="copy">
-                    <div class="label">Nächstes Ziel</div>
-                    <div class="value" id="target">—</div>
-                    <div class="subvalue" id="targetSub">—</div>
-                </div>
-            </article>
 
-            <article class="panel">
-                <div class="icon forecast" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M5 4v16M9 4v16M13 4v16M17 4v16M5 4h14v16H5z"></path>
-                    </svg>
-                </div>
-                <div class="copy">
-                    <div class="label">PV-Prognose</div>
-                    <div class="value" id="forecast">—</div>
-                    <div class="subvalue" id="forecastSub">—</div>
-                </div>
-            </article>
-        </section>
 
-        <div class="strategy">
-            <span class="icon forecast" aria-hidden="true" style="width:22px;height:22px">
-                <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
-                </svg>
-            </span>
-            <span id="strategy">—</span>
+<div id="app"></div>
+
+
+
+<!-- ============================================================
+     COMPACT TEMPLATE
+============================================================ -->
+
+<template id="compactTemplate">
+
+    <div class="view-shell compact">
+
+
+        <!-- ====================================================
+             KOPF
+        ===================================================== -->
+
+        <div class="compact-head">
+
+
+            <div class="compact-mode">
+
+                <span
+                    data-role="modeDot"
+                    class="status-dot standby"
+                ></span>
+
+
+                <div>
+
+                    <div class="label">
+                        WP Master-Betriebsart
+                    </div>
+
+
+                    <div
+                        class="compact-mode-value"
+                        data-role="mode"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="actions">
+
+
+                <button
+                    data-role="grossButton"
+                    class="action-button"
+                    type="button"
+                    title="Grossansicht"
+                    aria-label="Grossansicht"
+                >
+                    ↗
+                </button>
+
+
+                <button
+                    data-role="settingsButton"
+                    class="action-button"
+                    type="button"
+                    title="Einstellungen"
+                    aria-label="Einstellungen"
+                >
+                    ⚙
+                </button>
+
+
+            </div>
+
         </div>
 
-        <section class="bottom-grid">
-            <article class="metric">
-                <div class="icon pv" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="4"></circle>
-                        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
-                    </svg>
-                </div>
-                <div class="copy">
-                    <div class="label">PV</div>
-                    <div class="value" id="pv">—</div>
-                </div>
-            </article>
 
-            <article class="metric">
-                <div class="icon grid" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M4 9h16M4 9l3-3M4 9l3 3M20 15H4M20 15l-3-3M20 15l-3 3"></path>
-                    </svg>
-                </div>
-                <div class="copy">
-                    <div class="label">Netz</div>
-                    <div class="value" id="grid">—</div>
-                </div>
-            </article>
 
-            <article class="metric">
-                <div class="icon soc" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <rect x="5" y="4" width="13" height="16" rx="1"></rect>
-                        <path d="M18 9h2v6h-2M9 8h5v8H9z"></path>
-                    </svg>
+        <!-- ====================================================
+             SEITENWAHL
+        ===================================================== -->
+
+        <div class="page-selector">
+
+
+            <button
+                data-page-button="0"
+                class="page-button active"
+                type="button"
+            >
+                Betrieb
+            </button>
+
+
+            <button
+                data-page-button="1"
+                class="page-button"
+                type="button"
+            >
+                Speicher
+            </button>
+
+
+        </div>
+
+
+
+        <!-- ====================================================
+             DATENSEITEN
+        ===================================================== -->
+
+        <div class="compact-pages">
+
+
+            <!-- ================================================
+                 SEITE 1 - BETRIEB
+            ================================================= -->
+
+            <div
+                data-page-panel="0"
+                class="page-panel active"
+            >
+
+
+                <div class="compact-grid">
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Aussentemperatur
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="outside"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            WP Vorlauf
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="flow"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            WP Rücklauf
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="return"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Raumtemperatur Ø
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="roomAverage"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            FBH Ventile
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="valvesOpen"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Stellwert max.
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="demandMaximum"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
                 </div>
-                <div class="copy">
-                    <div class="label">SOC</div>
-                    <div class="value" id="soc">—</div>
+
+
+            </div>
+
+
+
+            <!-- ================================================
+                 SEITE 2 - SPEICHER
+            ================================================= -->
+
+            <div
+                data-page-panel="1"
+                class="page-panel"
+            >
+
+
+                <div class="compact-grid">
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Boiler oben
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="dhwTop"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Boiler unten
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="dhwBottom"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Puffer oben
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="bufferTop"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Puffer Mitte
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="bufferMiddle"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            Puffer unten
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="bufferBottom"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="card compact-card">
+
+                        <div class="label">
+                            WP Modulation
+                        </div>
+
+                        <div
+                            class="value"
+                            data-role="modulation"
+                        >
+                            —
+                        </div>
+
+                    </div>
+
+
                 </div>
-            </article>
 
-            <article class="metric">
-                <div class="icon limit" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M4 17a8 8 0 0 1 16 0"></path>
-                        <path d="M12 17l4-6"></path>
-                        <circle cx="12" cy="17" r="1.3"></circle>
-                    </svg>
-                </div>
-                <div class="copy">
-                    <div class="label">Gesamtlimit</div>
-                    <div class="value" id="limit">—</div>
-                </div>
-            </article>
-        </section>
-    </main>
 
-    <script>
-        "use strict";
+            </div>
 
-        const INITIAL_DATA = __SBEMSV_INITIAL_DATA__;
-        let currentData = isObject(INITIAL_DATA) ? cloneValue(INITIAL_DATA) : {};
-        let refreshAttempts = 0;
-        let refreshTimer = null;
 
-        function isObject(value) {
-            return value !== null && typeof value === "object" && !Array.isArray(value);
-        }
+        </div>
 
-        function cloneValue(value) {
-            if (Array.isArray(value)) {
-                return value.map(cloneValue);
+
+    </div>
+
+</template>
+
+
+
+<script>
+
+"use strict";
+
+
+const INITIAL_DATA =
+    __SBWRV_INITIAL_DATA__;
+
+
+let currentData =
+    isObject(
+        INITIAL_DATA
+    )
+        ?
+        cloneValue(
+            INITIAL_DATA
+        )
+        :
+        {};
+
+
+let refreshAttempts =
+    0;
+
+
+let refreshTimer =
+    null;
+
+
+/*
+ * Die Seitenauswahl ist rein lokal.
+ */
+let currentPage =
+    0;
+
+
+/* ============================================================
+   OBJECT / MERGE
+============================================================ */
+
+function isObject(value) {
+
+    return (
+        value !== null
+        &&
+        typeof value
+        ===
+        "object"
+        &&
+        !Array.isArray(value)
+    );
+}
+
+
+function cloneValue(value) {
+
+    if (
+        Array.isArray(value)
+    ) {
+
+        return value.map(
+            cloneValue
+        );
+    }
+
+
+    if (
+        isObject(value)
+    ) {
+
+        const out =
+            {};
+
+
+        Object.keys(
+            value
+        )
+        .forEach(
+            key => {
+
+                out[key] =
+                    cloneValue(
+                        value[key]
+                    );
+            }
+        );
+
+
+        return out;
+    }
+
+
+    return value;
+}
+
+
+function mergeData(
+    base,
+    incoming
+) {
+
+    const result =
+        isObject(base)
+            ?
+            cloneValue(base)
+            :
+            {};
+
+
+    if (
+        !isObject(incoming)
+    ) {
+        return result;
+    }
+
+
+    Object.keys(
+        incoming
+    )
+    .forEach(
+        key => {
+
+            const next =
+                incoming[key];
+
+
+            if (
+                isObject(next)
+            ) {
+
+                result[key] =
+                    mergeData(
+                        isObject(
+                            result[key]
+                        )
+                            ?
+                            result[key]
+                            :
+                            {},
+                        next
+                    );
+
+                return;
             }
 
-            if (!isObject(value)) {
-                return value;
-            }
 
-            const result = {};
-            Object.keys(value).forEach(key => {
-                result[key] = cloneValue(value[key]);
-            });
-            return result;
-        }
+            /*
+             * Null oder undefined darf einen vorhandenen
+             * gültigen Wert nicht zerstören.
+             */
+            if (
+                next === null
+                ||
+                typeof next
+                ===
+                "undefined"
+            ) {
 
-        function mergeData(base, incoming) {
-            const result = isObject(base) ? cloneValue(base) : {};
-
-            if (!isObject(incoming)) {
-                return result;
-            }
-
-            Object.keys(incoming).forEach(key => {
-                const next = incoming[key];
-
-                if (isObject(next)) {
-                    result[key] = mergeData(isObject(result[key]) ? result[key] : {}, next);
-                    return;
+                if (
+                    !(key in result)
+                ) {
+                    result[key] =
+                        next;
                 }
 
-                if (next === null || typeof next === "undefined") {
-                    if (!(key in result)) {
-                        result[key] = next;
+                return;
+            }
+
+
+            result[key] =
+                next;
+        }
+    );
+
+
+    return result;
+}
+
+
+/* ============================================================
+   PAYLOAD PRÜFEN
+============================================================ */
+
+function isExpectedPayload(data) {
+
+    if (
+        !isObject(data)
+    ) {
+        return false;
+    }
+
+
+    return (
+        isObject(data.wp)
+        ||
+        isObject(data.rooms)
+        ||
+        isObject(data.fbh)
+        ||
+        isObject(data.dhw)
+        ||
+        isObject(data.buffer)
+        ||
+        isObject(data.meteo)
+        ||
+        isObject(data.solcast)
+        ||
+        typeof data.settingsObjectID
+        ===
+        "number"
+        ||
+        typeof data.grossObjectID
+        ===
+        "number"
+    );
+}
+
+
+function hasCoreData() {
+
+    const wp =
+        isObject(
+            currentData.wp
+        )
+            ?
+            currentData.wp
+            :
+            {};
+
+
+    const rooms =
+        isObject(
+            currentData.rooms
+        )
+            ?
+            currentData.rooms
+            :
+            {};
+
+
+    const fbh =
+        isObject(
+            currentData.fbh
+        )
+            ?
+            currentData.fbh
+            :
+            {};
+
+
+    return (
+        typeof wp.mode
+        ===
+        "string"
+        &&
+        wp.mode.length
+        >
+        0
+        &&
+        (
+            Number.isFinite(
+                wp.outside
+            )
+            ||
+            Number.isFinite(
+                wp.flow
+            )
+            ||
+            Number.isFinite(
+                wp.return
+            )
+            ||
+            Number.isFinite(
+                rooms.average
+            )
+            ||
+            Number.isFinite(
+                fbh.total
+            )
+        )
+    );
+}
+
+
+/* ============================================================
+   DOM
+============================================================ */
+
+function allRole(role) {
+
+    return document.querySelectorAll(
+        '[data-role="'
+        +
+        role
+        +
+        '"]'
+    );
+}
+
+
+function setRoleText(
+    role,
+    value
+) {
+
+    allRole(
+        role
+    )
+    .forEach(
+        element => {
+
+            if (
+                element.textContent
+                !==
+                value
+            ) {
+                element.textContent =
+                    value;
+            }
+        }
+    );
+}
+
+
+/* ============================================================
+   FORMAT
+============================================================ */
+
+function isNumber(value) {
+
+    return (
+        typeof value
+        ===
+        "number"
+        &&
+        Number.isFinite(value)
+    );
+}
+
+
+function fmt(
+    value,
+    digits,
+    suffix
+) {
+
+    return isNumber(value)
+        ?
+        value.toFixed(
+            digits
+        )
+        +
+        suffix
+        :
+        "—";
+}
+
+
+function fmtTemp(value) {
+
+    return fmt(
+        value,
+        1,
+        " °C"
+    );
+}
+
+
+function fmtPercent(value) {
+
+    return fmt(
+        value,
+        0,
+        " %"
+    );
+}
+
+
+/* ============================================================
+   RENDER
+============================================================ */
+
+function renderCompact() {
+
+    const app =
+        document.getElementById(
+            "app"
+        );
+
+
+    const tpl =
+        document.getElementById(
+            "compactTemplate"
+        );
+
+
+    app.innerHTML =
+        "";
+
+
+    app.appendChild(
+        tpl.content.cloneNode(
+            true
+        )
+    );
+
+
+    bindButtons();
+
+    bindPageButtons();
+
+    showPage(
+        currentPage
+    );
+
+    applyData();
+}
+
+
+/* ============================================================
+   LOKALE SEITENWAHL
+============================================================ */
+
+function showPage(page) {
+
+    const requested =
+        Number(page);
+
+
+    currentPage =
+        requested === 1
+            ?
+            1
+            :
+            0;
+
+
+    document
+        .querySelectorAll(
+            "[data-page-panel]"
+        )
+        .forEach(
+            panel => {
+
+                const panelPage =
+                    Number(
+                        panel.getAttribute(
+                            "data-page-panel"
+                        )
+                    );
+
+
+                panel.classList.toggle(
+                    "active",
+                    panelPage
+                    ===
+                    currentPage
+                );
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            "[data-page-button]"
+        )
+        .forEach(
+            button => {
+
+                const buttonPage =
+                    Number(
+                        button.getAttribute(
+                            "data-page-button"
+                        )
+                    );
+
+
+                button.classList.toggle(
+                    "active",
+                    buttonPage
+                    ===
+                    currentPage
+                );
+            }
+        );
+}
+
+
+function bindPageButtons() {
+
+    document
+        .querySelectorAll(
+            "[data-page-button]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    event => {
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+
+                        showPage(
+                            button.getAttribute(
+                                "data-page-button"
+                            )
+                        );
                     }
-                    return;
+                );
+            }
+        );
+}
+
+
+/* ============================================================
+   CLIENTLOKALE NAVIGATION
+============================================================ */
+
+function openLocalObject(
+    objectID
+) {
+
+    const target =
+        Number(
+            objectID
+            ||
+            0
+        );
+
+
+    if (
+        target <= 0
+        ||
+        typeof openObject
+        !==
+        "function"
+    ) {
+        return false;
+    }
+
+
+    try {
+
+        /*
+         * Nur der aktuelle Client navigiert.
+         */
+        openObject(
+            target
+        );
+
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "SBWRV openObject failed",
+            error
+        );
+
+
+        return false;
+    }
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+function bindButtons() {
+
+    allRole(
+        "settingsButton"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    if (
+                        !openLocalObject(
+                            currentData.settingsObjectID
+                        )
+                    ) {
+
+                        requestRefresh(
+                            true
+                        );
+                    }
                 }
-
-                result[key] = next;
-            });
-
-            return result;
+            );
         }
+    );
 
-        function isExpectedPayload(data) {
-            if (!isObject(data)) {
-                return false;
-            }
 
-            return [
-                "strategy", "status", "target", "socNeed", "forecastEnergy",
-                "forecastPeak", "forecastDuration", "pv", "grid", "soc", "limit"
-            ].some(key => Object.prototype.hasOwnProperty.call(data, key));
+    allRole(
+        "grossButton"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    if (
+                        !openLocalObject(
+                            currentData.grossObjectID
+                        )
+                    ) {
+
+                        requestRefresh(
+                            true
+                        );
+                    }
+                }
+            );
         }
+    );
+}
 
-        function hasCoreData() {
-            return typeof currentData.strategy === "string"
-                || typeof currentData.target === "string"
-                || Number.isFinite(Number(currentData.pv));
+
+/* ============================================================
+   DATEN
+============================================================ */
+
+function applyData() {
+
+    const d =
+        isObject(
+            currentData
+        )
+            ?
+            currentData
+            :
+            {};
+
+
+    const wp =
+        isObject(
+            d.wp
+        )
+            ?
+            d.wp
+            :
+            {};
+
+
+    const rooms =
+        isObject(
+            d.rooms
+        )
+            ?
+            d.rooms
+            :
+            {};
+
+
+    const fbh =
+        isObject(
+            d.fbh
+        )
+            ?
+            d.fbh
+            :
+            {};
+
+
+    const dhw =
+        isObject(
+            d.dhw
+        )
+            ?
+            d.dhw
+            :
+            {};
+
+
+    const buffer =
+        isObject(
+            d.buffer
+        )
+            ?
+            d.buffer
+            :
+            {};
+
+
+    setRoleText(
+        "mode",
+        typeof wp.mode
+        ===
+        "string"
+            ?
+            wp.mode
+            :
+            "—"
+    );
+
+
+    allRole(
+        "modeDot"
+    )
+    .forEach(
+        element => {
+
+            element.className =
+                "status-dot "
+                +
+                (
+                    typeof wp.modeCode
+                    ===
+                    "string"
+                        ?
+                        wp.modeCode
+                        :
+                        "standby"
+                );
         }
+    );
 
-        function numeric(value, decimals) {
-            if (value === null || typeof value === "undefined" || value === "") {
-                return null;
-            }
 
-            const number = Number(value);
-            return Number.isFinite(number) ? number.toFixed(decimals) : null;
+    setRoleText(
+        "outside",
+        fmtTemp(
+            wp.outside
+        )
+    );
+
+
+    setRoleText(
+        "flow",
+        fmtTemp(
+            wp.flow
+        )
+    );
+
+
+    setRoleText(
+        "return",
+        fmtTemp(
+            wp.return
+        )
+    );
+
+
+    setRoleText(
+        "modulation",
+        fmtPercent(
+            wp.modulation
+        )
+    );
+
+
+    setRoleText(
+        "roomAverage",
+        fmtTemp(
+            rooms.average
+        )
+    );
+
+
+    setRoleText(
+        "valvesOpen",
+        (
+            isNumber(
+                fbh.open
+            )
+            &&
+            isNumber(
+                fbh.total
+            )
+        )
+            ?
+            fbh.open
+            +
+            " / "
+            +
+            fbh.total
+            :
+            "—"
+    );
+
+
+    setRoleText(
+        "demandMaximum",
+        fmtPercent(
+            fbh.demandMaximum
+        )
+    );
+
+
+    setRoleText(
+        "dhwTop",
+        fmtTemp(
+            dhw.top
+        )
+    );
+
+
+    setRoleText(
+        "dhwBottom",
+        fmtTemp(
+            dhw.bottom
+        )
+    );
+
+
+    setRoleText(
+        "bufferTop",
+        fmtTemp(
+            buffer.top
+        )
+    );
+
+
+    setRoleText(
+        "bufferMiddle",
+        fmtTemp(
+            buffer.middle
+        )
+    );
+
+
+    setRoleText(
+        "bufferBottom",
+        fmtTemp(
+            buffer.bottom
+        )
+    );
+
+
+    /*
+     * Navigationsbuttons erst aktivieren,
+     * wenn Ziel-ID und openObject vorhanden sind.
+     */
+
+    const settingsOK =
+        Number(
+            d.settingsObjectID
+            ||
+            0
+        )
+        >
+        0
+        &&
+        typeof openObject
+        ===
+        "function";
+
+
+    const grossOK =
+        Number(
+            d.grossObjectID
+            ||
+            0
+        )
+        >
+        0
+        &&
+        typeof openObject
+        ===
+        "function";
+
+
+    allRole(
+        "settingsButton"
+    )
+    .forEach(
+        button => {
+
+            button.disabled =
+                !settingsOK;
+
+
+            button.title =
+                settingsOK
+                    ?
+                    "WP Regelung Einstellungen öffnen"
+                    :
+                    "Einstellungen werden geladen";
         }
+    );
 
-        function power(value) {
-            const number = numeric(value, 1);
-            return number === null ? "—" : number + " kW";
+
+    allRole(
+        "grossButton"
+    )
+    .forEach(
+        button => {
+
+            button.disabled =
+                !grossOK;
+
+
+            button.title =
+                grossOK
+                    ?
+                    "Grossansicht öffnen"
+                    :
+                    "Grossansicht wird geladen";
         }
+    );
+}
 
-        function energy(value) {
-            const number = numeric(value, 1);
-            return number === null ? "—" : number + " kWh";
-        }
 
-        function percent(value) {
-            const number = numeric(value, 0);
-            return number === null ? "—" : number + " %";
-        }
+/* ============================================================
+   REFRESH / RETRY
+============================================================ */
 
-        function setText(id, value) {
-            const element = document.getElementById(id);
-            if (element) {
-                element.textContent = value;
-            }
-        }
+function requestRefresh(
+    force
+) {
 
-        function applyData() {
-            setText("strategy", currentData.strategy || "—");
-            setText("target", currentData.target || "—");
+    if (
+        typeof requestAction
+        !==
+        "function"
+    ) {
+        return;
+    }
 
-            const need = power(currentData.socNeed);
-            setText("targetSub", need === "—" ? "—" : "SOC-Ladebedarf " + need);
 
-            setText("forecast", energy(currentData.forecastEnergy));
+    if (
+        !force
+        &&
+        hasCoreData()
+    ) {
+        return;
+    }
 
-            const forecastDetails = [];
-            const peak = power(currentData.forecastPeak);
-            if (peak !== "—") {
-                forecastDetails.push("Peak " + peak);
-            }
 
-            const duration = numeric(currentData.forecastDuration, 1);
-            if (duration !== null) {
-                forecastDetails.push("Dauer " + duration + " h");
-            }
+    requestAction(
+        "Refresh",
+        true
+    );
+}
 
-            setText("forecastSub", forecastDetails.length ? forecastDetails.join(" · ") : "—");
-            setText("pv", power(currentData.pv));
-            setText("grid", power(currentData.grid));
-            setText("soc", percent(currentData.soc));
-            setText("limit", power(currentData.limit));
-        }
 
-        function requestRefresh(force) {
-            if (typeof requestAction !== "function") {
-                return;
-            }
+function scheduleRefreshRetry() {
 
-            if (!force && hasCoreData()) {
-                return;
-            }
+    if (
+        refreshTimer
+        !==
+        null
+    ) {
 
-            requestAction("Refresh", true);
-        }
+        clearTimeout(
+            refreshTimer
+        );
+    }
 
-        function scheduleRefreshRetry() {
-            if (refreshTimer !== null) {
-                clearTimeout(refreshTimer);
-            }
 
-            if (hasCoreData() || refreshAttempts >= 2) {
-                refreshTimer = null;
-                return;
-            }
+    if (
+        hasCoreData()
+        ||
+        refreshAttempts >= 2
+    ) {
 
-            const delays = [500, 1500];
-            const delay = delays[refreshAttempts] || 1500;
-            refreshAttempts += 1;
+        refreshTimer =
+            null;
 
-            refreshTimer = setTimeout(() => {
-                if (!hasCoreData()) {
-                    requestRefresh(true);
+        return;
+    }
+
+
+    const delays = [
+        500,
+        1500
+    ];
+
+
+    const delay =
+        delays[
+            refreshAttempts
+        ]
+        ||
+        1500;
+
+
+    refreshAttempts +=
+        1;
+
+
+    refreshTimer =
+        setTimeout(
+            () => {
+
+                if (
+                    !hasCoreData()
+                ) {
+
+                    requestRefresh(
+                        true
+                    );
+
+
                     scheduleRefreshRetry();
                 }
-            }, delay);
+            },
+            delay
+        );
+}
+
+
+/* ============================================================
+   LIVE MESSAGE
+============================================================ */
+
+function handleMessage(data) {
+
+    if (
+        typeof data
+        ===
+        "string"
+    ) {
+
+        try {
+
+            data =
+                JSON.parse(
+                    data
+                );
+
+        } catch (error) {
+
+            return;
         }
+    }
 
-        function handleMessage(data) {
-            if (typeof data === "string") {
-                try {
-                    data = JSON.parse(data);
-                } catch (error) {
-                    return;
-                }
-            }
 
-            if (!isExpectedPayload(data)) {
-                return;
-            }
+    /*
+     * Leere/fremde Nachrichten ignorieren.
+     */
 
-            currentData = mergeData(currentData, data);
-            applyData();
+    if (
+        !isExpectedPayload(
+            data
+        )
+    ) {
+        return;
+    }
 
-            if (hasCoreData()) {
-                refreshAttempts = 0;
-                if (refreshTimer !== null) {
-                    clearTimeout(refreshTimer);
-                    refreshTimer = null;
-                }
-            }
+
+    /*
+     * Neue Werte in bestehenden Zustand mergen.
+     */
+
+    currentData =
+        mergeData(
+            currentData,
+            data
+        );
+
+
+    /*
+     * Aktuelle Seite bleibt beim Live-Update erhalten.
+     */
+
+    applyData();
+
+
+    if (
+        hasCoreData()
+    ) {
+
+        refreshAttempts =
+            0;
+
+
+        if (
+            refreshTimer
+            !==
+            null
+        ) {
+
+            clearTimeout(
+                refreshTimer
+            );
+
+
+            refreshTimer =
+                null;
         }
+    }
+}
 
-        window.addEventListener("load", () => {
-            applyData();
-            requestRefresh(false);
-            scheduleRefreshRetry();
-        });
-    </script>
+
+/* ============================================================
+   START
+============================================================ */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        /*
+         * Initialdaten sofort anzeigen.
+         */
+
+        renderCompact();
+
+
+        /*
+         * Nur bei fehlenden Daten Server-Refresh.
+         */
+
+        requestRefresh(
+            false
+        );
+
+
+        /*
+         * Maximal zwei kurze Retries.
+         */
+
+        scheduleRefreshRetry();
+    }
+);
+
+</script>
+
 </body>
+
 </html>
